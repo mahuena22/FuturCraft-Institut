@@ -1,0 +1,487 @@
+@import "tailwindcss";
+
+/* ============================================================
+   FUTURCRAFT INSTITUT — GLOBAL DESIGN SYSTEM
+   Premium educational institute for Benin's digital economy
+   ============================================================ */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Sora", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand palette — deep midnight blue meets electric cyan */
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #dbe6fe;
+  --color-brand-200: #bfd3fe;
+  --color-brand-300: #93b4fd;
+  --color-brand-400: #608afa;
+  --color-brand-500: #3b63f6;
+  --color-brand-600: #2547eb;
+  --color-brand-700: #1d34d8;
+  --color-brand-800: #1e2caf;
+  --color-brand-900: #1e2a8a;
+  --color-brand-950: #0d1340;
+
+  /* Accent — electric cyan */
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+
+  /* Accent — violet */
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+}
+
+/* ───── Base ───── */
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8faff;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+}
+
+/* ───── Scrollbars ───── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 99, 246, 0.35) transparent;
+}
+
+::selection {
+  background-color: var(--color-brand-600);
+  color: #fff;
+}
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-18px) rotate(2deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes hero-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%       { transform: translate3d(12px, -10px, 0) scale(1.04); }
+  66%       { transform: translate3d(-8px, -18px, 0) scale(1.06); }
+}
+
+@keyframes hero-tilt {
+  0%, 100% { transform: perspective(1200px) rotateY(-8deg) rotateX(3deg); }
+  50%       { transform: perspective(1200px) rotateY(-3deg) rotateX(0deg) translateY(-8px); }
+}
+
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(59, 99, 246, 0.3); box-shadow: 0 0 0 0 rgba(59, 99, 246, 0); }
+  50%       { border-color: rgba(59, 99, 246, 0.8); box-shadow: 0 0 20px 4px rgba(59, 99, 246, 0.15); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes typing-cursor {
+  0%, 100% { border-right-color: #60a5fa; }
+  50%       { border-right-color: transparent; }
+}
+
+@keyframes particle-float {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0.6; }
+  25%  { transform: translateY(-20px) translateX(10px) scale(1.1); opacity: 0.8; }
+  50%  { transform: translateY(-35px) translateX(-5px) scale(0.9); opacity: 0.5; }
+  75%  { transform: translateY(-50px) translateX(15px) scale(1.05); opacity: 0.3; }
+  100% { transform: translateY(-70px) translateX(0) scale(1); opacity: 0; }
+}
+
+@keyframes reveal-up {
+  from { clip-path: inset(100% 0 0 0); opacity: 0; }
+  to   { clip-path: inset(0% 0 0 0); opacity: 1; }
+}
+
+@keyframes progress-bar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* ============================================================
+   UTILITY ANIMATION CLASSES
+   ============================================================ */
+
+.animate-fade-up    { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in    { animation: fade-in 0.6s ease-out both; }
+.animate-slide-right { animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-float      { animation: float 5s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.animate-spin-slow  { animation: spin-slow 20s linear infinite; }
+.animate-shimmer    { animation: shimmer 2.5s linear infinite; }
+.animate-gradient   { animation: gradient-shift 4s ease infinite; background-size: 200% 200%; }
+.hero-card-tilt     { animation: hero-tilt 7s ease-in-out infinite; }
+
+/* Delay classes */
+.delay-75   { animation-delay: 75ms; }
+.delay-100  { animation-delay: 0.1s; }
+.delay-150  { animation-delay: 150ms; }
+.delay-200  { animation-delay: 0.2s; }
+.delay-300  { animation-delay: 0.3s; }
+.delay-400  { animation-delay: 0.4s; }
+.delay-500  { animation-delay: 0.5s; }
+.delay-600  { animation-delay: 0.6s; }
+.delay-700  { animation-delay: 0.7s; }
+.delay-1000 { animation-delay: 1s; }
+
+/* ============================================================
+   DECORATIVE BACKGROUNDS
+   ============================================================ */
+
+/* Fine grid */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(59, 99, 246, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 99, 246, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.bg-grid-dark {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Dot pattern */
+.bg-dots {
+  background-image: radial-gradient(rgba(59, 99, 246, 0.15) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+.bg-dots-dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/* ============================================================
+   HERO ORBS — Floating glow blobs
+   ============================================================ */
+
+.hero-orb {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(1px);
+  animation: hero-drift 10s ease-in-out infinite;
+}
+
+.hero-orb-one {
+  width: 22rem;
+  height: 22rem;
+  right: 6%;
+  top: 8%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.14) 0%, transparent 70%);
+  animation-delay: 0s;
+}
+
+.hero-orb-two {
+  width: 14rem;
+  height: 14rem;
+  left: 38%;
+  bottom: 6%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
+  animation-delay: -4s;
+}
+
+.hero-orb-three {
+  width: 10rem;
+  height: 10rem;
+  left: 15%;
+  top: 25%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+  animation-delay: -7s;
+}
+
+/* ============================================================
+   GLASSMORPHISM
+   ============================================================ */
+
+.glass {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-light {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.glass-dark {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(7, 13, 38, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   SHIMMER / GRADIENT TEXT EFFECTS
+   ============================================================ */
+
+.text-gradient-brand {
+  background: linear-gradient(135deg, #60a5fa 0%, #a5b4fc 40%, #c4b5fd 80%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #60a5fa 0%,
+    #a5b4fc 25%,
+    #e0f2fe 50%,
+    #a5b4fc 75%,
+    #60a5fa 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ============================================================
+   CARD HOVER EFFECTS
+   ============================================================ */
+
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px -10px rgba(37, 71, 235, 0.18);
+}
+
+/* Glow border on hover */
+.border-glow:hover {
+  animation: border-glow 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   NUMBERED STEP CONNECTORS
+   ============================================================ */
+
+.step-connector {
+  position: relative;
+}
+
+.step-connector::after {
+  content: "";
+  position: absolute;
+  top: 2rem;
+  right: -1.5rem;
+  width: 3rem;
+  height: 2px;
+  background: linear-gradient(to right, #3b63f6, #a5b4fc);
+  opacity: 0.4;
+}
+
+.step-connector:last-child::after {
+  display: none;
+}
+
+/* ============================================================
+   TABLE STYLES
+   ============================================================ */
+
+.pricing-table tr:nth-child(even) {
+  background-color: rgba(248, 250, 255, 0.6);
+}
+
+.pricing-table tr:hover td {
+  background-color: rgba(238, 244, 255, 0.8);
+}
+
+/* ============================================================
+   BADGE / PILL COMPONENTS
+   ============================================================ */
+
+.badge-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #eef4ff, #dbe6fe);
+  color: #2547eb;
+  border: 1px solid rgba(37, 71, 235, 0.15);
+}
+
+.badge-success {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================================
+   HERO SECTION EXTRAS
+   ============================================================ */
+
+.hero-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* CTA gradient button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 1rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: white;
+  background: linear-gradient(135deg, #2547eb 0%, #6366f1 100%);
+  box-shadow: 0 8px 32px -4px rgba(37, 71, 235, 0.4);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #3b63f6 0%, #818cf8 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px -4px rgba(37, 71, 235, 0.5); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   PROSE / RICH TEXT
+   ============================================================ */
+
+.prose-body { line-height: 1.8; }
+
+/* ============================================================
+   RESPONSIVE LAYOUT HELPERS
+   ============================================================ */
+
+.section-py { padding-top: 5rem; padding-bottom: 5rem; }
+.section-py-lg { padding-top: 7rem; padding-bottom: 7rem; }
+
+/* ============================================================
+   STAT COUNTER
+   ============================================================ */
+
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #1e2a8a, #2547eb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
