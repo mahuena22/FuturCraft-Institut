@@ -28,6 +28,18 @@ interface OfferItem {
   status: string;
 }
 
+interface TalentItem {
+  name: string;
+  formation: string;
+  skills: string[];
+  status: string;
+  campus: string;
+  matricule: string;
+  promotion?: string;
+  photoUrl?: string;
+  cvUrl?: string;
+}
+
 export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] }) {
   const [activeTab, setActiveTab] = useState<"recruter" | "publier" | "partenariat">("recruter");
   const [skillSearch, setSkillSearch] = useState("");
@@ -61,7 +73,27 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
   const [partnerSuccess, setPartnerSuccess] = useState(false);
 
   // Mock available talents profile directory
-  const talents = [
+  const talents: TalentItem[] = [
+    {
+      name: "Loïc Assogba",
+      formation: "Développeur Web Full-Stack",
+      skills: ["HTML", "CSS", "JavaScript", "React", "Node.js", "Bases de données"],
+      status: "Recherche de stage",
+      campus: "Cotonou, Bénin",
+      matricule: "",
+      promotion: "Promotion 2025",
+      photoUrl: "/images/samuel.jpeg",
+      cvUrl: "/cv/CV_ASSOGBA_K._Samuel_Jean-Loïc.pdf",
+    },
+    {
+      name: "Ange AKONDE",
+      formation: "Développeur Full-Stack",
+      skills: ["React", "Next.js", "Node.js", "PostgreSQL", "TypeScript", "Tailwind CSS"],
+      status: "Disponible immédiatement",
+      campus: "Abomey-Calavi",
+      matricule: "FC-2025-0106",
+      cvUrl: "/cv/bigsixteen%20(1).pdf",
+    },
     {
       name: "Onesim T.",
       formation: "Développement Web Fullstack",
@@ -217,12 +249,23 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
                 className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 hover:border-blue-300 transition-colors"
               >
                 <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-400 font-bold block">
-                      {t.matricule}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    {t.photoUrl && (
+                      <img
+                        src={t.photoUrl}
+                        alt={`Photo de ${t.name}`}
+                        className="w-14 h-14 rounded-full object-cover border-2 border-blue-100"
+                      />
+                    )}
+                    <div>
+                    {(t.matricule || t.promotion) && (
+                      <span className="text-[10px] font-mono text-slate-400 font-bold block">
+                        {t.matricule || t.promotion}
+                      </span>
+                    )}
                     <h3 className="text-lg font-bold text-slate-900">{t.name}</h3>
                     <p className="text-xs text-blue-600 font-semibold">{t.formation}</p>
+                    </div>
                   </div>
                   <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     {t.status}
@@ -250,10 +293,13 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
                     <MapPin className="w-3.5 h-3.5 text-slate-400" /> {t.campus}
                   </span>
                   <a
-                    href="mailto:contact@futurcraftinstitut.com?subject=Demande de mise en relation profil FuturCraft"
+                    href={t.cvUrl || "mailto:contact@futurcraftinstitut.com?subject=Demande de mise en relation profil FuturCraft"}
+                    target={t.cvUrl ? "_blank" : undefined}
+                    rel={t.cvUrl ? "noreferrer" : undefined}
+                    download={t.cvUrl ? true : undefined}
                     className="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
                   >
-                    Demander le CV complet →
+                    {t.cvUrl ? "Télécharger le CV →" : "Demander le CV complet →"}
                   </a>
                 </div>
               </div>

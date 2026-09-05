@@ -82,7 +82,7 @@ export function Footer() {
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Adresse :</strong> Godomey, Supermarché O Bénin, avant pk14, Cotonou, Bénin
+                  <strong>Adresse :</strong> Godomey, Supermarché O Bénin, avant pk14, Abomey/Calavi, Bénin
                 </span>
               </div>
               <div className="flex items-center gap-2.5">

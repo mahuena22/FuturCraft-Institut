@@ -35,15 +35,15 @@ export default function InstitutPage() {
       bio: "Forme les futurs développeurs à maîtriser le développement web et les technologies fullstack, du code à la mise en production.",
     },
     {
-      name: "Gauthier Ore",
+      name: "Yoan Melson DANSOU",
       role: "Directeur des stages et emplois",
-      image: "/images/gauthier.jpg",
+      image: "/images/Yoan-DANSOU.jpg",
       bio: "Connecte les talents de FuturCraft aux entreprises et startups pour traduire les compétences acquises en opportunités professionnelles concrètes.",
     },
     {
-      name: "Yoan DANSOU",
+      name: "Gauthier I. ORE",
       role: "Co-founder & Prompt engineer",
-      image: "/images/Yoan-DANSOU.jpg",
+      image: "/images/Gauthier-ORE.jpg",
       bio: "Co-fondateur et expert en prompt engineering, il explore les usages avancés de l'IA générative pour former la prochaine génération.",
     },
     {
