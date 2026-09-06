@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { notifications } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
+import { getStudentSession } from "@/lib/student-auth";
 
 export async function POST(req: NextRequest) {
+  const studentId = await getStudentSession();
+  if (!studentId) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
   try {
     const { notificationId, markAllStudentId } = await req.json();
 
@@ -11,7 +16,12 @@ export async function POST(req: NextRequest) {
       await db
         .update(notifications)
         .set({ isRead: true })
-        .where(eq(notifications.studentId, Number(markAllStudentId)));
+        .where(
+          and(
+            eq(notifications.studentId, Number(markAllStudentId)),
+            eq(notifications.studentId, studentId)
+          )
+        );
       return NextResponse.json({ success: true });
     }
 
@@ -19,7 +29,12 @@ export async function POST(req: NextRequest) {
       await db
         .update(notifications)
         .set({ isRead: true })
-        .where(eq(notifications.id, Number(notificationId)));
+        .where(
+          and(
+            eq(notifications.id, Number(notificationId)),
+            eq(notifications.studentId, studentId)
+          )
+        );
       return NextResponse.json({ success: true });
     }
 

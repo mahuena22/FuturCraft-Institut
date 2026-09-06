@@ -22,6 +22,26 @@ export async function getFormations() {
   return await db.select().from(formations).orderBy(desc(formations.isPopular));
 }
 
+function normalizePhone(p: string | null | undefined): string {
+  // Strip all non-digits, then keep the last 8 digits (Benin local number length)
+  const digits = (p || "").replace(/\D/g, "");
+  return digits.slice(-8);
+}
+
+export async function findStudentByCredentials(studentNumber: string, phone: string) {
+  await ensureDatabaseSeeded();
+  const [row] = await db
+    .select()
+    .from(students)
+    .where(eq(students.studentNumber, String(studentNumber).trim()))
+    .limit(1);
+  if (!row) return null;
+  const matches =
+    normalizePhone(phone) === normalizePhone(row.phone) ||
+    (row.whatsapp !== null && normalizePhone(phone) === normalizePhone(row.whatsapp));
+  return matches ? row : null;
+}
+
 export async function getFormationBySlug(slug: string) {
   await ensureDatabaseSeeded();
   const rows = await db.select().from(formations).where(eq(formations.slug, slug));

@@ -105,10 +105,8 @@ interface StudentData {
 
 export function StudentPortal({
   initialData,
-  allStudentsList,
 }: {
   initialData: StudentData;
-  allStudentsList: { id: number; studentNumber: string; name: string; formationTitle?: string }[];
 }) {
   const [data, setData] = useState<StudentData>(initialData);
   const [activeTab, setActiveTab] = useState<
@@ -141,10 +139,10 @@ export function StudentPortal({
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileSaveSuccess, setProfileSaveSuccess] = useState(false);
 
-  // Reload current student
-  const reloadStudent = async (studentId: number) => {
+  // Reload current student (authenticated session)
+  const reloadStudent = async () => {
     try {
-      const res = await fetch(`/api/students/${studentId}`);
+      const res = await fetch("/api/student-me");
       if (res.ok) {
         const updated = await res.json();
         setData(updated);
@@ -154,9 +152,10 @@ export function StudentPortal({
     }
   };
 
-  // Switch student demo
-  const handleSwitchStudent = (id: number) => {
-    reloadStudent(id);
+  // Logout
+  const handleLogout = async () => {
+    await fetch("/api/student-logout", { method: "POST" });
+    window.location.href = "/espace-etudiant/connexion";
   };
 
   // Payment process simulation
@@ -181,7 +180,7 @@ export function StudentPortal({
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Erreur de paiement");
 
-      await reloadStudent(data.student.id);
+      await reloadStudent();
       setIsProcessingPayment(false);
       setPaymentSuccessReceipt(result.receipt.receiptNumber);
     } catch (err: any) {
@@ -209,7 +208,7 @@ export function StudentPortal({
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
     try {
-      const res = await fetch(`/api/students/${data.student.id}`, {
+      const res = await fetch(`/api/student-me`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -219,9 +218,9 @@ export function StudentPortal({
         }),
       });
       if (res.ok) {
-        setProfileSaveSuccess(true);
+setProfileSaveSuccess(true);
         setTimeout(() => setProfileSaveSuccess(false), 3000);
-        await reloadStudent(data.student.id);
+        await reloadStudent();
       }
     } finally {
       setIsSavingProfile(false);
@@ -241,30 +240,22 @@ export function StudentPortal({
   return (
     <div className="min-h-screen bg-slate-50/60 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Top demo switcher bar */}
+        {/* Session bar */}
         <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">
-              Compte Démo
+          <div className="flex items-center gap-2 text-slate-500">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="font-medium">
+              Session authentifiée — <span className="font-bold text-slate-700">{data.student.firstName} {data.student.lastName}</span>
             </span>
-            <span className="text-slate-600 font-medium">Basculez entre étudiants tests :</span>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {allStudentsList.map((st) => (
-              <button
-                key={st.id}
-                onClick={() => handleSwitchStudent(st.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  data.student.id === st.id
-                    ? "bg-blue-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                {st.name} ({st.studentNumber})
-              </button>
-            ))}
-          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Se déconnecter
+          </button>
         </div>
 
         {/* Student Identity Card Banner */}

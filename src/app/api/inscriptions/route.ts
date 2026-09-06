@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createStudentWithPlan } from "@/lib/data-service";
+import { createStudentSession } from "@/lib/student-auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,6 +30,9 @@ export async function POST(req: NextRequest) {
       guardianRelation: body.guardianRelation,
       residenceCountry: body.residenceCountry,
     });
+
+    // Auto-authenticate the newly registered student
+    await createStudentSession(student.id);
 
     return NextResponse.json({
       success: true,

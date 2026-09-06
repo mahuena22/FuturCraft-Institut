@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { getAllStudents, getStudentById } from "@/lib/data-service";
+import { getStudentById } from "@/lib/data-service";
+import { getStudentSession } from "@/lib/student-auth";
 import { StudentPortal } from "@/components/StudentPortal";
 import { redirect } from "next/navigation";
 
@@ -9,36 +10,18 @@ export const metadata = {
   description: "Portail étudiant : suivi des paiements, échéancier, reçus certifiés avec QR code, attestations et notifications.",
 };
 
-export default async function EspaceEtudiantPage(props: {
-  searchParams: Promise<{ studentId?: string }>;
-}) {
-  const { studentId } = await props.searchParams;
-  const allStudents = await getAllStudents();
+export default async function EspaceEtudiantPage() {
+  const studentId = await getStudentSession();
 
-  if (allStudents.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6 text-center">
-        <p className="text-slate-500">Aucun étudiant enregistré pour le moment.</p>
-      </div>
-    );
+  if (!studentId) {
+    redirect("/espace-etudiant/connexion");
   }
 
-  // Find targeted student, or default to Onesim Tokpo (FC-2025-0142) or first student
-  const targetId = studentId
-    ? Number(studentId)
-    : allStudents.find((s) => s.studentNumber === "FC-2025-0142")?.id || allStudents[0].id;
-
-  const studentData = await getStudentById(targetId);
+  const studentData = await getStudentById(studentId);
 
   if (!studentData) {
-    redirect("/espace-etudiant");
+    redirect("/espace-etudiant/connexion");
   }
-
-  const allStudentsList = allStudents.map((s) => ({
-    id: s.id,
-    studentNumber: s.studentNumber,
-    name: `${s.firstName} ${s.lastName}`,
-  }));
 
   return (
     <Suspense
@@ -48,7 +31,7 @@ export default async function EspaceEtudiantPage(props: {
         </div>
       }
     >
-      <StudentPortal initialData={studentData} allStudentsList={allStudentsList} />
+      <StudentPortal initialData={studentData} />
     </Suspense>
   );
 }

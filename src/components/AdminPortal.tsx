@@ -702,12 +702,6 @@ export function AdminPortal({
                           >
                             Changer statut
                           </button>
-                          <Link
-                            href={`/espace-etudiant?studentId=${st.id}`}
-                            className="text-xs font-bold text-slate-600 hover:underline"
-                          >
-                            Voir espace →
-                          </Link>
                         </td>
                       </tr>
                     ))}

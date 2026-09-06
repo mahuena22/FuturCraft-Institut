@@ -208,7 +208,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
         {/* Direct Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <Link
-            href={`/espace-etudiant?studentId=${successData.studentId}`}
+            href="/espace-etudiant"
             className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
           >
             <span>Accéder à Mon Espace Étudiant</span>
