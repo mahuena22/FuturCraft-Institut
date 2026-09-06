@@ -72,9 +72,12 @@ export default async function ActualitesPage() {
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                   <span className="font-semibold text-slate-700 text-[11px]">{art.author}</span>
-                  <span className="text-blue-600 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <Link
+                    href={`/actualites/${art.slug}`}
+                    className="text-blue-600 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                  >
                     Lire l&apos;article →
-                  </span>
+                  </Link>
                 </div>
               </div>
             </article>

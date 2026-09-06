@@ -347,6 +347,12 @@ export async function getBlogArticles() {
   return await db.select().from(blogArticles);
 }
 
+export async function getBlogArticleBySlug(slug: string) {
+  await ensureDatabaseSeeded();
+  const [row] = await db.select().from(blogArticles).where(eq(blogArticles.slug, slug)).limit(1);
+  return row || null;
+}
+
 export async function getCompanyOffers() {
   await ensureDatabaseSeeded();
   return await db.select().from(companyOffers).orderBy(desc(companyOffers.createdAt));
