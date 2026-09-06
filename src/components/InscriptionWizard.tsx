@@ -45,6 +45,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     email: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Form State
   const [formData, setFormData] = useState({
@@ -90,30 +91,58 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
   const updateField = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (fieldErrors[field]) setFieldErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
   };
+
+  const fieldCls = (field: string, base = "") =>
+    `${base} w-full p-3 rounded-xl border text-sm transition-all ${
+      fieldErrors[field] ? "border-rose-400 bg-rose-50/40 focus:ring-rose-500" : "border-slate-200 focus:ring-blue-500"
+    } focus:outline-none focus:ring-2`;
+
+  const renderFieldError = (field: string) =>
+    fieldErrors[field] ? (
+      <p className="text-[11px] font-semibold text-rose-500 mt-1">{fieldErrors[field]}</p>
+    ) : null;
 
   const handleNext = () => {
     setErrorMsg("");
+    setFieldErrors({});
+    const errs: Record<string, string> = {};
+
     if (step === 1) {
       if (!formData.formationId) {
-        setErrorMsg("Veuillez sélectionner une formation.");
-        return;
+        errs.formationId = "Veuillez sélectionner une formation.";
       }
     } else if (step === 2) {
-      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.phone.trim() || !formData.email.trim()) {
-        setErrorMsg("Veuillez renseigner les champs obligatoires (Nom, Prénom, Téléphone, Email).");
-        return;
+      if (!formData.lastName.trim()) errs.lastName = "Le nom est obligatoire.";
+      if (!formData.firstName.trim()) errs.firstName = "Le prénom est obligatoire.";
+      if (!formData.city.trim()) errs.city = "La ville est obligatoire.";
+      if (!formData.phone.trim()) {
+        errs.phone = "Le téléphone est obligatoire.";
+      } else if (formData.phone.replace(/\D/g, "").length < 8) {
+        errs.phone = "Numéro invalide (8 chiffres minimum).";
       }
-      if (!formData.email.includes("@")) {
-        setErrorMsg("Veuillez renseigner une adresse email valide.");
-        return;
+      if (!formData.whatsapp.trim()) {
+        errs.whatsapp = "Le WhatsApp est obligatoire.";
+      } else if (formData.whatsapp.replace(/\D/g, "").length < 8) {
+        errs.whatsapp = "Numéro invalide (8 chiffres minimum).";
+      }
+      if (!formData.email.trim()) {
+        errs.email = "L'email est obligatoire.";
+      } else if (!/.+@.+\..+/.test(formData.email)) {
+        errs.email = "Adresse email invalide.";
       }
     } else if (step === 3) {
-      if (!formData.previousDiploma || !formData.studyLevel) {
-        setErrorMsg("Veuillez préciser votre dernier diplôme et niveau d'étude.");
-        return;
-      }
+      if (!formData.previousDiploma) errs.previousDiploma = "Veuillez sélectionner votre dernier diplôme.";
+      if (!formData.studyLevel) errs.studyLevel = "Veuillez sélectionner votre niveau d'étude.";
     }
+
+    setFieldErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      setErrorMsg("Veuillez corriger les champs signalés.");
+      return;
+    }
+
     setStep((s) => s + 1);
   };
 
@@ -124,7 +153,12 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
   const handleSubmit = async () => {
     setErrorMsg("");
+    setFieldErrors({});
     if (!formData.agreeTerms || !formData.agreePrivacy) {
+      setFieldErrors({
+        agreeTerms: formData.agreeTerms ? "" : "Veuillez accepter le règlement pédagogique.",
+        agreePrivacy: formData.agreePrivacy ? "" : "Veuillez accepter la politique de confidentialité.",
+      });
       setErrorMsg("Veuillez accepter le règlement et la politique de confidentialité pour valider votre inscription.");
       return;
     }
@@ -390,8 +424,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   placeholder="ex: TOKPO"
                   value={formData.lastName}
                   onChange={(e) => updateField("lastName", e.target.value.toUpperCase())}
-                  className="w-full p-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500"
+                  className={fieldCls("lastName")}
                 />
+                {renderFieldError("lastName")}
               </div>
 
               <div>
@@ -401,8 +436,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   placeholder="ex: Onesim"
                   value={formData.firstName}
                   onChange={(e) => updateField("firstName", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500"
+                  className={fieldCls("firstName")}
                 />
+                {renderFieldError("firstName")}
               </div>
 
               <div>
@@ -445,8 +481,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   placeholder="ex: Cotonou, Calavi, Porto-Novo, Parakou..."
                   value={formData.city}
                   onChange={(e) => updateField("city", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 text-sm"
+                  className={fieldCls("city")}
                 />
+                {renderFieldError("city")}
               </div>
 
               <div>
@@ -456,8 +493,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   placeholder="ex: +229 97 00 00 00"
                   value={formData.phone}
                   onChange={(e) => updateField("phone", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 text-sm"
+                  className={fieldCls("phone")}
                 />
+                {renderFieldError("phone")}
               </div>
 
               <div>
@@ -467,8 +505,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   placeholder="ex: +229 97 00 00 00"
                   value={formData.whatsapp}
                   onChange={(e) => updateField("whatsapp", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 text-sm"
+                  className={fieldCls("whatsapp")}
                 />
+                {renderFieldError("whatsapp")}
               </div>
 
               <div className="sm:col-span-2">
@@ -478,8 +517,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   placeholder="ex: votre.nom@gmail.com"
                   value={formData.email}
                   onChange={(e) => updateField("email", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 text-sm"
+                  className={fieldCls("email")}
                 />
+                {renderFieldError("email")}
               </div>
             </div>
           </div>
@@ -501,7 +541,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                 <select
                   value={formData.previousDiploma}
                   onChange={(e) => updateField("previousDiploma", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 bg-white text-sm"
+                  className={`${fieldCls("previousDiploma")} bg-white`}
                 >
                   <option value="BEPC">BEPC</option>
                   <option value="Baccalauréat">Baccalauréat (BAC)</option>
@@ -510,6 +550,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   <option value="Formation professionnelle">Formation professionnelle / CAP</option>
                   <option value="Autre">Autre diplôme</option>
                 </select>
+                {renderFieldError("previousDiploma")}
               </div>
 
               <div>
@@ -517,7 +558,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                 <select
                   value={formData.studyLevel}
                   onChange={(e) => updateField("studyLevel", e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 bg-white text-sm"
+                  className={`${fieldCls("studyLevel")} bg-white`}
                 >
                   <option value="BEPC">Niveau BEPC</option>
                   <option value="Terminale">Niveau Terminale</option>
@@ -526,6 +567,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   <option value="BAC+3 et plus">BAC+3 et plus</option>
                   <option value="Professionnel en reconversion">Professionnel en activité / Reconversion</option>
                 </select>
+                {renderFieldError("studyLevel")}
               </div>
 
               <div>
@@ -704,6 +746,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   J&apos;atteste de l&apos;exactitude des renseignements fournis et j&apos;accepte les conditions d&apos;admission et le règlement pédagogique de FuturCraft Institut.
                 </span>
               </label>
+              {fieldErrors.agreeTerms && (
+                <p className="text-[11px] font-semibold text-rose-500 -mt-1">{fieldErrors.agreeTerms}</p>
+              )}
 
               <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
                 <input
@@ -716,6 +761,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   J&apos;accepte la politique de confidentialité relative au traitement de mes données personnelles dans le cadre de ma scolarité.
                 </span>
               </label>
+              {fieldErrors.agreePrivacy && (
+                <p className="text-[11px] font-semibold text-rose-500 -mt-1">{fieldErrors.agreePrivacy}</p>
+              )}
             </div>
           </div>
         )}
@@ -752,7 +800,10 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               className="px-8 py-3.5 rounded-xl text-sm font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xl shadow-emerald-600/30 transition-all flex items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <span>Génération du dossier...</span>
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                  Génération du dossier...
+                </span>
               ) : (
                 <>
                   <span>Confirmer ma demande d&apos;inscription</span>
