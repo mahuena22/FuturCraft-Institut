@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Handshake,
 } from "lucide-react";
+import Image from "next/image";
 
 interface OfferItem {
   id: number;
@@ -270,9 +271,12 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     {t.photoUrl && (
-                      <img
+                      <Image
                         src={t.photoUrl}
                         alt={`Photo de ${t.name}`}
+                        width={56}
+                        height={56}
+                        unoptimized
                         className="w-14 h-14 rounded-full object-cover border-2 border-blue-100"
                       />
                     )}
