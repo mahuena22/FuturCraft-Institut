@@ -478,3 +478,99 @@ export async function rejectPaymentRequest(id: number) {
   await db.update(paymentRequests).set({ status: "rejete" }).where(eq(paymentRequests.id, id));
   return { success: true };
 }
+
+export async function updateFormation(
+  slug: string,
+  data: {
+    title?: string;
+    duration?: string;
+    price?: number;
+    registrationFee?: number;
+    installmentsCount?: number;
+    campus?: string;
+    mode?: string;
+    isActive?: boolean;
+    isPopular?: boolean;
+  }
+) {
+  await ensureDatabaseSeeded();
+  const [row] = await db
+    .update(formations)
+    .set(data)
+    .where(eq(formations.slug, slug))
+    .returning();
+  return row || null;
+}
+
+function slugify(value: string): string {
+  const normalized = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/[\s]+/g, "-")
+    .replace(/-+/g, "-");
+  return normalized || `article-${randomBytes(3).toString("hex")}`;
+}
+
+export async function createBlogArticle(data: {
+  title: string;
+  slug?: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  author?: string;
+  readTime?: string;
+  category: string;
+  publishedAt?: string;
+}) {
+  await ensureDatabaseSeeded();
+  const [row] = await db
+    .insert(blogArticles)
+    .values({
+      title: data.title,
+      slug: data.slug || slugify(data.title),
+      excerpt: data.excerpt,
+      content: data.content,
+      coverImage: data.coverImage,
+      author: data.author || "Équipe Pédagogique FuturCraft",
+      readTime: data.readTime || "5 min de lecture",
+      category: data.category,
+      publishedAt: data.publishedAt || new Date().toISOString(),
+    })
+    .returning();
+  return row;
+}
+
+export async function updateBlogArticle(
+  slug: string,
+  data: {
+    title?: string;
+    newSlug?: string;
+    excerpt?: string;
+    content?: string;
+    coverImage?: string;
+    author?: string;
+    readTime?: string;
+    category?: string;
+    publishedAt?: string;
+  }
+) {
+  await ensureDatabaseSeeded();
+  const { newSlug, ...rest } = data;
+  const patch: Record<string, unknown> = { ...rest };
+  if (newSlug) patch.slug = newSlug;
+  const [row] = await db
+    .update(blogArticles)
+    .set(patch)
+    .where(eq(blogArticles.slug, slug))
+    .returning();
+  return row || null;
+}
+
+export async function deleteBlogArticle(slug: string) {
+  await ensureDatabaseSeeded();
+  await db.delete(blogArticles).where(eq(blogArticles.slug, slug));
+  return { success: true };
+}

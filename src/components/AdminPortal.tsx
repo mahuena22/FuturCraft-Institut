@@ -24,6 +24,9 @@ import {
   QrCode,
   LogOut,
   Handshake,
+  FileText,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 interface AdminStats {
@@ -91,7 +94,11 @@ interface FormationItem {
   duration: string;
   price: number;
   registrationFee: number;
+  installmentsCount: number;
+  campus: string;
+  mode: string;
   isActive: boolean | null;
+  isPopular: boolean | null;
 }
 
 interface PartnershipItem {
@@ -106,27 +113,44 @@ interface PartnershipItem {
   createdAt: string;
 }
 
+interface ArticleItem {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  author: string;
+  readTime: string;
+  category: string;
+  publishedAt: string;
+}
+
 export function AdminPortal({
   initialStats,
   initialStudents,
   initialPayments,
   formationsList,
   initialPartnerships,
+  initialArticles,
 }: {
   initialStats: AdminStats;
   initialStudents: StudentItem[];
   initialPayments: PaymentItem[];
   formationsList: FormationItem[];
   initialPartnerships: PartnershipItem[];
+  initialArticles?: ArticleItem[];
 }) {
   const [stats, setStats] = useState<AdminStats>(initialStats);
   const [students, setStudents] = useState<StudentItem[]>(initialStudents);
   const [payments, setPayments] = useState<PaymentItem[]>(initialPayments);
   const [partnerships, setPartnerships] = useState<PartnershipItem[]>(initialPartnerships);
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequestItem[]>([]);
+  const [articles, setArticles] = useState<ArticleItem[]>(initialArticles || []);
+  const [formations, setFormations] = useState<FormationItem[]>(formationsList);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "roles" | "partenariats">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats">("dashboard");
 
   const router = useRouter();
 
@@ -179,6 +203,36 @@ export function AdminPortal({
   // Edit status modal
   const [selectedStudentForStatus, setSelectedStudentForStatus] = useState<StudentItem | null>(null);
   const [newStatusValue, setNewStatusValue] = useState("");
+
+  // Formation edit modal
+  const [editingFormation, setEditingFormation] = useState<FormationItem | null>(null);
+  const [formationForm, setFormationForm] = useState({
+    title: "",
+    duration: "",
+    price: 0,
+    registrationFee: 0,
+    installmentsCount: 3,
+    campus: "",
+    mode: "",
+    isActive: true,
+    isPopular: false,
+  });
+  const [isSavingFormation, setIsSavingFormation] = useState(false);
+
+  // Article editor modal
+  const [articleModalOpen, setArticleModalOpen] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<ArticleItem | null>(null);
+  const [articleForm, setArticleForm] = useState({
+    title: "",
+    slug: "",
+    excerpt: "",
+    content: "",
+    coverImage: "",
+    author: "",
+    readTime: "5 min de lecture",
+    category: "",
+    publishedAt: "",
+  });
 
   // Filter students
   const filteredStudents = students.filter((s) => {
@@ -239,6 +293,140 @@ export function AdminPortal({
       window.alert("Erreur réseau lors du traitement");
     } finally {
       setProcessingRequestId(null);
+    }
+  };
+
+  // Open formation edit modal
+  const openFormationEditor = (f: FormationItem) => {
+    setEditingFormation(f);
+    setFormationForm({
+      title: f.title,
+      duration: f.duration,
+      price: f.price,
+      registrationFee: f.registrationFee,
+      installmentsCount: f.installmentsCount,
+      campus: f.campus,
+      mode: f.mode,
+      isActive: f.isActive !== null ? f.isActive : true,
+      isPopular: f.isPopular !== null ? f.isPopular : false,
+    });
+  };
+
+  // Save formation modifications
+  const handleSaveFormation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFormation) return;
+    setIsSavingFormation(true);
+    try {
+      const res = await fetch(`/api/formations/${editingFormation.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formationForm.title,
+          duration: formationForm.duration,
+          price: Number(formationForm.price),
+          registrationFee: Number(formationForm.registrationFee),
+          installmentsCount: Number(formationForm.installmentsCount),
+          campus: formationForm.campus,
+          mode: formationForm.mode,
+          isActive: formationForm.isActive,
+          isPopular: formationForm.isPopular,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur mise à jour");
+      setFormations((prev) =>
+        prev.map((f) => (f.slug === editingFormation.slug ? { ...f, ...data.formation } : f))
+      );
+      setEditingFormation(null);
+      alert("Formation mise à jour avec succès !");
+    } catch (err: any) {
+      alert(err.message || "Erreur");
+    } finally {
+      setIsSavingFormation(false);
+    }
+  };
+
+  // Open article editor (create or edit)
+  const openArticleEditor = (article: ArticleItem | null) => {
+    setEditingArticle(article);
+    setArticleForm(
+      article
+        ? {
+            title: article.title,
+            slug: article.slug,
+            excerpt: article.excerpt,
+            content: article.content,
+            coverImage: article.coverImage,
+            author: article.author,
+            readTime: article.readTime,
+            category: article.category,
+            publishedAt: article.publishedAt,
+          }
+        : {
+            title: "",
+            slug: "",
+            excerpt: "",
+            content: "",
+            coverImage: "",
+            author: "Équipe Pédagogique FuturCraft",
+            readTime: "5 min de lecture",
+            category: "",
+            publishedAt: new Date().toISOString().slice(0, 10),
+          }
+    );
+    setArticleModalOpen(true);
+  };
+
+  // Save article (create or update)
+  const handleSaveArticle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const url = editingArticle ? `/api/articles/${editingArticle.slug}` : "/api/articles";
+      const res = await fetch(url, {
+        method: editingArticle ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: articleForm.title,
+          slug: articleForm.slug,
+          excerpt: articleForm.excerpt,
+          content: articleForm.content,
+          coverImage: articleForm.coverImage,
+          author: articleForm.author,
+          readTime: articleForm.readTime,
+          category: articleForm.category,
+          publishedAt: articleForm.publishedAt,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur enregistrement article");
+
+      if (editingArticle) {
+        setArticles((prev) =>
+          prev.map((a) =>
+            a.slug === editingArticle.slug ? { ...a, ...data.article } : a
+          )
+        );
+      } else {
+        setArticles((prev) => [data.article, ...prev]);
+      }
+      setArticleModalOpen(false);
+      alert(editingArticle ? "Article mis à jour !" : "Article créé !");
+    } catch (err: any) {
+      alert(err.message || "Erreur");
+    }
+  };
+
+  // Delete article
+  const handleDeleteArticle = async (article: ArticleItem) => {
+    if (!window.confirm(`Supprimer l'article « ${article.title} » ?`)) return;
+    try {
+      const res = await fetch(`/api/articles/${article.slug}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Erreur suppression");
+      setArticles((prev) => prev.filter((a) => a.slug !== article.slug));
+      alert("Article supprimé.");
+    } catch (err: any) {
+      alert(err.message || "Erreur");
     }
   };
 
@@ -458,7 +646,19 @@ export function AdminPortal({
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>Formations &amp; Tarifs ({formationsList.length})</span>
+            <span>Formations &amp; Tarifs ({formations.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("articles")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "articles"
+                ? "border-violet-600 text-violet-600"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Blog &amp; Actualités ({articles.length})</span>
           </button>
 
           <button
@@ -687,7 +887,7 @@ export function AdminPortal({
                   className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
                 >
                   <option value="all">Toutes les formations</option>
-                  {formationsList.map((f) => (
+                  {formations.map((f) => (
                     <option key={f.id} value={f.id}>
                       {f.title}
                     </option>
@@ -956,22 +1156,39 @@ export function AdminPortal({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {formationsList.map((f) => (
+              {formations.map((f) => (
                 <div
                   key={f.id}
-                  className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3"
+                  className={`bg-white p-5 rounded-2xl border shadow-xs space-y-3 ${
+                    f.isActive === null || f.isActive === undefined || f.isActive === true
+                      ? "border-slate-200"
+                      : "border-rose-200 bg-rose-50/40"
+                  }`}
                 >
                   <div className="flex items-start justify-between">
                     <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
                       {f.category}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                      Actif
+                    <span className="flex items-center gap-2">
+                      {f.isPopular ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-100 text-violet-800">
+                          Populaire
+                        </span>
+                      ) : null}
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          f.isActive === null || f.isActive === undefined || f.isActive === true
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-rose-100 text-rose-800"
+                        }`}
+                      >
+                        {f.isActive === null || f.isActive === undefined || f.isActive === true ? "Actif" : "Inactif"}
+                      </span>
                     </span>
                   </div>
 
                   <h3 className="text-base font-bold text-slate-900 leading-snug">{f.title}</h3>
-                  <div className="text-xs text-slate-500">⏱️ {f.duration}</div>
+                  <div className="text-xs text-slate-500">⏱️ {f.duration} — {f.mode || "Présentiel & Hybride"}</div>
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                     <div>
@@ -979,16 +1196,118 @@ export function AdminPortal({
                       <strong className="text-sm font-black text-slate-900">
                         {f.price.toLocaleString("fr-FR")} FCFA
                       </strong>
+                      <span className="text-[10px] text-slate-400 block">
+                        + {f.registrationFee.toLocaleString("fr-FR")} FCFA dossier
+                      </span>
                     </div>
-                    <Link
-                      href={`/formation/${f.slug}`}
-                      className="text-xs font-bold text-blue-600 hover:underline"
-                    >
-                      Voir page →
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/formation/${f.slug}`}
+                        className="text-xs font-bold text-blue-600 hover:underline"
+                      >
+                        Voir page →
+                      </Link>
+                      <button
+                        onClick={() => openFormationEditor(f)}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition-colors"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        Modifier
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB BLOG & ACTUALITÉS */}
+        {activeTab === "articles" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Blog &amp; Actualités</h2>
+                <p className="text-xs text-slate-500">
+                  Rédigez, modifiez ou supprimez les articles publiés sur la page Actualités.
+                </p>
+              </div>
+              <button
+                onClick={() => openArticleEditor(null)}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Nouvel article</span>
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="py-3 px-4">Titre</th>
+                      <th className="py-3 px-4">Catégorie</th>
+                      <th className="py-3 px-4">Auteur</th>
+                      <th className="py-3 px-4">Temps de lecture</th>
+                      <th className="py-3 px-4">Publié le</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-150">
+                    {articles.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-slate-400">
+                          Aucun article publié pour le moment.
+                        </td>
+                      </tr>
+                    )}
+                    {articles.map((a) => (
+                      <tr key={a.id} className="hover:bg-slate-50/70 transition-colors align-top">
+                        <td className="py-3 px-4 max-w-[320px]">
+                          <strong className="text-slate-900 block truncate">{a.title}</strong>
+                          <span className="text-[10px] text-slate-400 font-mono truncate block">
+                            /actualites/{a.slug}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                            {a.category}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600">{a.author}</td>
+                        <td className="py-3 px-4 text-slate-500">{a.readTime}</td>
+                        <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{a.publishedAt}</td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/actualites/${a.slug}`}
+                              target="_blank"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline"
+                            >
+                              Voir
+                            </Link>
+                            <button
+                              onClick={() => openArticleEditor(a)}
+                              className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition-colors"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                              Modifier
+                            </button>
+                            <button
+                              onClick={() => handleDeleteArticle(a)}
+                              className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              Supprimer
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -1308,7 +1627,7 @@ export function AdminPortal({
                   }
                   className="w-full p-2 rounded-xl border border-slate-200 bg-white"
                 >
-                  {formationsList.map((f) => (
+                  {formations.map((f) => (
                     <option key={f.id} value={f.id}>
                       {f.title} ({f.price.toLocaleString("fr-FR")} FCFA)
                     </option>
@@ -1368,6 +1687,281 @@ export function AdminPortal({
                 Annuler
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: MODIFIER UNE FORMATION */}
+      {editingFormation && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-blue-600" />
+                <span>Modifier « {editingFormation.title} »</span>
+              </h3>
+              <button
+                onClick={() => setEditingFormation(null)}
+                className="text-slate-400 hover:text-slate-600 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveFormation} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Titre *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formationForm.title}
+                    onChange={(e) => setFormationForm((p) => ({ ...p, title: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Durée *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex : 9 mois"
+                    value={formationForm.duration}
+                    onChange={(e) => setFormationForm((p) => ({ ...p, duration: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Prix total (FCFA) *</label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    value={formationForm.price}
+                    onChange={(e) => setFormationForm((p) => ({ ...p, price: Number(e.target.value) }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Frais dossier (FCFA) *</label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    value={formationForm.registrationFee}
+                    onChange={(e) =>
+                      setFormationForm((p) => ({ ...p, registrationFee: Number(e.target.value) }))
+                    }
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Nb mensualités</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={formationForm.installmentsCount}
+                    onChange={(e) =>
+                      setFormationForm((p) => ({ ...p, installmentsCount: Number(e.target.value) }))
+                    }
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Mode</label>
+                  <select
+                    value={formationForm.mode}
+                    onChange={(e) => setFormationForm((p) => ({ ...p, mode: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200 bg-white"
+                  >
+                    <option value="Présentiel & Hybride">Présentiel & Hybride</option>
+                    <option value="En ligne">En ligne</option>
+                    <option value="Présentiel">Présentiel</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Campus</label>
+                <input
+                  type="text"
+                  value={formationForm.campus}
+                  onChange={(e) => setFormationForm((p) => ({ ...p, campus: e.target.value }))}
+                  className="w-full p-2 rounded-xl border border-slate-200"
+                />
+              </div>
+
+              <div className="flex items-center gap-6 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={formationForm.isActive}
+                    onChange={(e) => setFormationForm((p) => ({ ...p, isActive: e.target.checked }))}
+                    className="w-4 h-4 rounded border-slate-300"
+                  />
+                  Active
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={formationForm.isPopular}
+                    onChange={(e) => setFormationForm((p) => ({ ...p, isPopular: e.target.checked }))}
+                    className="w-4 h-4 rounded border-slate-300"
+                  />
+                  Populaire
+                </label>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="submit"
+                  disabled={isSavingFormation}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all"
+                >
+                  {isSavingFormation ? "Enregistrement…" : "Enregistrer les modifications"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingFormation(null)}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CRÉER / MODIFIER UN ARTICLE */}
+      {articleModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600" />
+                <span>{editingArticle ? "Modifier l'article" : "Nouvel article de blog"}</span>
+              </h3>
+              <button
+                onClick={() => setArticleModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveArticle} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block font-bold text-slate-700 mb-1">Titre *</label>
+                  <input
+                    type="text"
+                    required
+                    value={articleForm.title}
+                    onChange={(e) => setArticleForm((p) => ({ ...p, title: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Slug (URL)</label>
+                  <input
+                    type="text"
+                    placeholder="auto-généré depuis le titre si vide"
+                    value={articleForm.slug}
+                    onChange={(e) => setArticleForm((p) => ({ ...p, slug: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Catégorie *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex : Événements"
+                    value={articleForm.category}
+                    onChange={(e) => setArticleForm((p) => ({ ...p, category: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block font-bold text-slate-700 mb-1">Extrait court *</label>
+                <textarea
+                  required
+                  rows={2}
+                  value={articleForm.excerpt}
+                  onChange={(e) => setArticleForm((p) => ({ ...p, excerpt: e.target.value }))}
+                  className="w-full p-2 rounded-xl border border-slate-200 resize-none"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block font-bold text-slate-700 mb-1">Contenu complet (HTML/markdown libre) *</label>
+                <textarea
+                  required
+                  rows={6}
+                  value={articleForm.content}
+                  onChange={(e) => setArticleForm((p) => ({ ...p, content: e.target.value }))}
+                  className="w-full p-2 rounded-xl border border-slate-200 resize-y font-mono text-[11px]"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block font-bold text-slate-700 mb-1">URL image de couverture *</label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://images.pexels.com/..."
+                  value={articleForm.coverImage}
+                  onChange={(e) => setArticleForm((p) => ({ ...p, coverImage: e.target.value }))}
+                  className="w-full p-2 rounded-xl border border-slate-200 font-mono text-[11px]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Auteur</label>
+                  <input
+                    type="text"
+                    value={articleForm.author}
+                    onChange={(e) => setArticleForm((p) => ({ ...p, author: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Temps de lecture</label>
+                  <input
+                    type="text"
+                    value={articleForm.readTime}
+                    onChange={(e) => setArticleForm((p) => ({ ...p, readTime: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all"
+                >
+                  {editingArticle ? "Enregistrer les modifications" : "Publier l'article"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setArticleModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
