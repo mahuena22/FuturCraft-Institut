@@ -116,7 +116,7 @@ export async function createStudentWithPlan(data: {
   const nextNum = String(countStudents[0].maxId + 1).padStart(4, "0");
   const studentNumber = `FC-2026-${nextNum}`;
 
-  const total = formation.price;
+  const total = formation.price + (formation.registrationFee || 0);
 
   const [newStudent] = await db
     .insert(students)
@@ -145,26 +145,28 @@ export async function createStudentWithPlan(data: {
     })
     .returning();
 
-  // Create default payment schedule: Inscription fee + 4 installments
-  const regFee = formation.registrationFee || 25000;
-  const remainingTuition = total - regFee;
+  // Create default payment schedule: Frais de dossier + mensualités (dossier ajouté au prix)
+  const regFee = formation.registrationFee || 0;
+  const tuition = formation.price;
   const installmentsCount = formation.installmentsCount || 4;
-  const installmentAmount = Math.round(remainingTuition / installmentsCount);
+  const installmentAmount = Math.round(tuition / installmentsCount);
 
-  // Inscription
-  await db.insert(paymentSchedules).values({
-    studentId: newStudent.id,
-    title: "Frais d'inscription & validation de dossier",
-    amount: regFee,
-    dueDate: "À régler sous 7 jours",
-    status: "en_attente",
-  });
+  // Frais de dossier
+  if (regFee > 0) {
+    await db.insert(paymentSchedules).values({
+      studentId: newStudent.id,
+      title: "Frais d'inscription & validation de dossier",
+      amount: regFee,
+      dueDate: "À régler sous 7 jours",
+      status: "en_attente",
+    });
+  }
 
   // Installments
   for (let i = 1; i <= installmentsCount; i++) {
     const isLast = i === installmentsCount;
     const amount = isLast
-      ? remainingTuition - installmentAmount * (installmentsCount - 1)
+      ? tuition - installmentAmount * (installmentsCount - 1)
       : installmentAmount;
     await db.insert(paymentSchedules).values({
       studentId: newStudent.id,
