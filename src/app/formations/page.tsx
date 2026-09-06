@@ -30,25 +30,25 @@ export default async function FormationsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8faff]">
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
 
       {/* ── Hero Header ── */}
-      <section className="relative bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-b from-[var(--color-fc-deep)] via-[var(--color-fc-primary)]/30 to-[var(--color-fc-deep)] text-white overflow-hidden">
         <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none" />
         <div className="absolute inset-0 bg-grid-dark opacity-10 pointer-events-none" />
 
         {/* Orbs */}
-        <div className="absolute right-0 top-0 w-96 h-96 rounded-full bg-blue-600/20 blur-[100px] pointer-events-none" />
-        <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-violet-600/15 blur-[80px] pointer-events-none" />
+        <div className="absolute right-0 top-0 w-96 h-96 rounded-full bg-[var(--color-fc-primary)]/20 blur-[100px] pointer-events-none" />
+        <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-[var(--color-fc-cyan)]/15 blur-[80px] pointer-events-none" />
 
         {/* Top line */}
-        <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+        <div className="h-0.5 bg-gradient-to-r from-transparent via-[var(--color-fc-primary)]/50 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
           <div className="text-center max-w-4xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-200 text-xs font-bold mb-8 animate-fade-up">
-              <Layers className="w-3.5 h-3.5 text-blue-300" />
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-light)] text-xs font-bold mb-8 animate-fade-up">
+              <Layers className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
               Catalogue Officiel 2026 — Admissions Ouvertes
             </div>
 
@@ -67,8 +67,8 @@ export default async function FormationsPage() {
             <div className="animate-fade-up delay-300 mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
               {highlights.map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="glass rounded-2xl px-4 py-4 text-center hover:-translate-y-1 transition-transform duration-300">
-                  <div className="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
-                    <Icon className="w-4.5 h-4.5 text-blue-300" />
+                  <div className="w-9 h-9 rounded-xl bg-[var(--color-fc-primary)]/20 flex items-center justify-center mx-auto mb-2">
+                    <Icon className="w-4.5 h-4.5 text-[var(--color-fc-cyan)]" />
                   </div>
                   <p className="font-display font-bold text-white text-sm">{label}</p>
                   <p className="text-blue-300/60 text-[11px] mt-0.5">{sub}</p>
@@ -79,7 +79,7 @@ export default async function FormationsPage() {
         </div>
 
         {/* Wave bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#f8faff] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--color-fc-bg)] to-transparent pointer-events-none" />
       </section>
 
       {/* ── Main Content ── */}
@@ -89,16 +89,16 @@ export default async function FormationsPage() {
         <FormationsExplorer formations={formations} />
 
         {/* Bottom Banner — Full width */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900 via-indigo-900 to-violet-900 p-px shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--color-fc-deep)] via-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] p-px shadow-2xl">
           {/* Inner content */}
-          <div className="relative rounded-[calc(1.5rem-1px)] bg-gradient-to-br from-blue-950 via-indigo-950 to-slate-950 px-8 py-12 sm:px-12 lg:px-16">
+          <div className="relative rounded-[calc(1.5rem-1px)] bg-[var(--color-fc-deep)] px-8 py-12 sm:px-12 lg:px-16">
             <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none rounded-[calc(1.5rem-1px)]" />
-            <div className="absolute right-8 top-8 w-48 h-48 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute right-8 top-8 w-48 h-48 rounded-full bg-[var(--color-fc-primary)]/10 blur-3xl pointer-events-none" />
 
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="space-y-3 max-w-xl text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold">
-                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-fc-primary)]/20 border border-[var(--color-fc-primary)]/30 text-[var(--color-fc-cyan)] text-xs font-bold">
+                  <Sparkles className="w-3 h-3 text-[var(--color-fc-cyan)]" />
                   Orientation personnalisée gratuite
                 </div>
                 <h3 className="font-display text-2xl sm:text-3xl font-black text-white">
@@ -113,14 +113,14 @@ export default async function FormationsPage() {
               <div className="flex flex-col gap-3 shrink-0">
                 <Link
                   href="/contact"
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white text-slate-900 text-sm font-extrabold hover:bg-blue-50 transition-all hover:-translate-y-0.5 shadow-lg"
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[var(--color-fc-bg)] text-[var(--color-fc-deep)] text-sm font-extrabold hover:bg-[var(--color-fc-light)]/30 transition-all hover:-translate-y-0.5 shadow-lg"
                 >
                   <Phone className="w-4 h-4" />
                   Prendre rendez-vous
                 </Link>
                 <Link
                   href="/inscription"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-all shadow-md"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[var(--color-fc-primary)] hover:bg-[var(--color-fc-deep)] text-[var(--color-fc-bg)] text-sm font-bold transition-all shadow-md"
                 >
                   Candidater directement
                   <ArrowRight className="w-4 h-4" />

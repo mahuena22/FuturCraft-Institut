@@ -76,12 +76,12 @@ export function Header() {
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/98 backdrop-blur-xl shadow-lg shadow-blue-900/6 border-b border-slate-200/70"
-            : "bg-white/95 backdrop-blur-md border-b border-slate-100"
+            ? "bg-[var(--color-fc-bg)]/98 backdrop-blur-xl shadow-lg shadow-[var(--color-fc-deep)]/10 border-b border-[var(--color-fc-gray-light)]/70"
+            : "bg-[var(--color-fc-bg)]/95 backdrop-blur-md border-b border-[var(--color-fc-gray-light)]/50"
         }`}
       >
         {/* Top accent bar */}
-        <div className="h-0.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-600" />
+        <div className="h-0.5 bg-[var(--color-fc-primary)]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-[72px]">
@@ -98,11 +98,11 @@ export function Header() {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-display font-extrabold text-[1.15rem] tracking-tight text-slate-900 leading-none">
+                <span className="font-display font-extrabold text-[1.15rem] tracking-tight text-[var(--color-fc-black)] leading-none">
                   FuturCraft
-                  <span className="text-blue-600">.</span>
+                  <span className="text-[var(--color-fc-primary)]">.</span>
                 </span>
-                <span className="text-[9px] font-semibold tracking-[0.15em] uppercase text-slate-400 mt-0.5">
+                <span className="text-[9px] font-semibold tracking-[0.15em] uppercase text-[var(--color-fc-gray-mid)] mt-0.5">
                   Institut Numérique
                 </span>
               </div>
@@ -124,8 +124,8 @@ export function Header() {
                       <button
                         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                           active
-                            ? "text-blue-600 bg-blue-50 font-semibold"
-                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                            ? "text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 font-semibold"
+                            : "text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)] hover:bg-[var(--color-fc-gray-light)]/30"
                         }`}
                       >
                         {link.label}
@@ -150,24 +150,24 @@ export function Header() {
                           </div>
                           <div className="p-2 space-y-0.5">
                             {formations.map(({ label, href, icon: Icon }) => (
-                              <Link
-                                key={href}
-                                href={href}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 group/item transition-colors"
-                              >
-                                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover/item:bg-blue-600 transition-colors">
-                                  <Icon className="w-4 h-4 text-blue-600 group-hover/item:text-white transition-colors" />
-                                </div>
-                                <span className="text-sm text-slate-700 font-medium group-hover/item:text-blue-600 transition-colors">
-                                  {label}
-                                </span>
-                              </Link>
+<Link
+                            key={href}
+                            href={href}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--color-fc-primary)]/8 group/item transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-[var(--color-fc-primary)]/12 flex items-center justify-center shrink-0 group-hover/item:bg-[var(--color-fc-primary)] transition-colors">
+                              <Icon className="w-4 h-4 text-[var(--color-fc-primary)] group-hover/item:text-white transition-colors" />
+                            </div>
+                            <span className="text-sm text-[var(--color-fc-gray-mid)] font-medium group-hover/item:text-[var(--color-fc-primary)] transition-colors">
+                              {label}
+                            </span>
+                          </Link>
                             ))}
                           </div>
-                          <div className="border-t border-slate-100 p-3">
+                          <div className="border-t border-[var(--color-fc-gray-light)] p-3">
                             <Link
                               href="/formations"
-                              className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors"
+                              className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--color-fc-primary)] text-white text-xs font-bold hover:bg-[var(--color-fc-deep)] transition-colors"
                             >
                               <span>Voir toutes les formations</span>
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -220,7 +220,7 @@ export function Header() {
             <div className="flex xl:hidden items-center gap-2">
               <Link
                 href="/espace-etudiant"
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 flex items-center gap-1"
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 border border-[var(--color-fc-primary)]/20 flex items-center gap-1"
               >
                 <UserCheck className="w-3.5 h-3.5" />
                 Espace
@@ -242,63 +242,63 @@ export function Header() {
             mobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="bg-white border-t border-slate-100 px-4 pt-3 pb-6 shadow-2xl">
+          <div className="bg-[var(--color-fc-bg)] border-t border-[var(--color-fc-gray-light)]/50 px-4 pt-3 pb-6 shadow-2xl shadow-[var(--color-fc-deep)]/10">
             <div className="space-y-0.5">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const active = isActive(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                      active
-                        ? "text-blue-600 bg-blue-50 font-semibold"
-                        : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    {Icon && <Icon className="w-4 h-4 text-blue-500 shrink-0" />}
-                    {link.label}
-                    {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600" />}
-                  </Link>
-                );
-              })}
-            </div>
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                    active
+                      ? "text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 font-semibold"
+                      : "text-[var(--color-fc-gray-mid)] hover:bg-[var(--color-fc-gray-light)]/30"
+                  }`}
+                >
+                  {Icon && <Icon className="w-4 h-4 text-[var(--color-fc-primary)] shrink-0" />}
+                  {link.label}
+                  {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--color-fc-primary)]" />}
+                </Link>
+              );
+            })}
+          </div>
 
-            <div className="pt-4 mt-3 border-t border-slate-100 flex flex-col gap-2">
-              <Link
-                href="/espace-etudiant"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 transition-colors"
-              >
-                <UserCheck className="w-4 h-4 text-blue-600" />
-                Accéder à Mon Espace Étudiant
+          <div className="pt-4 mt-3 border-t border-[var(--color-fc-gray-light)]/50 flex flex-col gap-2">
+            <Link
+              href="/espace-etudiant"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-gray-light)]/30 hover:bg-[var(--color-fc-gray-light)]/50 transition-colors"
+            >
+              <UserCheck className="w-4 h-4 text-[var(--color-fc-primary)]" />
+              Accéder à Mon Espace Étudiant
+            </Link>
+            <Link
+              href="/inscription"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white bg-[var(--color-fc-primary)] shadow-md shadow-[var(--color-fc-primary)]/25 hover:bg-[var(--color-fc-deep)] transition-all"
+            >
+              Candidater maintenant
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <div className="flex items-center justify-between text-xs text-[var(--color-fc-gray-mid)] pt-1 px-1">
+              <Link href="/recu" onClick={() => setMobileMenuOpen(false)} className="hover:text-[var(--color-fc-primary)] transition-colors">
+                Vérifier un reçu
               </Link>
-              <Link
-                href="/inscription"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md shadow-blue-500/25 hover:from-blue-700 hover:to-indigo-700 transition-all"
-              >
-                Candidater maintenant
-                <ArrowRight className="w-4 h-4" />
+              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="text-[var(--color-fc-cyan)] font-semibold hover:text-[var(--color-fc-primary)] transition-colors">
+                Administration
               </Link>
-              <div className="flex items-center justify-between text-xs text-slate-400 pt-1 px-1">
-                <Link href="/recu" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-600 transition-colors">
-                  Vérifier un reçu
-                </Link>
-                <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="text-violet-600 font-semibold hover:text-violet-700 transition-colors">
-                  Administration
-                </Link>
-              </div>
             </div>
+          </div>
           </div>
         </div>
       </header>
 
       {/* Overlay for mega menu */}
       {formationsOpen && (
-        <div className="fixed inset-0 z-40 bg-slate-900/5" />
+        <div className="fixed inset-0 z-40 bg-[var(--color-fc-black)]/5" />
       )}
     </>
   );
