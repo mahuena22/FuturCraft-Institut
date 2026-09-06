@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         location: body.location || "Cotonou / Hybride",
         description: body.description || "",
         skillsRequired: body.skillsRequired || "",
-        deadline: body.deadline || "2025-06-30",
+        deadline: body.deadline || "2026-12-31",
         status: "publie",
       })
       .returning();

@@ -32,6 +32,9 @@
   --color-violet-400: #a78bfa;
   --color-violet-500: #8b5cf6;
   --color-violet-600: #7c3aed;
+
+  /* Slate entre 100 (#f1f5f9) et 200 (#e2e8f0) */
+  --color-slate-150: #e9edf3;
 }
 
 /* ───── Base ───── */
@@ -64,6 +67,15 @@ h4,
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(59, 99, 246, 0.35) transparent;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 ::selection {
@@ -179,6 +191,57 @@ h4,
 .animate-shimmer    { animation: shimmer 2.5s linear infinite; }
 .animate-gradient   { animation: gradient-shift 4s ease infinite; background-size: 200% 200%; }
 .hero-card-tilt     { animation: hero-tilt 7s ease-in-out infinite; }
+
+/* ───── Enter/Exit system (modals, panes) ───── */
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1))
+      rotate(var(--tw-enter-rotate, 0));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1))
+      rotate(var(--tw-exit-rotate, 0));
+  }
+}
+
+.animate-in,
+.animate-out {
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.animate-in {
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-rotate: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+  animation-name: enter;
+}
+
+.animate-out {
+  --tw-exit-opacity: initial;
+  --tw-exit-scale: initial;
+  --tw-exit-rotate: initial;
+  --tw-exit-translate-x: initial;
+  --tw-exit-translate-y: initial;
+  animation-name: exit;
+}
+
+.fade-in  { --tw-enter-opacity: 0; }
+.fade-out { --tw-exit-opacity: 0; }
+
+.zoom-in-95  { --tw-enter-scale: 0.95; }
+.zoom-out-95 { --tw-exit-scale: 0.95; }
 
 /* Delay classes */
 .delay-75   { animation-delay: 75ms; }

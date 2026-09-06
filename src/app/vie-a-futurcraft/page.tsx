@@ -26,7 +26,7 @@ export default async function ViePage() {
     {
       title: "Ateliers Code & Pizza",
       desc: "Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.",
-      image: "/images/pro2.jpg",
+      image: "/images/projet-vano-baby.jpg",
       tag: "Coding Night",
     },
     {

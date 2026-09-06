@@ -160,6 +160,18 @@ export const companyOffers = pgTable("company_offers", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const partnershipRequests = pgTable("partnership_requests", {
+  id: serial("id").primaryKey(),
+  companyName: text("company_name").notNull(),
+  contactName: text("contact_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  partnershipType: text("partnership_type").notNull(), // 'Stage & Recrutement prioritaire' | 'Coaching' | 'Certification' | 'Autre'
+  message: text("message"),
+  status: text("status").notNull().default("nouveau"), // 'nouveau' | 'contacte' | 'cloture'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),

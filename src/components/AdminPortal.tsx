@@ -23,6 +23,7 @@ import {
   RefreshCw,
   QrCode,
   LogOut,
+  Handshake,
 } from "lucide-react";
 
 interface AdminStats {
@@ -79,23 +80,38 @@ interface FormationItem {
   isActive: boolean | null;
 }
 
+interface PartnershipItem {
+  id: number;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  partnershipType: string;
+  message: string | null;
+  status: string;
+  createdAt: string;
+}
+
 export function AdminPortal({
   initialStats,
   initialStudents,
   initialPayments,
   formationsList,
+  initialPartnerships,
 }: {
   initialStats: AdminStats;
   initialStudents: StudentItem[];
   initialPayments: PaymentItem[];
   formationsList: FormationItem[];
+  initialPartnerships: PartnershipItem[];
 }) {
   const [stats, setStats] = useState<AdminStats>(initialStats);
   const [students, setStudents] = useState<StudentItem[]>(initialStudents);
   const [payments, setPayments] = useState<PaymentItem[]>(initialPayments);
+  const [partnerships, setPartnerships] = useState<PartnershipItem[]>(initialPartnerships);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "roles">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "roles" | "partenariats">("dashboard");
 
   const router = useRouter();
 
@@ -156,14 +172,16 @@ export function AdminPortal({
   // Reload data helper
   const reloadData = async () => {
     try {
-      const [resStats, resStudents, resPayments] = await Promise.all([
+      const [resStats, resStudents, resPayments, resPartnerships] = await Promise.all([
         fetch("/api/admin/stats").then((r) => r.json()),
         fetch("/api/students").then((r) => r.json()),
         fetch("/api/payments").then((r) => r.json()),
+        fetch("/api/partnerships").then((r) => r.json()),
       ]);
       setStats(resStats);
       setStudents(resStudents);
       setPayments(resPayments);
+      setPartnerships(resPartnerships);
     } catch (e) {
       console.error(e);
     }
@@ -245,6 +263,26 @@ export function AdminPortal({
       if (res.ok) {
         await reloadData();
         setSelectedStudentForStatus(null);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Update partnership request status
+  const handlePartnerStatusChange = async (id: number, status: string) => {
+    try {
+      const res = await fetch(`/api/partnerships`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      if (res.ok) {
+        setPartnerships((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, status } : p))
+        );
+      } else {
+        await reloadData();
       }
     } catch (e) {
       console.error(e);
@@ -366,6 +404,18 @@ export function AdminPortal({
           >
             <Layers className="w-4 h-4" />
             <span>Formations &amp; Tarifs ({formationsList.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("partenariats")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "partenariats"
+                ? "border-violet-600 text-violet-600"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Handshake className="w-4 h-4" />
+            <span>Demandes de Partenariat ({partnerships.length})</span>
           </button>
 
           <button
@@ -787,6 +837,89 @@ export function AdminPortal({
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB PARTENARIATS */}
+        {activeTab === "partenariats" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Demandes de Partenariat Entreprises</h2>
+              <p className="text-xs text-slate-500">
+                Propositions de partenariat reçues depuis l&apos;espace entreprises : stages, recrutement, coaching, certification.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="py-3 px-4">Entreprise</th>
+                      <th className="py-3 px-4">Contact</th>
+                      <th className="py-3 px-4">Type de partenariat</th>
+                      <th className="py-3 px-4">Message</th>
+                      <th className="py-3 px-4">Date</th>
+                      <th className="py-3 px-4">Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-150">
+                    {partnerships.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-slate-400">
+                          Aucune demande de partenariat pour le moment.
+                        </td>
+                      </tr>
+                    )}
+                    {partnerships.map((p) => (
+                      <tr key={p.id} className="hover:bg-slate-50/70 transition-colors align-top">
+                        <td className="py-3 px-4">
+                          <strong className="text-slate-900 block">{p.companyName}</strong>
+                          <span className="text-[10px] text-slate-400">N° {p.id}</span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600">
+                          <div className="font-semibold text-slate-900">{p.contactName}</div>
+                          <div className="text-[11px]">{p.email}</div>
+                          <div className="text-[11px]">{p.phone}</div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                            {p.partnershipType}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 max-w-[260px]">
+                          {p.message || <span className="text-slate-300">—</span>}
+                        </td>
+                        <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
+                          {new Date(p.createdAt).toLocaleDateString("fr-FR", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="py-3 px-4">
+                          <select
+                            value={p.status}
+                            onChange={(e) => handlePartnerStatusChange(p.id, e.target.value)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${
+                              p.status === "nouveau"
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : p.status === "contacte"
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            }`}
+                          >
+                            <option value="nouveau">Nouveau</option>
+                            <option value="contacte">Contactée</option>
+                            <option value="cloture">Clôturée</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

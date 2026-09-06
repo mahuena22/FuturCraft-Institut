@@ -1,4 +1,4 @@
-import { getAdminStats, getAllStudents, getFormations } from "@/lib/data-service";
+import { getAdminStats, getAllStudents, getFormations, getPartnershipRequests } from "@/lib/data-service";
 import { AdminPortal } from "@/components/AdminPortal";
 import { AdminLogin } from "@/components/AdminLogin";
 import { isAuthenticated } from "@/lib/auth";
@@ -21,6 +21,7 @@ export default async function AdminPage() {
   const stats = await getAdminStats();
   const rawStudents = await getAllStudents();
   const formationsList = await getFormations();
+  const partnerships = await getPartnershipRequests();
 
   const rawPayments = await db
     .select({
@@ -50,6 +51,7 @@ export default async function AdminPage() {
       initialStudents={rawStudents}
       initialPayments={rawPayments}
       formationsList={formationsList}
+      initialPartnerships={partnerships}
     />
   );
 }

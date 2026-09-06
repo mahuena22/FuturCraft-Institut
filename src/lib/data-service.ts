@@ -9,11 +9,13 @@ import {
   notifications,
   studentProjects,
   companyOffers,
+  partnershipRequests,
   events,
   blogArticles,
 } from "@/db/schema";
 import { ensureDatabaseSeeded } from "@/db/ensure-seed";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
+import { randomBytes } from "crypto";
 
 export async function getFormations() {
   await ensureDatabaseSeeded();
@@ -110,9 +112,9 @@ export async function createStudentWithPlan(data: {
   const [formation] = await db.select().from(formations).where(eq(formations.id, data.formationId));
   if (!formation) throw new Error("Formation introuvable");
 
-  const countStudents = await db.select().from(students);
-  const nextNum = String(countStudents.length + 101).padStart(4, "0");
-  const studentNumber = `FC-2025-${nextNum}`;
+  const countStudents = await db.select({ maxId: sql<number>`coalesce(max(${students.id}), 0)` }).from(students);
+  const nextNum = String(countStudents[0].maxId + 1).padStart(4, "0");
+  const studentNumber = `FC-2026-${nextNum}`;
 
   const total = formation.price;
 
@@ -197,10 +199,10 @@ export async function recordPayment(data: {
   const [student] = await db.select().from(students).where(eq(students.id, data.studentId));
   if (!student) throw new Error("Étudiant introuvable");
 
-  const countPayments = await db.select().from(payments);
-  const recIndex = String(countPayments.length + 1430).padStart(5, "0");
-  const receiptNumber = `REC-2025-${recIndex}`;
-  const verificationCode = `FC-SEC-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+  const countPayments = await db.select({ maxId: sql<number>`coalesce(max(${payments.id}), 0)` }).from(payments);
+  const recIndex = String(countPayments[0].maxId + 1).padStart(5, "0");
+  const receiptNumber = `REC-2026-${recIndex}`;
+  const verificationCode = `FC-SEC-${randomBytes(4).toString("hex").toUpperCase()}-${Date.now().toString().slice(-4)}`;
   const trxRef = `TRX-${data.paymentMethod.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-6)}`;
   const nowStr = new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
@@ -346,4 +348,13 @@ export async function getBlogArticles() {
 export async function getCompanyOffers() {
   await ensureDatabaseSeeded();
   return await db.select().from(companyOffers).orderBy(desc(companyOffers.createdAt));
+}
+
+export async function getPartnershipRequests() {
+  await ensureDatabaseSeeded();
+  const rows = await db.select().from(partnershipRequests).orderBy(desc(partnershipRequests.createdAt));
+  return rows.map((r) => ({
+    ...r,
+    createdAt: new Date(r.createdAt).toISOString(),
+  }));
 }

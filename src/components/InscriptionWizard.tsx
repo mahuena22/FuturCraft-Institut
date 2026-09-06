@@ -52,7 +52,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     formationId: preselectedFormationId ? Number(preselectedFormationId) : formations[0]?.id || 1,
     campus: "Godomey (Cotonou)",
     mode: "Présentiel & Hybride",
-    session: "Session Mars 2025",
+    session: "Session Mars 2026",
 
     // Step 2: Informations personnelles
     firstName: "",
@@ -314,9 +314,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                     onChange={(e) => updateField("session", e.target.value)}
                     className="w-full p-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900"
                   >
-                    <option value="Session Mars 2025">Session Mars 2025</option>
-                    <option value="Session Mai 2025">Session Mai 2025</option>
-                    <option value="Session Cohorte Été 2025">Session Cohorte Été 2025</option>
+                    <option value="Session Mars 2026">Session Mars 2026</option>
+                    <option value="Session Mai 2026">Session Mai 2026</option>
+                    <option value="Session Cohorte Été 2026">Session Cohorte Été 2026</option>
                   </select>
                 </div>
 

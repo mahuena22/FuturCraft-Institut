@@ -56,7 +56,7 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
     location: "Cotonou / Hybride",
     description: "",
     skillsRequired: "",
-    deadline: "2025-06-30",
+    deadline: "2026-12-31",
   });
   const [isPostingOffer, setIsPostingOffer] = useState(false);
   const [offerSuccess, setOfferSuccess] = useState(false);
@@ -81,7 +81,7 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
       status: "Recherche de stage",
       campus: "Cotonou, Bénin",
       matricule: "",
-      promotion: "Promotion 2025",
+      promotion: "Promotion 2026",
       photoUrl: "/images/samuel.jpeg",
       cvUrl: "/cv/CV_ASSOGBA_K._Samuel_Jean-Loïc.pdf",
     },
@@ -161,7 +161,7 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
           location: "Cotonou / Hybride",
           description: "",
           skillsRequired: "",
-          deadline: "2025-06-30",
+          deadline: "2026-12-31",
         });
       }
     } finally {
@@ -169,17 +169,36 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
     }
   };
 
-  const handlePartnerSubmit = (e: React.FormEvent) => {
+  const [isSubmittingPartner, setIsSubmittingPartner] = useState(false);
+
+  const handlePartnerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPartnerSuccess(true);
-    setPartnerForm({
-      companyName: "",
-      contactName: "",
-      email: "",
-      phone: "",
-      partnershipType: "Stage & Recrutement prioritaire",
-      message: "",
-    });
+    setIsSubmittingPartner(true);
+    try {
+      const res = await fetch("/api/partnerships", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(partnerForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPartnerSuccess(true);
+        setPartnerForm({
+          companyName: "",
+          contactName: "",
+          email: "",
+          phone: "",
+          partnershipType: "Stage & Recrutement prioritaire",
+          message: "",
+        });
+      } else {
+        console.error("POST /api/partnerships error:", data.error);
+      }
+    } catch (error) {
+      console.error("POST /api/partnerships error:", error);
+    } finally {
+      setIsSubmittingPartner(false);
+    }
   };
 
   return (
@@ -577,9 +596,12 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all"
+                    disabled={isSubmittingPartner}
+                    className="w-full py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-md transition-all"
                   >
-                    Transmettre notre proposition de partenariat
+                    {isSubmittingPartner
+                      ? "Envoi en cours..."
+                      : "Transmettre notre proposition de partenariat"}
                   </button>
                 </div>
               </form>

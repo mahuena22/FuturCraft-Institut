@@ -3,11 +3,14 @@ import { getStudentById } from "@/lib/data-service";
 import { db } from "@/db";
 import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAuth();
+  if (denied) return denied;
   try {
     const { id } = await context.params;
     const studentData = await getStudentById(Number(id));
@@ -25,6 +28,8 @@ export async function PATCH(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAuth();
+  if (denied) return denied;
   try {
     const { id } = await context.params;
     const body = await req.json();

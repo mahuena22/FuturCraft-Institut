@@ -4,8 +4,11 @@ import { db } from "@/db";
 import { payments, students, formations } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { ensureDatabaseSeeded } from "@/db/ensure-seed";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET() {
+  const denied = await requireAuth();
+  if (denied) return denied;
   try {
     await ensureDatabaseSeeded();
     const rows = await db
@@ -40,6 +43,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await requireAuth();
+  if (denied) return denied;
   try {
     const body = await req.json();
     if (!body.studentId || !body.amount || !body.paymentMethod) {

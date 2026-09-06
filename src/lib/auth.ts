@@ -5,8 +5,8 @@ import { NextResponse } from "next/server";
 const SESSION_COOKIE = "fc_admin_session";
 const MAX_AGE = 60 * 60 * 24 * 2; // 2 days
 
-function secret() {
-  return process.env.ADMIN_PASSWORD || "futurcraft-admin-2025";
+function secret(): string {
+  return process.env.ADMIN_PASSWORD || "";
 }
 
 function sign(value: string): string {

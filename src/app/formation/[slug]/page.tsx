@@ -1,4 +1,4 @@
-import { getFormationBySlug, getFormations, getPromotions, getProjects } from "@/lib/data-service";
+import { getFormationBySlug, getPromotions, getProjects } from "@/lib/data-service";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,10 +20,6 @@ import {
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-export async function generateStaticParams() {
-  const all = await getFormations();
-  return all.map((f) => ({ slug: f.slug }));
-}
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;

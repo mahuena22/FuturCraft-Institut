@@ -43,7 +43,7 @@ export default function InstitutPage() {
     {
       name: "Gauthier I. ORE",
       role: "Co-founder & Prompt engineer",
-      image: "/images/Gauthier-ORE.jpg",
+      image: "/images/gauthier.jpg",
       bio: "Co-fondateur et expert en prompt engineering, il explore les usages avancés de l'IA générative pour former la prochaine génération.",
     },
     {
