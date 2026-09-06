@@ -195,3 +195,14 @@ export const blogArticles = pgTable("blog_articles", {
   category: text("category").notNull(),
   publishedAt: text("published_at").notNull(),
 });
+
+export const paymentRequests = pgTable("payment_requests", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(),
+  method: text("method").notNull().default("MTN Mobile Money"),
+  phone: text("phone").notNull(),
+  status: text("status").notNull().default("en_attente"), // 'en_attente' | 'valide' | 'rejete'
+  reference: text("reference").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

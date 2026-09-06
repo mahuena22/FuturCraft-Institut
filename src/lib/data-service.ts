@@ -12,6 +12,7 @@ import {
   partnershipRequests,
   events,
   blogArticles,
+  paymentRequests,
 } from "@/db/schema";
 import { ensureDatabaseSeeded } from "@/db/ensure-seed";
 import { eq, desc, sql } from "drizzle-orm";
@@ -90,6 +91,11 @@ export async function getStudentById(id: number) {
     .from(notifications)
     .where(eq(notifications.studentId, student.id))
     .orderBy(desc(notifications.createdAt));
+  const paymentRequestsList = await db
+    .select()
+    .from(paymentRequests)
+    .where(eq(paymentRequests.studentId, student.id))
+    .orderBy(desc(paymentRequests.createdAt));
 
   return {
     student,
@@ -99,6 +105,7 @@ export async function getStudentById(id: number) {
     payments: studentPayments,
     receipts: studentReceipts,
     notifications: studentNotifs,
+    paymentRequests: paymentRequestsList,
   };
 }
 
@@ -215,6 +222,7 @@ export async function recordPayment(data: {
   paymentMethod: string;
   recordedBy?: string;
   notes?: string;
+  transactionRef?: string;
 }) {
   await ensureDatabaseSeeded();
 
@@ -225,7 +233,7 @@ export async function recordPayment(data: {
   const recIndex = String(countPayments[0].maxId + 1).padStart(5, "0");
   const receiptNumber = `REC-2026-${recIndex}`;
   const verificationCode = `FC-SEC-${randomBytes(4).toString("hex").toUpperCase()}-${Date.now().toString().slice(-4)}`;
-  const trxRef = `TRX-${data.paymentMethod.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-6)}`;
+  const trxRef = data.transactionRef || `TRX-${data.paymentMethod.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-6)}`;
   const nowStr = new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
     month: "long",
@@ -385,4 +393,88 @@ export async function getPartnershipRequests() {
     ...r,
     createdAt: new Date(r.createdAt).toISOString(),
   }));
+}
+
+export async function createPaymentRequest(data: {
+  studentId: number;
+  amount: number;
+  method: string;
+  phone: string;
+}) {
+  await ensureDatabaseSeeded();
+  const reference = `PR-${Date.now().toString().slice(-6)}-${randomBytes(2).toString("hex").toUpperCase()}`;
+  const [row] = await db
+    .insert(paymentRequests)
+    .values({
+      studentId: data.studentId,
+      amount: data.amount,
+      method: data.method,
+      phone: data.phone,
+      status: "en_attente",
+      reference,
+    })
+    .returning();
+  return row;
+}
+
+export async function getPaymentRequests() {
+  await ensureDatabaseSeeded();
+  const rows = await db
+    .select({
+      id: paymentRequests.id,
+      studentId: paymentRequests.studentId,
+      amount: paymentRequests.amount,
+      method: paymentRequests.method,
+      phone: paymentRequests.phone,
+      status: paymentRequests.status,
+      reference: paymentRequests.reference,
+      createdAt: paymentRequests.createdAt,
+      studentFirstName: students.firstName,
+      studentLastName: students.lastName,
+      studentNumber: students.studentNumber,
+    })
+    .from(paymentRequests)
+    .leftJoin(students, eq(paymentRequests.studentId, students.id))
+    .orderBy(desc(paymentRequests.createdAt));
+  return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt).toISOString() }));
+}
+
+export async function getStudentPaymentRequests(studentId: number) {
+  await ensureDatabaseSeeded();
+  const rows = await db
+    .select()
+    .from(paymentRequests)
+    .where(eq(paymentRequests.studentId, studentId))
+    .orderBy(desc(paymentRequests.createdAt));
+  return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt).toISOString() }));
+}
+
+export async function confirmPaymentRequest(id: number) {
+  await ensureDatabaseSeeded();
+  const [req] = await db.select().from(paymentRequests).where(eq(paymentRequests.id, id)).limit(1);
+  if (!req) throw new Error("Demande de paiement introuvable");
+  if (req.status !== "en_attente") throw new Error("Cette demande a déjà été traitée");
+
+  await db.update(paymentRequests).set({ status: "valide" }).where(eq(paymentRequests.id, id));
+
+  const result = await recordPayment({
+    studentId: req.studentId,
+    amount: req.amount,
+    paymentMethod: req.method,
+    recordedBy: `Admin (Paiement en ligne ${req.phone})`,
+    notes: `Paiement en ligne validé — Réf ${req.reference}`,
+    transactionRef: req.reference,
+  });
+
+  return result;
+}
+
+export async function rejectPaymentRequest(id: number) {
+  await ensureDatabaseSeeded();
+  const [req] = await db.select().from(paymentRequests).where(eq(paymentRequests.id, id)).limit(1);
+  if (!req) throw new Error("Demande de paiement introuvable");
+  if (req.status !== "en_attente") throw new Error("Cette demande a déjà été traitée");
+
+  await db.update(paymentRequests).set({ status: "rejete" }).where(eq(paymentRequests.id, id));
+  return { success: true };
 }

@@ -101,6 +101,15 @@ interface StudentData {
     isRead: boolean | null;
     createdAt: string | Date;
   }[];
+  paymentRequests: {
+    id: number;
+    amount: number;
+    method: string;
+    phone: string;
+    status: string;
+    reference: string;
+    createdAt: string | Date;
+  }[];
 }
 
 export function StudentPortal({
@@ -121,6 +130,7 @@ export function StudentPortal({
   const [momoNumber, setMomoNumber] = useState<string>(data.student.phone || "+229 ");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccessReceipt, setPaymentSuccessReceipt] = useState<string | null>(null);
+  const [paymentRequestReference, setPaymentRequestReference] = useState<string | null>(null);
 
   // Receipt Modal State
   const [viewingReceipt, setViewingReceipt] = useState<{
@@ -158,22 +168,19 @@ export function StudentPortal({
     window.location.href = "/espace-etudiant/connexion";
   };
 
-  // Payment process simulation
+  // Paiement en ligne : création d'une demande (validation par l'équipe)
   const handleExecutePayment = async () => {
     if (!paymentAmount || paymentAmount <= 0) return;
     setIsProcessingPayment(true);
 
     try {
-      const res = await fetch("/api/payments", {
+      const res = await fetch("/api/payment-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studentId: data.student.id,
-          scheduleId: selectedScheduleId,
           amount: paymentAmount,
-          paymentMethod,
-          recordedBy: `En ligne (${paymentMethod} - ${momoNumber})`,
-          notes: `Règlement échéance par l'étudiant`,
+          method: paymentMethod,
+          phone: momoNumber,
         }),
       });
 
@@ -182,7 +189,7 @@ export function StudentPortal({
 
       await reloadStudent();
       setIsProcessingPayment(false);
-      setPaymentSuccessReceipt(result.receipt.receiptNumber);
+      setPaymentRequestReference(result.paymentRequest.reference);
     } catch (err: any) {
       alert(err.message || "Erreur lors du paiement");
       setIsProcessingPayment(false);
@@ -597,6 +604,40 @@ setProfileSaveSuccess(true);
               )}
             </div>
 
+            {/* Pending online payment requests */}
+            {data.paymentRequests && data.paymentRequests.some((r) => r.status === "en_attente") && (
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+                <h3 className="text-xs font-bold text-amber-800 flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Paiements en ligne en attente de validation
+                </h3>
+                <div className="space-y-1.5">
+                  {data.paymentRequests
+                    .filter((r) => r.status === "en_attente")
+                    .map((r) => (
+                      <div
+                        key={r.id}
+                        className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-lg border border-amber-200 px-3 py-2 text-[11px]"
+                      >
+                        <span className="font-mono font-bold text-amber-700">{r.reference}</span>
+                        <span className="text-slate-700 font-semibold">
+                          {r.amount.toLocaleString("fr-FR")} FCFA via {r.method}
+                        </span>
+                        <span className="text-slate-400">
+                          {new Date(r.createdAt).toLocaleString("fr-FR")}
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold">
+                          En attente
+                        </span>
+                      </div>
+                    ))}
+                </div>
+                <p className="text-[10px] text-amber-700/70">
+                  Votre reçu officiel sera généré dès validation par notre équipe financière.
+                </p>
+              </div>
+            )}
+
             {/* Schedules Table */}
             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
@@ -962,7 +1003,7 @@ setProfileSaveSuccess(true);
                       {!n.isRead && (
                         <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-600 text-white">
                           Nouveau
-                        </span>
+</span>
                       )}
                     </div>
                     <p className="text-slate-600 text-xs leading-relaxed">{n.message}</p>
@@ -1089,6 +1130,7 @@ setProfileSaveSuccess(true);
                 onClick={() => {
                   setShowPaymentModal(false);
                   setPaymentSuccessReceipt(null);
+                  setPaymentRequestReference(null);
                 }}
                 className="text-slate-400 hover:text-slate-600 font-bold"
               >
@@ -1096,29 +1138,31 @@ setProfileSaveSuccess(true);
               </button>
             </div>
 
-            {paymentSuccessReceipt ? (
+            {paymentRequestReference ? (
               <div className="text-center py-4 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
+                <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+                  <Clock className="w-8 h-8" />
                 </div>
-                <h4 className="text-xl font-bold text-slate-900">Paiement Validé avec Succès !</h4>
-                <p className="text-xs text-slate-600">
-                  Votre reçu numérique N° <strong>{paymentSuccessReceipt}</strong> a été généré avec QR code sécurisé.
+                <h4 className="text-xl font-bold text-slate-900">Demande de paiement envoyée</h4>
+                <p className="text-xs text-slate-600 space-y-2">
+                  <span className="block">
+                    Votre paiement en ligne est <strong className="text-amber-600">en attente de validation</strong> par notre équipe financière.
+                  </span>
+                  <span className="block font-mono font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-xl py-2">
+                    Référence : {paymentRequestReference}
+                  </span>
+                  <span className="block">
+                    Une fois confirmé, votre reçu officiel avec QR code sera disponible ici.
+                  </span>
                 </p>
                 <div className="pt-2 flex flex-col gap-2">
-                  <Link
-                    href={`/recu/${paymentSuccessReceipt}`}
-                    target="_blank"
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs"
-                  >
-                    Voir mon Reçu Officiel
-                  </Link>
                   <button
                     onClick={() => {
                       setShowPaymentModal(false);
                       setPaymentSuccessReceipt(null);
+                      setPaymentRequestReference(null);
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200"
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs"
                   >
                     Fermer
                   </button>
