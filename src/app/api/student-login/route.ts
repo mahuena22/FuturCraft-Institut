@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
     const matriculeKey = rateLimitKey(ip, `student|${studentNumber}`);
     const ipKey = rateLimitKey(ip, "student-ip");
 
-    const limit = tooManyAttempts(matriculeKey);
-    const ipLimit = tooManyAttempts(ipKey);
+    const limit = await tooManyAttempts(matriculeKey);
+    const ipLimit = await tooManyAttempts(ipKey);
     if (limit.blocked || ipLimit.blocked) {
       const retryAfter = Math.max(limit.retryAfterSeconds, ipLimit.retryAfterSeconds);
       return NextResponse.json(
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
     }
 
     if (!studentNumber || !phone) {
-      recordAttempt(matriculeKey);
-      recordAttempt(ipKey);
+      await recordAttempt(matriculeKey);
+      await recordAttempt(ipKey);
       return NextResponse.json(
         { error: "Veuillez saisir votre matricule et votre numéro de téléphone" },
         { status: 400 }
@@ -47,15 +47,15 @@ export async function POST(req: NextRequest) {
 
     const student = await findStudentByCredentials(studentNumber, phone);
     if (!student) {
-      recordAttempt(matriculeKey);
-      recordAttempt(ipKey);
+      await recordAttempt(matriculeKey);
+      await recordAttempt(ipKey);
       return NextResponse.json(
         { error: "Matricule ou téléphone incorrect. Vérifiez vos informations." },
         { status: 401 }
       );
     }
 
-    resetAttempts(matriculeKey);
+    await resetAttempts(matriculeKey);
     await createStudentSession(student.id);
     return NextResponse.json({ success: true, studentId: student.id, name: student.firstName });
   } catch (error) {

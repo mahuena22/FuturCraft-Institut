@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // mots de passe, il faut bloquer l'IP, pas une valeur de mot de passe donnée.
     const key = rateLimitKey(getClientIp(req), "admin");
 
-    const limit = tooManyAttempts(key);
+    const limit = await tooManyAttempts(key);
     if (limit.blocked) {
       return NextResponse.json(
         {
@@ -34,12 +34,12 @@ export async function POST(req: NextRequest) {
     const result = authenticate(password);
 
     if (!result.ok || !result.cookie) {
-      recordAttempt(key);
+      await recordAttempt(key);
       return NextResponse.json({ error: "Mot de passe incorrect" }, { status: 401 });
     }
 
     // Succès → réinitialise la jauge pour cet identifiant
-    resetAttempts(key);
+    await resetAttempts(key);
 
     const res = NextResponse.json({ success: true });
     res.cookies.set(SESSION_COOKIE_NAME, result.cookie, {
