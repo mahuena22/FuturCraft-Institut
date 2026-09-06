@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { partnershipRequests } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
+import { sendPartnershipEmail } from "@/lib/email";
 
 export async function GET() {
   const denied = await requireAuth();
@@ -41,6 +42,15 @@ export async function POST(req: NextRequest) {
         status: "nouveau",
       })
       .returning();
+
+    void sendPartnershipEmail({
+      companyName: request.companyName,
+      contactName: request.contactName,
+      email: request.email,
+      phone: request.phone,
+      partnershipType: request.partnershipType,
+      message: request.message || "",
+    });
 
     return NextResponse.json({ success: true, request });
   } catch (error) {

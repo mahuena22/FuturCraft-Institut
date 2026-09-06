@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createStudentWithPlan } from "@/lib/data-service";
+import { createStudentWithPlan, getFormations } from "@/lib/data-service";
 import { createStudentSession } from "@/lib/student-auth";
+import { sendInscriptionEmails } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,6 +34,20 @@ export async function POST(req: NextRequest) {
 
     // Auto-authenticate the newly registered student
     await createStudentSession(student.id);
+
+    // Notifications par email (Resend si configuré, sinon log)
+    const [formation] = await getFormations().then((rows) =>
+      rows.filter((f) => f.id === student.formationId)
+    );
+    void sendInscriptionEmails({
+      studentNumber: student.studentNumber,
+      firstName: student.firstName,
+      lastName: student.lastName,
+      email: student.email,
+      formationTitle: formation?.title || "Formation FuturCraft",
+      totalAmount: student.totalAmount,
+      phone: student.phone,
+    });
 
     return NextResponse.json({
       success: true,
