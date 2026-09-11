@@ -80,20 +80,18 @@ const testimonials = [
 ];
 
 const trainingPricing = [
-    { title: "Développement web", duration: "2 ans", price: "300.000 FCFA / an" },
-    { title: "Développement IA", duration: "2 ans", price: "300.000 FCFA / an" },
-    { title: "Web master", duration: "1 an", price: "300.000 FCFA" },
-    { title: "Photographie, cadrage et montage vidéo", duration: "1 an", price: "300.000 FCFA" },
-    { title: "Graphisme et web design", duration: "1 an", price: "300.000 FCFA" },
-    { title: "Graphisme et sérigraphie", duration: "1 an", price: "250.000 FCFA" },
-    { title: "Maintenance informatique et réseau", duration: "9 mois", price: "250.000 FCFA" },
-    { title: "Marketing digital", duration: "8 mois", price: "250.000 FCFA / an" },
-    { title: "Secrétariat et caisse", duration: "6 mois", price: "200.000 FCFA" },
-    { title: "Copywriting", duration: "6 mois", price: "250.000 FCFA" },
-    { title: "E-commerce", duration: "6 mois", price: "200.000 FCFA" },
-    { title: "Maîtrise IA (ChatGPT, Midjourney, etc.)", duration: "1 mois", price: "70.000 FCFA" },
-    { title: "Pilotage de drone professionnel", duration: "1 mois", price: "100.000 FCFA" },
-    { title: "Trading & analyse des marchés financiers", duration: "1 mois", price: "100.000 FCFA" },
+    { title: "Développement Web Fullstack", duration: "2 ans", price: "600.000 FCFA" },
+    { title: "Développement en Intelligence Artificielle", duration: "2 ans", price: "600.000 FCFA" },
+    { title: "Maîtrise des Outils IA", duration: "1 mois", price: "70.000 FCFA" },
+    { title: "Web Design (UI/UX)", duration: "9 mois", price: "250.000 FCFA" },
+    { title: "Graphisme et Sérigraphie", duration: "9 mois", price: "250.000 FCFA" },
+    { title: "Marketing Digital & Growth", duration: "3 mois", price: "150.000 FCFA" },
+    { title: "Maintenance Informatique et Réseau", duration: "6 mois", price: "250.000 FCFA" },
+    { title: "Photographie, Cadrage et Montage Vidéo", duration: "1 an", price: "300.000 FCFA" },
+    { title: "Copywriting & Storytelling Digital", duration: "2 mois", price: "150.000 FCFA" },
+    { title: "E-commerce & Vente en Ligne", duration: "2 mois", price: "150.000 FCFA" },
+    { title: "Pilotage Professionnel de Drone", duration: "1 mois", price: "100.000 FCFA" },
+    { title: "Webmaster & Gestionnaire de Sites", duration: "1 an", price: "300.000 FCFA" },
 ];
 
 const instructors = [
@@ -133,7 +131,7 @@ export default async function HomePage() {
                 <div className="relative mx-auto flex min-h-[720px] max-w-7xl items-center px-4 py-24 sm:px-6 lg:px-8">
                     <div className="grid w-full items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
                         <div className="max-w-2xl">
-                            <h1 className="animate-fade-up font-display text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
+                            <h1 className="animate-fade-up font-display text-4xl font-black leading-[1.04] tracking-tight sm:text-5xl lg:text-6xl">
                                 Ton avenir
                                 <span className="block text-[var(--color-fc-cyan)]">
                                     se construit ici.
@@ -163,15 +161,15 @@ export default async function HomePage() {
                             </div>
                             <div className="animate-fade-up delay-400 mt-10 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-[var(--color-fc-light)]/70">
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
                                     Projets réels
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
                                     Certifications professionnelles
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
                                     Accompagnement emploi
                                 </span>
                             </div>
@@ -191,7 +189,7 @@ export default async function HomePage() {
                                 <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
                                 <div className="absolute bottom-6 left-6 right-6">
                                     <div className="mb-2 flex items-center gap-2 text-xs font-bold text-[var(--color-fc-light)]">
-                                        <span className="h-2 w-2 rounded-full bg-[var(--color-fc-cyan)] shadow-[0_0_12px_rgba(24,152,186,0.5)]" />
+                                        <span className="h-2 w-2 rounded-full bg-[var(--color-fc-primary)] shadow-[0_0_12px_rgba(18,81,149,0.5)]" />
                                         Campus en mouvement
                                     </div>
                                     <p className="font-display text-2xl font-bold">
@@ -249,7 +247,7 @@ export default async function HomePage() {
                                 ) : (
                                     <>
                                         <p className="font-display text-2xl font-black text-[var(--color-fc-black)]">
-                                            <StatCounter target={item.target} prefix={item.prefix} suffix={item.suffix} />
+                                            <StatCounter target={item.target} prefix={item.prefix} suffix={item.suffix} activeAt />
                                         </p>
                                         <p className="text-xs font-medium text-[var(--color-fc-gray-mid)]">
                                             {label}

@@ -30,7 +30,7 @@ export function StatCounter({
   target,
   prefix = "",
   suffix = "",
-  activeAt = true,
+  activeAt = false,
 }: {
   target: number;
   prefix?: string;

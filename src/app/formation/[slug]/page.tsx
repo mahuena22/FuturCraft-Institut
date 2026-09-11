@@ -122,7 +122,7 @@ export default async function FormationDetailPage(props: {
               <div>
                 <span className="text-slate-400 block mb-0.5">Durée :</span>
                 <span className="font-bold text-white flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
+                  <Clock className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
                   {formation.duration}
                 </span>
               </div>
@@ -135,14 +135,14 @@ export default async function FormationDetailPage(props: {
               </div>
               <div>
                 <span className="text-slate-400 block mb-0.5">Frais de scolarité :</span>
-                <span className="font-bold text-[var(--color-fc-cyan)] text-sm">
+                <span className="font-bold text-[var(--color-fc-primary)] text-sm">
                   {formation.price.toLocaleString("fr-FR")} FCFA
                 </span>
               </div>
               <div>
                 <span className="text-slate-400 block mb-0.5">Modalité :</span>
                 <span className="font-bold text-white flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
+                  <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
                   {formation.mode}
                 </span>
               </div>
@@ -226,7 +226,7 @@ export default async function FormationDetailPage(props: {
 
             {/* 9.4 COMPÉTENCES ACQUISES */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-cyan)] bg-[var(--color-fc-cyan)]/10 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                 Objectifs opérationnels
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
@@ -238,7 +238,7 @@ export default async function FormationDetailPage(props: {
                     key={idx}
                     className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-[var(--color-fc-cyan)] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[var(--color-fc-primary)] shrink-0 mt-0.5" />
                     <span className="text-xs text-[var(--color-fc-gray-mid)] font-medium">{comp}</span>
                   </div>
                 ))}
@@ -247,7 +247,7 @@ export default async function FormationDetailPage(props: {
 
 {/* 9.5 OUTILS UTILISÉS */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-cyan)] bg-[var(--color-fc-cyan)]/10 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                 Environnement Technique
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
@@ -268,7 +268,7 @@ export default async function FormationDetailPage(props: {
 
             {/* 9.6 DÉBOUCHÉS */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-cyan)] bg-[var(--color-fc-cyan)]/10 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                 Opportunités de Carrière
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
@@ -278,12 +278,12 @@ export default async function FormationDetailPage(props: {
                 {jobs.map((j, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50 shadow-xs group hover:border-[var(--color-fc-cyan)] transition-colors"
+                    className="flex items-center gap-3 p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50 shadow-xs group hover:border-[var(--color-fc-primary)] transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[var(--color-fc-cyan)]/10 text-[var(--color-fc-cyan)] flex items-center justify-center font-bold text-xs shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-primary)] flex items-center justify-center font-bold text-xs shrink-0">
                       <Briefcase className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-bold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-cyan)]">
+                    <span className="text-xs font-bold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)]">
                       {j}
                     </span>
                   </div>
@@ -358,7 +358,7 @@ export default async function FormationDetailPage(props: {
           <div className="lg:col-span-4 space-y-6">
             <div className="sticky top-28 space-y-6">
               {/* Enrollment Card */}
-              <div className="bg-white rounded-2xl border-2 border-blue-600/30 p-6 shadow-xl space-y-6">
+              <div className="bg-[var(--color-fc-bg)] rounded-2xl border-2 border-[var(--color-fc-primary)]/30 p-6 shadow-xl space-y-6">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] block mb-1">
                     Candidature &amp; Inscription
@@ -418,19 +418,19 @@ export default async function FormationDetailPage(props: {
                 </div>
               </div>
 
-              {/* WhatsApp Quick Contact */}
-              <div className="bg-[var(--color-fc-cyan)]/10 rounded-2xl border border-[var(--color-fc-cyan)]/30 p-5 space-y-2 text-xs">
-                <span className="font-bold text-[var(--color-fc-cyan)] block text-sm">
+{/* WhatsApp Quick Contact */}
+              <div className="bg-[var(--color-fc-primary)]/10 rounded-2xl border border-[var(--color-fc-primary)]/30 p-5 space-y-2 text-xs">
+                <span className="font-bold text-[var(--color-fc-primary)] block text-sm">
                   Une question sur cette filière ?
                 </span>
-                <p className="text-[var(--color-fc-cyan)]/80">
-                  Échangez instantanément avec notre conseiller d&apos;orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
+                <p className="text-[var(--color-fc-primary)]/80">
+                  Échangez instantanément avec notre conseiller d'orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
                 </p>
                 <a
                   href="https://wa.me/22943327832"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-block pt-1 font-bold text-[var(--color-fc-cyan)] hover:underline"
+                  className="inline-block pt-1 font-bold text-[var(--color-fc-primary)] hover:underline"
                 >
                   Ouvrir WhatsApp →
                 </a>

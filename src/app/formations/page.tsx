@@ -68,7 +68,7 @@ export default async function FormationsPage() {
               {highlights.map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="glass rounded-2xl px-4 py-4 text-center hover:-translate-y-1 transition-transform duration-300">
                   <div className="w-9 h-9 rounded-xl bg-[var(--color-fc-primary)]/20 flex items-center justify-center mx-auto mb-2">
-                    <Icon className="w-4.5 h-4.5 text-[var(--color-fc-cyan)]" />
+                    <Icon className="w-4.5 h-4.5 text-[var(--color-fc-deep)]" />
                   </div>
                   <p className="font-display font-bold text-white text-sm">{label}</p>
                   <p className="text-[var(--color-fc-light)]/60 text-[11px] mt-0.5">{sub}</p>
@@ -97,8 +97,8 @@ export default async function FormationsPage() {
 
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="space-y-3 max-w-xl text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-fc-primary)]/20 border border-[var(--color-fc-primary)]/30 text-[var(--color-fc-cyan)] text-xs font-bold">
-                  <Sparkles className="w-3 h-3 text-[var(--color-fc-cyan)]" />
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-fc-primary)]/20 border border-[var(--color-fc-primary)]/30 text-[var(--color-fc-deep)] text-xs font-bold">
+                  <Sparkles className="w-3 h-3 text-[var(--color-fc-deep)]" />
                   Orientation personnalisée gratuite
                 </div>
                 <h3 className="font-display text-2xl sm:text-3xl font-black text-white">

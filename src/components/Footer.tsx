@@ -112,7 +112,7 @@ export function Footer() {
               <span className="text-[11px] text-[var(--color-fc-gray-mid)] block mb-2.5 font-medium">Suivez FuturCraft :</span>
               <div className="flex items-center gap-2.5">
                 {[
-                  { name: "Facebook", label: "FB", url: "https://facebook.com/futurcraftinstitue" },
+                  { name: "Facebook", label: "FB", url: "https://facebook.com/futurcraftinstitut" },
                   { name: "Instagram", label: "IG", url: "https://instagram.com/futurcraft_institut" },
                   { name: "LinkedIn", label: "IN", url: "https://linkedin.com/company/futurcraft-institut" },
                   { name: "TikTok", label: "TT", url: "https://tiktok.com/@futurcraft_institut" },
