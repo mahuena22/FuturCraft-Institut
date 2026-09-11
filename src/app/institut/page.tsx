@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+export const revalidate = 3600;
+
 export const metadata = {
   title: "L'Institut | FuturCraft Institut Bénin",
   description:

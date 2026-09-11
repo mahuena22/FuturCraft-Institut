@@ -3,7 +3,7 @@ import { ProjectsShowcase } from "@/components/ProjectsShowcase";
 import { Layers } from "lucide-react";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 export const metadata = {
   title: "Galerie des Projets Étudiants | FuturCraft Institut Bénin",
   description:

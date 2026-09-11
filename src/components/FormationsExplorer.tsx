@@ -13,6 +13,7 @@ import {
   Filter,
   Flame,
 } from "lucide-react";
+import { FormationsGridSkeleton, FilterBarSkeleton } from "./FormationCardSkeleton";
 
 interface Formation {
   id: number;
@@ -32,7 +33,12 @@ interface Formation {
   imageUrl: string;
 }
 
-export function FormationsExplorer({ formations }: { formations: Formation[] }) {
+interface FormationsExplorerProps {
+  formations: Formation[];
+  isLoading?: boolean;
+}
+
+export function FormationsExplorer({ formations, isLoading = false }: FormationsExplorerProps) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("Tous");
 
@@ -52,6 +58,15 @@ export function FormationsExplorer({ formations }: { formations: Formation[] }) 
       return matchCat && matchSearch;
     });
   }, [formations, selectedCategory, search]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <FilterBarSkeleton />
+        <FormationsGridSkeleton count={6} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -126,6 +141,7 @@ export function FormationsExplorer({ formations }: { formations: Formation[] }) 
                     alt={f.title}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    placeholder="blur"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">

@@ -16,7 +16,7 @@ import {
 import { getFormations } from "@/lib/data-service";
 import { FAQAccordion } from "@/components/FAQAccordion";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 export const metadata = {
   title: "Admissions & Tarifs | FuturCraft Institut Bénin",
   description:

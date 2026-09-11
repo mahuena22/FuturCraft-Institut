@@ -2,7 +2,7 @@ import { getCompanyOffers } from "@/lib/data-service";
 import { CompanyPortal } from "@/components/CompanyPortal";
 import { Building2, CheckCircle2 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 export const metadata = {
   title: "Espace Entreprises | FuturCraft Institut Bénin",
   description:

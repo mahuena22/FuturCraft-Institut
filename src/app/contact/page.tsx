@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/components/Toast";
 import {
   MapPin,
   Phone,
@@ -10,6 +11,7 @@ import {
   CheckCircle2,
   Smartphone,
 } from "lucide-react";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -20,10 +22,16 @@ export default function ContactPage() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const { showToast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+    showToast({
+      type: "success",
+      title: "Message envoyé !",
+      message: `Merci ${form.name}, notre équipe a bien reçu votre demande et vous contactera très prochainement.`,
+    });
   };
 
 return (
@@ -98,15 +106,10 @@ return (
 
               {/* Direct WhatsApp CTA */}
               <div className="pt-2">
-                <a
-                  href="https://wa.me/22943327832?text=Bonjour,%20je%20souhaite%20des%20informations%20sur%20les%20formations%20FuturCraft"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full py-3 rounded-xl text-xs font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-cyan)] hover:bg-[var(--color-fc-primary)] shadow-md shadow-[var(--color-fc-cyan)]/25 flex items-center justify-center gap-2 transition-all"
-                >
-                  <Smartphone className="w-4 h-4" />
-                  <span>Discuter directement sur WhatsApp</span>
-                </a>
+                <WhatsAppButton
+                  defaultMessage="Bonjour, je souhaite des informations sur les formations FuturCraft"
+                  variant="default"
+                />
               </div>
             </div>
           </div>

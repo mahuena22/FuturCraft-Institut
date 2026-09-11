@@ -32,6 +32,65 @@ export async function generateMetadata(props: {
     description:
       formation.shortDescription ||
       `Formation ${formation.title} proposée par FuturCraft Institut à Godomey, Supermarché O Bénin Avant pk14 (Bénin).`,
+    other: {
+      "script:ld+json": JSON.stringify([
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          name: formation.title,
+          description: formation.shortDescription,
+          provider: {
+            "@type": "Organization",
+            name: "FuturCraft Institut",
+            url: "https://futurcraft.bj",
+            logo: "https://futurcraft.bj/images/Logo-crop.png",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "Supermarché O Bénin, avant pk14",
+              addressLocality: "Godomey",
+              addressRegion: "Cotonou",
+              addressCountry: "BJ",
+            },
+            telephone: "+229 43 32 78 32",
+            email: "contact@futurcraftinstitut.com",
+          },
+          offers: {
+            "@type": "Offer",
+            price: formation.price,
+            priceCurrency: "XOF",
+            availability: "https://schema.org/InStock",
+          },
+          educationalCredentialAwarded: "Certificat Professionnel de Compétences FuturCraft",
+          timeRequired: formation.duration,
+          educationalLevel: formation.level,
+          teaches: JSON.parse(formation.competencies || "[]"),
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Accueil",
+              item: "https://futurcraft.bj",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Formations",
+              item: "https://futurcraft.bj/formations",
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: formation.title,
+              item: `https://futurcraft.bj/formation/${slug}`,
+            },
+          ],
+        },
+      ]),
+    },
   };
 }
 
@@ -93,6 +152,7 @@ export default async function FormationDetailPage(props: {
             fill
             priority
             sizes="100vw"
+            placeholder="blur"
             className="object-cover object-center blur-xs"
           />
           <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
@@ -312,6 +372,7 @@ export default async function FormationDetailPage(props: {
                           alt={proj.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 25vw"
+                          placeholder="blur"
                           className="object-cover"
                         />
                       </div>

@@ -20,6 +20,16 @@
   --color-fc-gray-mid: #969493;
   --color-fc-black: #141213;
 
+  /* Dark mode palette */
+  --color-fc-deep-dark: #03083d;
+  --color-fc-primary-dark: #1a6bb8;
+  --color-fc-cyan-dark: #0ea5c7;
+  --color-fc-light-dark: #6a9cb5;
+  --color-fc-bg-dark: #0a0f1e;
+  --color-fc-gray-light-dark: #2a2f3a;
+  --color-fc-gray-mid-dark: #6b6e7a;
+  --color-fc-black-dark: #f0f2f5;
+
   /* Derived palette for gradients and effects */
   --color-brand-950: #051269;
   --color-brand-900: #125195;
@@ -36,9 +46,42 @@
   --color-accent-500: #051269;
 }
 
+/* Dark mode theme */
+.dark {
+  --color-fc-deep: var(--color-fc-deep-dark);
+  --color-fc-primary: var(--color-fc-primary-dark);
+  --color-fc-cyan: var(--color-fc-cyan-dark);
+  --color-fc-light: var(--color-fc-light-dark);
+  --color-fc-bg: var(--color-fc-bg-dark);
+  --color-fc-gray-light: var(--color-fc-gray-light-dark);
+  --color-fc-gray-mid: var(--color-fc-gray-mid-dark);
+  --color-fc-black: var(--color-fc-black-dark);
+
+  --color-brand-950: var(--color-fc-deep-dark);
+  --color-brand-900: var(--color-fc-primary-dark);
+  --color-brand-800: var(--color-fc-cyan-dark);
+  --color-brand-700: var(--color-fc-light-dark);
+  --color-brand-600: var(--color-fc-gray-light-dark);
+  --color-brand-500: var(--color-fc-gray-mid-dark);
+  --color-brand-400: var(--color-fc-bg-dark);
+  --color-brand-300: var(--color-fc-black-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    color-scheme: light;
+  }
+}
+
 /* ───── Base ───── */
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 html {
@@ -50,8 +93,8 @@ body {
   letter-spacing: -0.011em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FBFCFC;
-  color: #141213;
+  background-color: var(--color-fc-bg);
+  color: var(--color-fc-black);
 }
 
 h1,
@@ -81,6 +124,45 @@ h4,
 ::selection {
   background-color: #125195;
   color: #fff;
+}
+
+/* ============================================================
+   FOCUS VISIBLE - Accessibility
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--color-fc-primary);
+  outline-offset: 2px;
+}
+
+/* Remove default focus ring for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Custom focus styles for specific elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-fc-primary);
+  outline-offset: 2px;
+}
+
+/* Skip link focus */
+.skip-link:focus-visible {
+  outline: 2px solid var(--color-fc-primary);
+  outline-offset: 2px;
+}
+
+/* Form elements focus */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--color-fc-primary);
+  box-shadow: 0 0 0 3px rgba(18, 81, 149, 0.15);
 }
 
 /* ============================================================
@@ -138,6 +220,26 @@ h4,
   50%       { transform: perspective(1200px) rotateY(-3deg) rotateX(0deg) translateY(-8px); }
 }
 
+@keyframes hero-tilt {
+  0%, 100% { transform: perspective(1200px) rotateY(-8deg) rotateX(3deg); }
+  50%       { transform: perspective(1200px) rotateY(-3deg) rotateX(0deg) translateY(-8px); }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 @keyframes border-glow {
   0%, 100% { border-color: rgba(18, 81, 149, 0.3); box-shadow: 0 0 0 0 rgba(18, 81, 149, 0); }
   50%       { border-color: rgba(18, 81, 149, 0.8); box-shadow: 0 0 20px 4px rgba(18, 81, 149, 0.15); }
@@ -184,6 +286,8 @@ h4,
 .animate-fade-up    { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-fade-in    { animation: fade-in 0.6s ease-out both; }
 .animate-slide-right { animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-slide-in { animation: slide-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-slide-out { animation: slide-out 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-float      { animation: float 5s ease-in-out infinite; }
 .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }

@@ -1,5 +1,6 @@
 import { getFormations } from "@/lib/data-service";
 import { FormationsExplorer } from "@/components/FormationsExplorer";
+import { FormationsExplorerWrapper } from "@/components/FormationsExplorerWrapper";
 import {
   Layers,
   GraduationCap,
@@ -11,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -86,7 +88,9 @@ export default async function FormationsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
 
         {/* Live Filterable Component */}
-        <FormationsExplorer formations={formations} />
+        <Suspense fallback={<div className="space-y-8"><div className="h-64 bg-[var(--color-fc-gray-light)]/30 rounded-2xl animate-pulse" /></div>}>
+          <FormationsExplorerWrapper formations={formations} />
+        </Suspense>
 
         {/* Bottom Banner — Full width */}
         <div className="relative overflow-hidden rounded-3xl bg-[var(--color-fc-deep)] p-px shadow-2xl">

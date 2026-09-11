@@ -12,7 +12,7 @@ import {
   Code2,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 export const metadata = {
   title: "Vie à FuturCraft | FuturCraft Institut Bénin",
   description:
