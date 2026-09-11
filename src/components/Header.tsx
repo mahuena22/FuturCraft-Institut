@@ -179,40 +179,38 @@ export function Header() {
                   );
                 }
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      active
-                        ? "text-blue-600 bg-blue-50 font-semibold"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
+return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        active
+                          ? "text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 font-semibold"
+                          : "text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)] hover:bg-[var(--color-fc-gray-light)]/30"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
               })}
             </nav>
 
-            {/* ── Desktop Actions ── */}
+{/* ── Desktop Actions ── */}
             <div className="hidden sm:flex items-center gap-2.5">
               <Link
                 href="/espace-etudiant"
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 transition-all duration-200"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-primary)] hover:bg-[var(--color-fc-primary)]/8 border border-[var(--color-fc-gray-light)]/50 transition-all duration-200"
               >
-                <UserCheck className="w-4 h-4 text-blue-600" />
+                <UserCheck className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 Mon Espace
               </Link>
 
               <Link
                 href="/inscription"
-                className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white overflow-hidden group"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] transition-colors"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300" />
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-700 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative">S&apos;inscrire</span>
-                <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-1 duration-200" />
+                S'inscrire
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 duration-200" />
               </Link>
             </div>
 
@@ -227,7 +225,7 @@ export function Header() {
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+                className="p-2 rounded-xl text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)] hover:bg-[var(--color-fc-gray-light)]/30 transition-colors focus:outline-none"
                 aria-label="Menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

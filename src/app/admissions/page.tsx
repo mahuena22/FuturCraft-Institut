@@ -32,7 +32,7 @@ export default async function AdmissionsPage() {
       title: "Exploration & Choix",
       desc: "Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.",
       icon: GraduationCap,
-      color: "from-blue-500 to-indigo-600",
+      color: "var(--color-fc-primary)",
       highlight: "Catalogue gratuit",
     },
     {
@@ -40,7 +40,7 @@ export default async function AdmissionsPage() {
       title: "Candidature en ligne",
       desc: "Remplissez le formulaire en quelques minutes et obtenez instantanément votre numéro de dossier unique.",
       icon: CheckCircle2,
-      color: "from-violet-500 to-purple-600",
+      color: "var(--color-fc-cyan)",
       highlight: "Réponse instantanée",
     },
     {
@@ -48,7 +48,7 @@ export default async function AdmissionsPage() {
       title: "Validation & Paiement",
       desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
       icon: CreditCard,
-      color: "from-emerald-500 to-teal-600",
+      color: "var(--color-fc-light)",
       highlight: "Paiement sécurisé",
     },
     {
@@ -56,7 +56,7 @@ export default async function AdmissionsPage() {
       title: "Accès & Rentrée",
       desc: "Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.",
       icon: Star,
-      color: "from-amber-500 to-orange-600",
+      color: "var(--color-fc-cyan)",
       highlight: "Accès immédiat",
     },
   ];
@@ -94,10 +94,10 @@ export default async function AdmissionsPage() {
     new Intl.NumberFormat("fr-FR").format(price).replace(/\u202f/g, " ");
 
   return (
-    <div className="min-h-screen bg-[#f8faff]">
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
 
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white overflow-hidden">
+      <section className="relative bg-[var(--color-fc-deep)] text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid-dark opacity-15 pointer-events-none" />
         <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
         <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />

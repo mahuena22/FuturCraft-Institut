@@ -33,7 +33,7 @@ export default async function FormationsPage() {
     <div className="min-h-screen bg-[var(--color-fc-bg)]">
 
       {/* ── Hero Header ── */}
-      <section className="relative bg-gradient-to-b from-[var(--color-fc-deep)] via-[var(--color-fc-primary)]/30 to-[var(--color-fc-deep)] text-white overflow-hidden">
+      <section className="relative bg-[var(--color-fc-deep)] text-white overflow-hidden">
         <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none" />
         <div className="absolute inset-0 bg-grid-dark opacity-10 pointer-events-none" />
 
@@ -42,7 +42,7 @@ export default async function FormationsPage() {
         <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-[var(--color-fc-cyan)]/15 blur-[80px] pointer-events-none" />
 
         {/* Top line */}
-        <div className="h-0.5 bg-gradient-to-r from-transparent via-[var(--color-fc-primary)]/50 to-transparent" />
+        <div className="h-0.5 bg-[var(--color-fc-primary)]/50" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
           <div className="text-center max-w-4xl mx-auto">
@@ -55,10 +55,10 @@ export default async function FormationsPage() {
             <h1 className="animate-fade-up delay-100 font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
               <span className="text-white">Formations d&apos;avenir</span>
               <br />
-              <span className="text-gradient-brand">aux métiers du numérique</span>
+              <span className="text-[var(--color-fc-cyan)]">aux métiers du numérique</span>
             </h1>
 
-            <p className="animate-fade-up delay-200 text-blue-200/70 text-base sm:text-lg leading-relaxed mt-6 max-w-2xl mx-auto">
+            <p className="animate-fade-up delay-200 text-[var(--color-fc-light)]/70 text-base sm:text-lg leading-relaxed mt-6 max-w-2xl mx-auto">
               De la maîtrise accélérée des outils IA en 1 mois aux filières complètes
               de développement logiciel. Pratique intensive, projets réels, diplômes certifiants.
             </p>
@@ -71,7 +71,7 @@ export default async function FormationsPage() {
                     <Icon className="w-4.5 h-4.5 text-[var(--color-fc-cyan)]" />
                   </div>
                   <p className="font-display font-bold text-white text-sm">{label}</p>
-                  <p className="text-blue-300/60 text-[11px] mt-0.5">{sub}</p>
+                  <p className="text-[var(--color-fc-light)]/60 text-[11px] mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
@@ -79,7 +79,7 @@ export default async function FormationsPage() {
         </div>
 
         {/* Wave bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--color-fc-bg)] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-[var(--color-fc-bg)] pointer-events-none" />
       </section>
 
       {/* ── Main Content ── */}
@@ -89,7 +89,7 @@ export default async function FormationsPage() {
         <FormationsExplorer formations={formations} />
 
         {/* Bottom Banner — Full width */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--color-fc-deep)] via-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] p-px shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-[var(--color-fc-deep)] p-px shadow-2xl">
           {/* Inner content */}
           <div className="relative rounded-[calc(1.5rem-1px)] bg-[var(--color-fc-deep)] px-8 py-12 sm:px-12 lg:px-16">
             <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none rounded-[calc(1.5rem-1px)]" />
@@ -104,7 +104,7 @@ export default async function FormationsPage() {
                 <h3 className="font-display text-2xl sm:text-3xl font-black text-white">
                   Besoin d&apos;aide pour choisir ?
                 </h3>
-                <p className="text-sm text-blue-200/60 leading-7">
+                <p className="text-sm text-[var(--color-fc-light)]/60 leading-7">
                   Nos conseillers pédagogiques vous aident à identifier la formation
                   la plus adaptée à votre profil et vos ambitions professionnelles.
                 </p>

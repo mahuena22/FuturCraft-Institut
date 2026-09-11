@@ -205,44 +205,44 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Admissions & Écosystème */}
+{/* Admissions & Écosystème */}
           <div className="space-y-3 text-sm">
-            <h4 className="font-semibold text-white uppercase tracking-wider text-xs border-b border-slate-800 pb-2">
+            <h4 className="font-semibold text-[var(--color-fc-bg)] uppercase tracking-wider text-xs border-b border-[var(--color-fc-primary)]/30 pb-2">
               Admissions & Vie
             </h4>
-            <ul className="space-y-2 text-slate-400 text-xs">
+            <ul className="space-y-2 text-[var(--color-fc-gray-mid)] text-xs">
               <li>
-                <Link href="/admissions" className="hover:text-blue-400 transition-colors">
+                <Link href="/admissions" className="hover:text-[var(--color-fc-cyan)] transition-colors">
                   Modalités & Tarifs en FCFA
                 </Link>
               </li>
               <li>
-                <Link href="/inscription" className="hover:text-blue-400 transition-colors">
+                <Link href="/inscription" className="hover:text-[var(--color-fc-cyan)] transition-colors">
                   Candidater en ligne
                 </Link>
               </li>
               <li>
-                <Link href="/vie-a-futurcraft" className="hover:text-blue-400 transition-colors">
+                <Link href="/vie-a-futurcraft" className="hover:text-[var(--color-fc-cyan)] transition-colors">
                   Vie à FuturCraft & Événements
                 </Link>
               </li>
               <li>
-                <Link href="/projets-etudiants" className="hover:text-blue-400 transition-colors">
+                <Link href="/projets-etudiants" className="hover:text-[var(--color-fc-cyan)] transition-colors">
                   Galerie des Projets Étudiants
                 </Link>
               </li>
               <li>
-                <Link href="/entreprises" className="hover:text-blue-400 transition-colors">
+                <Link href="/entreprises" className="hover:text-[var(--color-fc-cyan)] transition-colors">
                   Espace Recruteurs & Partenaires
                 </Link>
               </li>
               <li>
-                <Link href="/recu" className="hover:text-blue-400 transition-colors text-emerald-400 font-medium">
-                  Vérifier l&apos;authenticité d&apos;un reçu
+                <Link href="/recu" className="hover:text-[var(--color-fc-cyan)] transition-colors text-[var(--color-fc-cyan)] font-medium">
+                  Vérifier l'authenticité d'un reçu
                 </Link>
               </li>
               <li>
-                <Link href="/actualites" className="hover:text-blue-400 transition-colors">
+                <Link href="/actualites" className="hover:text-[var(--color-fc-cyan)] transition-colors">
                   Actualités & Blog Tech
                 </Link>
               </li>
@@ -251,36 +251,36 @@ export function Footer() {
 
           {/* Espace & Sécurité */}
           <div className="space-y-3 text-sm">
-            <h4 className="font-semibold text-white uppercase tracking-wider text-xs border-b border-slate-800 pb-2">
+            <h4 className="font-semibold text-[var(--color-fc-bg)] uppercase tracking-wider text-xs border-b border-[var(--color-fc-primary)]/30 pb-2">
               Plateformes Sécurisées
             </h4>
             <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                <span className="font-semibold text-white block mb-1 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-blue-400" />
+              <div className="p-3 rounded-xl bg-[var(--color-fc-deep)] border border-[var(--color-fc-primary)]/30">
+                <span className="font-semibold text-[var(--color-fc-bg)] block mb-1 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[var(--color-fc-cyan)]" />
                   Espace Étudiant
                 </span>
-                <p className="text-slate-400 text-[11px] mb-2">
+                <p className="text-[var(--color-fc-gray-mid)] text-[11px] mb-2">
                   Suivi des mensualités, téléchargement des reçus numériques et attestations.
                 </p>
                 <Link
                   href="/espace-etudiant"
-                  className="text-blue-400 font-semibold hover:underline inline-flex items-center gap-1"
+                  className="text-[var(--color-fc-cyan)] font-semibold hover:underline inline-flex items-center gap-1"
                 >
                   Accéder à mon espace <ExternalLink className="w-3 h-3" />
                 </Link>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                <span className="font-semibold text-violet-300 block mb-1">
+              <div className="p-3 rounded-xl bg-[var(--color-fc-deep)] border border-[var(--color-fc-primary)]/30">
+                <span className="font-semibold text-[var(--color-fc-cyan)] block mb-1">
                   Espace Administration
                 </span>
-                <p className="text-slate-400 text-[11px] mb-2">
+                <p className="text-[var(--color-fc-gray-mid)] text-[11px] mb-2">
                   Gestion des inscriptions, encaissements, promotions et reçus.
                 </p>
                 <Link
                   href="/admin"
-                  className="text-violet-400 font-semibold hover:underline inline-flex items-center gap-1"
+                  className="text-[var(--color-fc-cyan)] font-semibold hover:underline inline-flex items-center gap-1"
                 >
                   Console de gestion <ExternalLink className="w-3 h-3" />
                 </Link>

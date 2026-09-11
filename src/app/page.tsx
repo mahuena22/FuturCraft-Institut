@@ -125,7 +125,7 @@ export default async function HomePage() {
                     sizes="100vw"
                     className="object-cover object-center opacity-55"
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(5,18,105,0.98)_0%,rgba(18,81,149,0.88)_44%,rgba(24,152,186,0.35)_100%)]" />
+                <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
                 <div className="absolute inset-0 bg-grid-dark opacity-30" />
                 <div className="hero-orb hero-orb-one" />
                 <div className="hero-orb hero-orb-two" />
@@ -135,7 +135,7 @@ export default async function HomePage() {
                         <div className="max-w-2xl">
                             <h1 className="animate-fade-up font-display text-5xl font-black leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
                                 Ton avenir
-                                <span className="block bg-gradient-to-r from-[var(--color-fc-cyan)] via-[var(--color-fc-light)] to-[var(--color-fc-bg)] bg-clip-text text-transparent">
+                                <span className="block text-[var(--color-fc-cyan)]">
                                     se construit ici.
                                 </span>
                             </h1>
@@ -155,23 +155,23 @@ export default async function HomePage() {
                                 </Link>
                                 <Link
                                     href="/formations"
-                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-md transition-all hover:-translate-y-1 hover:bg-white/15"
+                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[var(--color-fc-light)]/30 bg-transparent px-6 py-3.5 text-sm font-bold text-white transition-all hover:-translate-y-1 hover:bg-[var(--color-fc-light)]/10"
                                 >
-                                    <Play className="h-4 w-4 fill-current text-cyan-300" />
+                                    <Play className="h-4 w-4 fill-current text-[var(--color-fc-cyan)]" />
                                     Découvrir les formations
                                 </Link>
                             </div>
-                            <div className="animate-fade-up delay-400 mt-10 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-blue-100/70">
+                            <div className="animate-fade-up delay-400 mt-10 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-[var(--color-fc-light)]/70">
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
                                     Projets réels
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
                                     Certifications professionnelles
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
                                     Accompagnement emploi
                                 </span>
                             </div>
@@ -179,8 +179,8 @@ export default async function HomePage() {
 
                         <div className="relative hidden min-h-[430px] lg:block">
                             <div className="absolute right-2 top-4 h-80 w-80 rounded-full bg-[var(--color-fc-primary)]/20 blur-3xl" />
-                            <div className="absolute right-10 top-16 h-[350px] w-[350px] rounded-[3rem] border border-white/15 bg-white/10 shadow-2xl shadow-[var(--color-fc-deep)]/50 backdrop-blur-sm hero-card-tilt" />
-                            <div className="absolute right-20 top-28 h-[350px] w-[350px] overflow-hidden rounded-[2.5rem] border border-white/20 shadow-2xl shadow-blue-950/50 hero-card-tilt">
+                            <div className="absolute right-10 top-16 h-[350px] w-[350px] rounded-[3rem] border border-[var(--color-fc-light)]/20 bg-[var(--color-fc-bg)]/10 shadow-2xl shadow-[var(--color-fc-deep)]/50 backdrop-blur-sm hero-card-tilt" />
+                            <div className="absolute right-20 top-28 h-[350px] w-[350px] overflow-hidden rounded-[2.5rem] border border-[var(--color-fc-light)]/20 shadow-2xl shadow-[var(--color-fc-deep)]/50 hero-card-tilt">
                                 <Image
                                     src="/images/hero-bg.jpg"
                                     alt=""
@@ -188,10 +188,10 @@ export default async function HomePage() {
                                     sizes="350px"
                                     className="object-cover object-center"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent" />
+                                <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
                                 <div className="absolute bottom-6 left-6 right-6">
-                                    <div className="mb-2 flex items-center gap-2 text-xs font-bold text-cyan-200">
-                                        <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_12px_#6ee7b7]" />
+                                    <div className="mb-2 flex items-center gap-2 text-xs font-bold text-[var(--color-fc-light)]">
+                                        <span className="h-2 w-2 rounded-full bg-[var(--color-fc-cyan)] shadow-[0_0_12px_rgba(24,152,186,0.5)]" />
                                         Campus en mouvement
                                     </div>
                                     <p className="font-display text-2xl font-bold">
@@ -202,11 +202,11 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-50 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[var(--color-fc-bg)] to-transparent" />
             </section>
 
             <section className="relative z-10 mx-auto -mt-2 max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 sm:grid-cols-3">
+                <div className="grid overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-white shadow-xl shadow-[var(--color-fc-deep)]/10 sm:grid-cols-3">
                     {([
                         {
                             variant: "count" as const,
@@ -237,7 +237,7 @@ export default async function HomePage() {
                         return (
                         <div
                             key={label}
-                            className="flex items-center gap-4 border-b border-slate-100 p-6 last:border-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                            className="flex items-center gap-4 border-b border-[var(--color-fc-gray-light)]/50 p-6 last:border-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
                             <div className="rounded-2xl bg-[var(--color-fc-primary)]/10 p-3 text-[var(--color-fc-primary)]">
                                 <Icon className="h-5 w-5" />
                             </div>
@@ -266,13 +266,13 @@ export default async function HomePage() {
             <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
                 <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                     <div>
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+                        <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
                             Choisis ton terrain de jeu
                         </p>
-                        <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                        <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
                             Des compétences qui ouvrent des portes
                         </h2>
-                        <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600">
+                        <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--color-fc-gray-mid)]">
                             Un apprentissage pratique pour passer de l&apos;idée
                             à l&apos;impact, accompagné par des experts du
                             terrain.
