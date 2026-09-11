@@ -83,9 +83,9 @@ export default async function FormationDetailPage(props: {
   ];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-[var(--color-fc-bg)] min-h-screen">
       {/* 9.1 HERO SECTION */}
-      <section className="relative overflow-hidden bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800">
+      <section className="relative overflow-hidden bg-[var(--color-fc-deep)] text-white py-16 lg:py-24 border-b border-[var(--color-fc-primary)]/30">
         <div className="absolute inset-0 opacity-25 relative">
           <Image
             src={formation.imageUrl}
@@ -95,16 +95,16 @@ export default async function FormationDetailPage(props: {
             sizes="100vw"
             className="object-cover object-center blur-xs"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40" />
+          <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl space-y-6">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-fc-primary)]/20 text-[var(--color-fc-cyan)] border border-[var(--color-fc-primary)]/30">
                 {formation.category}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-slate-200 border border-white/10">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-fc-primary)]/20 text-[var(--color-fc-cyan)] border border-[var(--color-fc-primary)]/30">
                 🇧🇯 {formation.campus}
               </span>
             </div>
@@ -118,31 +118,31 @@ export default async function FormationDetailPage(props: {
             </p>
 
             {/* Quick meta bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-[var(--color-fc-bg)]/90 backdrop-blur-md border border-[var(--color-fc-gray-light)]/30 text-xs">
               <div>
                 <span className="text-slate-400 block mb-0.5">Durée :</span>
                 <span className="font-bold text-white flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-blue-400" />
+                  <Clock className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
                   {formation.duration}
                 </span>
               </div>
               <div>
                 <span className="text-slate-400 block mb-0.5">Niveau requis :</span>
                 <span className="font-bold text-white flex items-center gap-1">
-                  <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+                  <GraduationCap className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
                   {formation.level}
                 </span>
               </div>
               <div>
                 <span className="text-slate-400 block mb-0.5">Frais de scolarité :</span>
-                <span className="font-bold text-emerald-400 text-sm">
+                <span className="font-bold text-[var(--color-fc-cyan)] text-sm">
                   {formation.price.toLocaleString("fr-FR")} FCFA
                 </span>
               </div>
               <div>
                 <span className="text-slate-400 block mb-0.5">Modalité :</span>
                 <span className="font-bold text-white flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-violet-400" />
+                  <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
                   {formation.mode}
                 </span>
               </div>
@@ -152,7 +152,7 @@ export default async function FormationDetailPage(props: {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href={`/inscription?formationId=${formation.id}`}
-                className="px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base text-white bg-blue-600 hover:bg-blue-500 shadow-xl shadow-blue-600/30 transition-all flex items-center gap-2 transform active:scale-95"
+                className="px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-xl shadow-[var(--color-fc-deep)]/30 transition-all flex items-center gap-2 transform active:scale-95"
               >
                 <span>Je candidate maintenant</span>
                 <ArrowRight className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default async function FormationDetailPage(props: {
 
               <a
                 href="#programme"
-                className="px-5 py-3.5 rounded-xl font-semibold text-sm text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-all"
+                className="px-5 py-3.5 rounded-xl font-semibold text-sm text-[var(--color-fc-deep)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-light)]/30 border border-[var(--color-fc-gray-light)]/30 transition-all"
               >
                 Consulter le programme détaillé
               </a>
@@ -176,13 +176,13 @@ export default async function FormationDetailPage(props: {
           <div className="lg:col-span-8 space-y-14">
             {/* 9.2 PRÉSENTATION */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                 Présentation détaillée
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
                 À propos de la formation
               </h2>
-              <p className="text-slate-700 text-base leading-relaxed whitespace-pre-line">
+              <p className="text-[var(--color-fc-gray-mid)] text-base leading-relaxed whitespace-pre-line">
                 {formation.fullDescription}
               </p>
             </section>
@@ -191,14 +191,14 @@ export default async function FormationDetailPage(props: {
             <section id="programme" className="space-y-6 scroll-mt-24">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                     Curriculum Pédagogique
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 mt-1">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
                     Ce que vous allez apprendre
                   </h2>
                 </div>
-                <span className="text-xs font-semibold text-slate-500">
+                <span className="text-xs font-semibold text-[var(--color-fc-gray-mid)]">
                   {modules.length} modules structurés
                 </span>
               </div>
@@ -207,18 +207,18 @@ export default async function FormationDetailPage(props: {
                 {modules.map((m, idx) => (
                   <div
                     key={idx}
-                    className="p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-blue-300 transition-all shadow-xs space-y-2"
+                    className="p-5 rounded-2xl border border-[var(--color-fc-gray-light)]/50 bg-[var(--color-fc-bg)] hover:border-[var(--color-fc-primary)] transition-all shadow-xs space-y-2"
                   >
                     <div className="flex items-center justify-between flex-wrap gap-2">
-                      <span className="text-xs font-extrabold px-2.5 py-1 rounded-md bg-blue-100/70 text-blue-800">
+                      <span className="text-xs font-extrabold px-2.5 py-1 rounded-md bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-primary)]">
                         {m.moduleNumber}
                       </span>
-                      <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" /> {m.duration}
+                      <span className="text-xs text-[var(--color-fc-gray-mid)] font-medium flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-[var(--color-fc-gray-mid)]" /> {m.duration}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900">{m.title}</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">{m.description}</p>
+                    <h3 className="text-lg font-bold text-[var(--color-fc-black)]">{m.title}</h3>
+                    <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed">{m.description}</p>
                   </div>
                 ))}
               </div>
@@ -226,40 +226,40 @@ export default async function FormationDetailPage(props: {
 
             {/* 9.4 COMPÉTENCES ACQUISES */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-cyan)] bg-[var(--color-fc-cyan)]/10 px-2.5 py-1 rounded">
                 Objectifs opérationnels
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
                 Compétences acquises
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 {competencies.map((comp, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-150"
+                    className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span className="text-xs text-slate-800 font-medium">{comp}</span>
+                    <CheckCircle2 className="w-4 h-4 text-[var(--color-fc-cyan)] shrink-0 mt-0.5" />
+                    <span className="text-xs text-[var(--color-fc-gray-mid)] font-medium">{comp}</span>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* 9.5 OUTILS UTILISÉS */}
+{/* 9.5 OUTILS UTILISÉS */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-cyan)] bg-[var(--color-fc-cyan)]/10 px-2.5 py-1 rounded">
                 Environnement Technique
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
-                Outils &amp; Technologies maîtrisés
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
+                Outils & Technologies maîtrisés
               </h2>
               <div className="flex flex-wrap gap-2.5 pt-2">
                 {tools.map((t, idx) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-800 border border-slate-200 shadow-xs hover:border-violet-400 hover:text-violet-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)] border border-[var(--color-fc-gray-light)]/50 shadow-xs hover:border-[var(--color-fc-primary)] hover:text-[var(--color-fc-primary)] transition-colors"
                   >
-                    <Wrench className="w-3.5 h-3.5 text-blue-600" />
+                    <Wrench className="w-3.5 h-3.5 text-[var(--color-fc-primary)]" />
                     {t}
                   </span>
                 ))}
@@ -268,22 +268,22 @@ export default async function FormationDetailPage(props: {
 
             {/* 9.6 DÉBOUCHÉS */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-cyan)] bg-[var(--color-fc-cyan)]/10 px-2.5 py-1 rounded">
                 Opportunités de Carrière
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
                 Métiers accessibles
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 {jobs.map((j, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-xs group hover:border-emerald-400 transition-colors"
+                    className="flex items-center gap-3 p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50 shadow-xs group hover:border-[var(--color-fc-cyan)] transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--color-fc-cyan)]/10 text-[var(--color-fc-cyan)] flex items-center justify-center font-bold text-xs shrink-0">
                       <Briefcase className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                    <span className="text-xs font-bold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-cyan)]">
                       {j}
                     </span>
                   </div>
@@ -294,19 +294,19 @@ export default async function FormationDetailPage(props: {
             {/* 9.7 PROJETS ÉTUDIANTS LIÉS */}
             {relatedProjects.length > 0 && (
               <section className="space-y-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                   Réalisations concrètes
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
                   Projets développés dans cette filière
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
                   {relatedProjects.map((proj) => (
                     <div
                       key={proj.id}
-                      className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-xs"
+                      className="bg-[var(--color-fc-bg)] rounded-xl border border-[var(--color-fc-gray-light)]/50 p-4 space-y-3 shadow-xs"
                     >
-                      <div className="relative h-32 rounded-lg overflow-hidden bg-slate-100">
+                      <div className="relative h-32 rounded-lg overflow-hidden bg-[var(--color-fc-gray-light)]/30">
                         <Image
                           src={proj.coverImage}
                           alt={proj.title}
@@ -315,11 +315,11 @@ export default async function FormationDetailPage(props: {
                           className="object-cover"
                         />
                       </div>
-                      <h4 className="font-bold text-slate-900 text-sm">{proj.title}</h4>
-                      <p className="text-xs text-slate-600 line-clamp-2">{proj.description}</p>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">{proj.title}</h4>
+                      <p className="text-xs text-[var(--color-fc-gray-mid)] line-clamp-2">{proj.description}</p>
                       <Link
                         href="/projets-etudiants"
-                        className="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1"
+                        className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline inline-flex items-center gap-1"
                       >
                         Découvrir la fiche projet →
                       </Link>
@@ -331,23 +331,23 @@ export default async function FormationDetailPage(props: {
 
             {/* 9.8 FAQ */}
             <section className="space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-gray-light)]/30 px-2.5 py-1 rounded">
                 Questions Fréquentes
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
                 Tout savoir sur cette formation
               </h2>
               <div className="space-y-3 pt-2">
                 {faqs.map((faq, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1.5"
+                    className="p-4 rounded-xl bg-[var(--color-fc-gray-light)]/30 border border-[var(--color-fc-gray-light)]/50 space-y-1.5"
                   >
-                    <h4 className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                      <HelpCircle className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <h4 className="text-xs font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                      <HelpCircle className="w-3.5 h-3.5 text-[var(--color-fc-primary)] shrink-0" />
                       {faq.q}
                     </h4>
-                    <p className="text-xs text-slate-600 leading-relaxed pl-5.5">{faq.a}</p>
+                    <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed pl-5.5">{faq.a}</p>
                   </div>
                 ))}
               </div>
@@ -360,31 +360,31 @@ export default async function FormationDetailPage(props: {
               {/* Enrollment Card */}
               <div className="bg-white rounded-2xl border-2 border-blue-600/30 p-6 shadow-xl space-y-6">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-blue-600 block mb-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] block mb-1">
                     Candidature &amp; Inscription
                   </span>
-                  <div className="text-2xl sm:text-3xl font-black text-slate-950">
+                  <div className="text-2xl sm:text-3xl font-black text-[var(--color-fc-black)]">
                     {formation.price.toLocaleString("fr-FR")}{" "}
-                    <span className="text-xs font-bold text-slate-500">FCFA</span>
+                    <span className="text-xs font-bold text-[var(--color-fc-gray-mid)]">FCFA</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-[11px] text-[var(--color-fc-gray-mid)] mt-1">
                     Frais de dossier : {formation.registrationFee.toLocaleString("fr-FR")} FCFA + mensualités
                   </p>
                 </div>
 
                 {/* Next available promotions */}
                 {promotions.length > 0 && (
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <span className="text-xs font-bold text-slate-700 block">
+                  <div className="space-y-2 pt-2 border-t border-[var(--color-fc-gray-light)]/50">
+                    <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] block">
                       Sessions disponibles :
                     </span>
                     {promotions.map((p) => (
                       <div
                         key={p.id}
-                        className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-0.5"
+                        className="p-2.5 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50 text-xs space-y-0.5"
                       >
                         <span className="font-bold text-slate-900 block">{p.name}</span>
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[11px] text-[var(--color-fc-gray-mid)]">
                           Début : {p.startDate} • {p.campus}
                         </span>
                       </div>
@@ -395,14 +395,14 @@ export default async function FormationDetailPage(props: {
                 {/* Primary CTA */}
                 <Link
                   href={`/inscription?formationId=${formation.id}`}
-                  className="w-full py-3.5 rounded-xl text-center text-sm font-extrabold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl text-center text-sm font-extrabold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-md shadow-[var(--color-fc-deep)]/25 transition-all flex items-center justify-center gap-2"
                 >
                   <span>Candidater à cette formation</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 {/* Guarantees */}
-                <div className="space-y-2 pt-2 border-t border-slate-100 text-xs text-slate-600">
+                <div className="space-y-2 pt-2 border-t border-[var(--color-fc-gray-light)]/50 text-xs text-[var(--color-fc-gray-mid)]">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>Paiement échelonné jusqu&apos;à {formation.installmentsCount} fois</span>
@@ -419,18 +419,18 @@ export default async function FormationDetailPage(props: {
               </div>
 
               {/* WhatsApp Quick Contact */}
-              <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-5 space-y-2 text-xs">
-                <span className="font-bold text-emerald-900 block text-sm">
+              <div className="bg-[var(--color-fc-cyan)]/10 rounded-2xl border border-[var(--color-fc-cyan)]/30 p-5 space-y-2 text-xs">
+                <span className="font-bold text-[var(--color-fc-cyan)] block text-sm">
                   Une question sur cette filière ?
                 </span>
-                <p className="text-emerald-700">
+                <p className="text-[var(--color-fc-cyan)]/80">
                   Échangez instantanément avec notre conseiller d&apos;orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
                 </p>
                 <a
                   href="https://wa.me/22943327832"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-block pt-1 font-bold text-emerald-800 hover:underline"
+                  className="inline-block pt-1 font-bold text-[var(--color-fc-cyan)] hover:underline"
                 >
                   Ouvrir WhatsApp →
                 </a>
@@ -441,18 +441,18 @@ export default async function FormationDetailPage(props: {
       </div>
 
       {/* 9.9 CTA FINAL */}
-      <section className="py-16 bg-slate-50 border-t border-slate-200">
+      <section className="py-16 bg-[var(--color-fc-gray-light)]/30 border-t border-[var(--color-fc-gray-light)]/50">
         <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-950">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[var(--color-fc-black)]">
             Prêt à rejoindre la prochaine génération de professionnels ?
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="text-[var(--color-fc-gray-mid)] text-sm sm:text-base max-w-xl mx-auto">
             Les candidatures pour la session {formation.title} sont examinées par ordre d&apos;arrivée.
           </p>
           <div className="pt-2">
             <Link
               href={`/inscription?formationId=${formation.id}`}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-extrabold text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-600/30 transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-extrabold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-xl shadow-[var(--color-fc-deep)]/30 transition-all"
             >
               <span>Je candidate maintenant</span>
               <ArrowRight className="w-5 h-5" />
