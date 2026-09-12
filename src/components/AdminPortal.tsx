@@ -27,7 +27,14 @@ import {
   FileText,
   Pencil,
   Trash2,
+  DollarSign,
+  Bell,
+  Mail,
+  AlertCircle,
+  Download,
 } from "lucide-react";
+
+import { ReminderMonitor } from "./ReminderMonitor";
 
 interface AdminStats {
   totalStudents: number;
@@ -150,7 +157,7 @@ export function AdminPortal({
   const [formations, setFormations] = useState<FormationItem[]>(formationsList);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats" | "rappels">("dashboard");
 
   const router = useRouter();
 
@@ -673,7 +680,7 @@ export function AdminPortal({
             <span>Demandes de Partenariat ({partnerships.length})</span>
           </button>
 
-          <button
+<button
             onClick={() => setActiveTab("roles")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "roles"
@@ -682,7 +689,19 @@ export function AdminPortal({
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Gestion des Rôles &amp; Permissions</span>
+            <span>Gestion des Rôles & Permissions</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("rappels")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "rappels"
+                ? "border-violet-600 text-violet-600"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4" />
+            <span>Suivi des Rappels</span>
           </button>
         </div>
 
