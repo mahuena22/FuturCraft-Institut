@@ -205,7 +205,7 @@ export function Footer() {
             </ul>
           </div>
 
-{/* Admissions & Écosystème */}
+          {/* Admissions & Écosystème */}
           <div className="space-y-3 text-sm">
             <h4 className="font-semibold text-[var(--color-fc-bg)] uppercase tracking-wider text-xs border-b border-[var(--color-fc-primary)]/30 pb-2">
               Admissions & Vie
@@ -249,47 +249,10 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Espace & Sécurité */}
-          <div className="space-y-3 text-sm">
-            <h4 className="font-semibold text-[var(--color-fc-bg)] uppercase tracking-wider text-xs border-b border-[var(--color-fc-primary)]/30 pb-2">
-              Plateformes Sécurisées
-            </h4>
-            <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-[var(--color-fc-deep)] border border-[var(--color-fc-primary)]/30">
-                <span className="font-semibold text-[var(--color-fc-bg)] block mb-1 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[var(--color-fc-cyan)]" />
-                  Espace Étudiant
-                </span>
-                <p className="text-[var(--color-fc-gray-mid)] text-[11px] mb-2">
-                  Suivi des mensualités, téléchargement des reçus numériques et attestations.
-                </p>
-                <Link
-                  href="/espace-etudiant"
-                  className="text-[var(--color-fc-cyan)] font-semibold hover:underline inline-flex items-center gap-1"
-                >
-                  Accéder à mon espace <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
 
-              <div className="p-3 rounded-xl bg-[var(--color-fc-deep)] border border-[var(--color-fc-primary)]/30">
-                <span className="font-semibold text-[var(--color-fc-cyan)] block mb-1">
-                  Espace Administration
-                </span>
-                <p className="text-[var(--color-fc-gray-mid)] text-[11px] mb-2">
-                  Gestion des inscriptions, encaissements, promotions et reçus.
-                </p>
-                <Link
-                  href="/admin"
-                  className="text-[var(--color-fc-cyan)] font-semibold hover:underline inline-flex items-center gap-1"
-                >
-                  Console de gestion <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
 
-{/* Bottom bar */}
+        {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-[var(--color-fc-primary)]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-fc-gray-mid)]">
           <p>© {new Date().getFullYear()} FuturCraft Institut. Tous droits réservés. Enregistré en République du Bénin.</p>
           <div className="flex items-center gap-6">

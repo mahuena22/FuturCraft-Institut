@@ -43,22 +43,22 @@ const testimonials = [
             "FuturCraft offre un cadre dynamique, une pédagogie axée sur la pratique et un accompagnement qui fait vraiment la différence dans le parcours des apprenants.",
     },
     {
-        name: "William ZOMANHOUN",
+        name: "Onesim Graça Ema-Ayé ",
         role: "Développeur web",
         avatar: "/images/wiliam.jpg",
         quote:
             "Les projets concrets m'ont permis de progresser rapidement et de prendre confiance. J'ai appris à travailler comme dans une véritable équipe produit.",
     },
     {
-        name: "Carlos HOUESSINON",
-        role: "Graphiste & UI/UX Designer",
+        name: "Pacome ASSOGBA",
+        role: "Photographie, Cadrage et Montage Vidéo",
         avatar: "/images/houessinon.jpg",
         quote:
             "Une formation accessible et exigeante, portée par des intervenants toujours disponibles. Chaque cours nous rapproche un peu plus du monde professionnel.",
     },
     {
-        name: "Nicodème ATAKOUN",
-        role: "Spécialiste Marketing digital",
+        name: "Ange AKONDE",
+        role: "Développeur web Full-stack",
         avatar: "/images/nicodem.jpg",
         quote:
             "J'ai trouvé à FuturCraft une communauté motivée et les outils nécessaires pour transformer mes idées en compétences et résultats concrets.",
@@ -80,8 +80,8 @@ const testimonials = [
 ];
 
 const trainingPricing = [
-    { title: "Développement Web Fullstack", duration: "2 ans", price: "600.000 FCFA" },
-    { title: "Développement en Intelligence Artificielle", duration: "2 ans", price: "600.000 FCFA" },
+    { title: "Développement Web Fullstack", duration: "2 ans", price: "300.000 FCFA/ans" },
+    { title: "Développement en Intelligence Artificielle", duration: "2 ans", price: "300.000 FCFA/ans" },
     { title: "Maîtrise des Outils IA", duration: "1 mois", price: "70.000 FCFA" },
     { title: "Web Design (UI/UX)", duration: "9 mois", price: "250.000 FCFA" },
     { title: "Graphisme et Sérigraphie", duration: "9 mois", price: "250.000 FCFA" },
@@ -125,7 +125,6 @@ export default async function HomePage() {
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                     className="object-cover object-center opacity-55"
                 />
-                <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
                 <div className="absolute inset-0 bg-grid-dark opacity-30" />
                 <div className="hero-orb hero-orb-one" />
                 <div className="hero-orb hero-orb-two" />
@@ -188,7 +187,7 @@ export default async function HomePage() {
                                     sizes="350px"
                                     className="object-cover object-center"
                                 />
-                                <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                                 <div className="absolute bottom-6 left-6 right-6">
                                     <div className="mb-2 flex items-center gap-2 text-xs font-bold text-[var(--color-fc-light)]">
                                         <span className="h-2 w-2 rounded-full bg-[var(--color-fc-primary)] shadow-[0_0_12px_rgba(18,81,149,0.5)]" />
@@ -235,29 +234,29 @@ export default async function HomePage() {
                     >).map((item) => {
                         const { icon: Icon, label } = item;
                         return (
-                        <div
-                            key={label}
-                            className="flex items-center gap-4 border-b border-[var(--color-fc-gray-light)]/50 p-6 last:border-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
-                            <div className="rounded-2xl bg-[var(--color-fc-primary)]/10 p-3 text-[var(--color-fc-primary)]">
-                                <Icon className="h-5 w-5" />
-                            </div>
-                            <div>
-                                {item.variant === "address" ? (
-                                    <p className="font-display text-lg font-black leading-tight text-[var(--color-fc-black)]">
-                                        {label}
-                                    </p>
-                                ) : (
-                                    <>
-                                        <p className="font-display text-2xl font-black text-[var(--color-fc-black)]">
-                                            <StatCounter target={item.target} prefix={item.prefix} suffix={item.suffix} activeAt />
-                                        </p>
-                                        <p className="text-xs font-medium text-[var(--color-fc-gray-mid)]">
+                            <div
+                                key={label}
+                                className="flex items-center gap-4 border-b border-[var(--color-fc-gray-light)]/50 p-6 last:border-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                                <div className="rounded-2xl bg-[var(--color-fc-primary)]/10 p-3 text-[var(--color-fc-primary)]">
+                                    <Icon className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    {item.variant === "address" ? (
+                                        <p className="font-display text-lg font-black leading-tight text-[var(--color-fc-black)]">
                                             {label}
                                         </p>
-                                    </>
-                                )}
+                                    ) : (
+                                        <>
+                                            <p className="font-display text-2xl font-black text-[var(--color-fc-black)]">
+                                                <StatCounter target={item.target} prefix={item.prefix} suffix={item.suffix} activeAt />
+                                            </p>
+                                            <p className="text-xs font-medium text-[var(--color-fc-gray-mid)]">
+                                                {label}
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
                         );
                     })}
                 </div>
@@ -278,10 +277,10 @@ export default async function HomePage() {
                             terrain.
                         </p>
                     </div>
-<Link
-                                href="/formations"
-                                className="group inline-flex items-center gap-2 text-sm font-extrabold text-[var(--color-fc-primary)] hover:text-[var(--color-fc-deep)]"
-                            >
+                    <Link
+                        href="/formations"
+                        className="group inline-flex items-center gap-2 text-sm font-extrabold text-[var(--color-fc-primary)] hover:text-[var(--color-fc-deep)]"
+                    >
                         Voir tout le catalogue
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
@@ -289,10 +288,10 @@ export default async function HomePage() {
                 <div className="mt-10 grid gap-5 md:grid-cols-3">
                     {formations.slice(0, 3).map((formation, index) => (
                         <Reveal key={formation.id} delay={(index % 3) * 90} className="h-full">
-<Link
-                                    href={`/formation/${formation.slug}`}
-                                    className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-fc-primary)] hover:shadow-xl"
-                                >
+                            <Link
+                                href={`/formation/${formation.slug}`}
+                                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-fc-primary)] hover:shadow-xl"
+                            >
                                 <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)]/30">
                                     <Image
                                         src={formation.imageUrl}
@@ -359,7 +358,7 @@ export default async function HomePage() {
                     ))}
                 </div>
                 <div className="mt-6 rounded-2xl border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-primary)]/8 p-5 text-center text-sm text-[var(--color-fc-gray-mid)]">
-                    <span className="font-bold text-[var(--color-fc-primary)]">FuturCraft Institut et Programme Futur</span> fait partie des programmes phares de notre écosystème de formation et d&apos;engagement numérique.
+                    <span className="font-bold text-[var(--color-fc-primary)]">FuturCraft Institut et Programme Futur  </span> font partie des programmes phares de notre écosystème de formation et d&apos;engagement numérique.
                 </div>
             </section>
 
@@ -432,7 +431,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            <section className="bg-[var(--color-fc-deep)] py-24 text-white">
+            <section className="mb-24 mt-24 rounded-[2rem] bg-[var(--color-fc-deep)] px-2 py-24 text-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
@@ -462,7 +461,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            <section className="mx-4 mb-24 overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] sm:mx-6 lg:mx-auto lg:max-w-7xl">
+            <section className="mx-4 mb-24  overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] sm:mx-6 lg:mx-auto lg:max-w-7xl">
                 <div className="relative px-6 py-14 sm:px-12 lg:px-16">
                     <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-[var(--color-fc-primary)]/30 blur-3xl" />
                     <Rocket className="absolute right-12 top-12 h-24 w-24 rotate-12 text-[var(--color-fc-cyan)]/10" />
