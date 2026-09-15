@@ -8,6 +8,7 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const DEFAULT_FROM =
   process.env.EMAIL_FROM || "FuturCraft Institut <no-reply@futurcraft.bj>";
 export const INTERNAL_EMAIL = process.env.INTERNAL_EMAIL || "contact@futurcraft.bj";
+import { getAdminName } from "@/lib/auth";
 
 export async function sendEmail(opts: {
   to: string;
@@ -78,7 +79,7 @@ export async function sendInscriptionEmails(params: {
     `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
      <p>Votre préinscription à la formation <strong>${params.formationTitle}</strong> est bien reçue.</p>
      <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("N° matricule", params.studentNumber)}${field("Formation", params.formationTitle)}${field("Frais totaux", money)}${field("Contact", params.phone)}</table>
-     <p style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 16px;"><strong>⏳ Validation en attente :</strong> votre dossier sera vérifié par l'administration (Yoan Melson DANSOU). Vous recevrez une notification dès que votre compte sera activé.</p>
+     <p style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 16px;"><strong>⏳ Validation en attente :</strong> votre dossier sera vérifié par l'administration (${getAdminName()}). Vous recevrez une notification dès que votre compte sera activé.</p>
      <p>Une fois validé, connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#4f46e5;font-weight:700;">espace étudiant</a> avec votre matricule et votre téléphone pour régler vos frais en ligne (MTN MoMo / Moov Money) ou au guichet.</p>`
   );
 
@@ -114,7 +115,7 @@ export async function sendValidationEmail(params: {
     isValidated ? "Compte activé 🎉" : "Dossier non retenu",
     isValidated
       ? `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
-         <p>Félicitations ! Votre dossier de candidature a été <strong>validé</strong> par l'administration (Yoan Melson DANSOU).</p>
+         <p>Félicitations ! Votre dossier de candidature a été <strong>validé</strong> par l'administration (${getAdminName()}).</p>
          <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("N° matricule", params.studentNumber)}${params.formationTitle ? field("Formation", params.formationTitle) : ""}</table>
          <p style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:12px 16px;"><strong>✅ Compte actif :</strong> votre profil est désormais visible par les recruteurs sur notre <a href="https://futurcraft.bj/entreprises" style="color:#4f46e5;font-weight:700;">page Entreprises</a>.</p>
          ${params.note ? `<p><em>Note de l'administration : ${params.note.replace(/[\n]/g, "<br/>")}</em></p>` : ""}
@@ -131,6 +132,27 @@ export async function sendValidationEmail(params: {
       html,
     }).catch((e) => console.error("[email] échec validation étudiant:", e));
   }
+}
+
+export async function sendAdminDocumentUploadEmail(params: {
+  firstName: string;
+  lastName: string;
+  studentNumber: string;
+  kind: "avatar" | "cv";
+  url: string;
+}) {
+  const kindLabel = params.kind === "avatar" ? "photo de profil" : "Curriculum Vitae (PDF)";
+  const html = layout(
+    "Nouveau document étudiant",
+    `<p>💼 <strong>${params.firstName} ${params.lastName}</strong> (matricule ${params.studentNumber}) vient de déposer sa <strong>${kindLabel}</strong> dans son espace étudiant.</p>
+     <p><a href="https://futurcraft.bj${params.url}" style="color:#4f46e5;font-weight:700;">Consulter le document →</a></p>
+     <p><em>Sa fiche est désormais complète et plus attractive pour les recruteurs sur la page Entreprises.</em></p>`
+  );
+  void sendEmail({
+    to: INTERNAL_EMAIL,
+    subject: `[FuturCraft] Document déposé — ${params.firstName} ${params.lastName} (${kindLabel})`,
+    html,
+  }).catch((e) => console.error("[email] échec alerte document étudiant:", e));
 }
 
 export async function sendPartnershipEmail(params: {

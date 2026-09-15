@@ -5,6 +5,7 @@ import { getStudentSession } from "@/lib/student-auth";
 import { db } from "@/db";
 import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { sendAdminDocumentUploadEmail } from "@/lib/email";
 
 async function removeFile(url: string | null | undefined) {
   if (!url || !url.startsWith("/uploads/students/")) return;
@@ -73,6 +74,14 @@ export async function POST(req: NextRequest) {
       .set(kind === "avatar" ? { avatarUrl: publicUrl } : { cvUrl: publicUrl })
       .where(eq(students.id, studentId));
     await removeFile(previousUrl);
+
+    void sendAdminDocumentUploadEmail({
+      firstName: existing.firstName,
+      lastName: existing.lastName,
+      studentNumber: existing.studentNumber,
+      kind: kind as "avatar" | "cv",
+      url: publicUrl,
+    });
 
     return NextResponse.json({ success: true, url: publicUrl });
   } catch (error) {
