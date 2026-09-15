@@ -78,15 +78,16 @@ export async function sendInscriptionEmails(params: {
     `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
      <p>Votre préinscription à la formation <strong>${params.formationTitle}</strong> est bien reçue.</p>
      <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("N° matricule", params.studentNumber)}${field("Formation", params.formationTitle)}${field("Frais totaux", money)}${field("Contact", params.phone)}</table>
-     <p>Connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#4f46e5;font-weight:700;">espace étudiant</a> avec votre matricule et votre téléphone pour régler vos frais en ligne (MTN MoMo / Moov Money) ou au guichet.</p>`
+     <p style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 16px;"><strong>⏳ Validation en attente :</strong> votre dossier sera vérifié par l'administration (Yoan Melson DANSOU). Vous recevrez une notification dès que votre compte sera activé.</p>
+     <p>Une fois validé, connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#4f46e5;font-weight:700;">espace étudiant</a> avec votre matricule et votre téléphone pour régler vos frais en ligne (MTN MoMo / Moov Money) ou au guichet.</p>`
   );
 
   // Alerte interne à l'équipe
   const teamHtml = layout(
-    "Nouvelle préinscription reçue",
-    `<p>Une nouvelle préinscription vient d'être enregistrée :</p>
+    "Nouvelle préinscription reçue — à valider",
+    `<p>Une nouvelle préinscription vient d'être enregistrée et attend votre validation :</p>
      <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("Matricule", params.studentNumber)}${field("Étudiant", `${params.firstName} ${params.lastName}`)}${field("Formation", params.formationTitle)}${field("Total à percevoir", money)}${field("Téléphone", params.phone)}${field("Email", params.email)}</table>
-     <p>Pensez à contacter rapidement le candidat pour finaliser les frais d'inscription.</p>`
+     <p>Connectez-vous à la console d'administration pour valider ou rejeter ce dossier. Le compte ne sera actif et visible sur la page Entreprises qu'après validation.</p>`
   );
 
   if (params.email) {

@@ -207,12 +207,118 @@ export async function createStudentWithPlan(data: {
   // Welcome notification
   await db.insert(notifications).values({
     studentId: newStudent.id,
-    title: "Bienvenue à FuturCraft Institut !",
-    message: `Votre préinscription sous le numéro ${studentNumber} a été enregistrée avec succès. Vous pouvez finaliser vos frais d'inscription depuis votre espace.`,
+    title: "Inscription enregistrée 🎓",
+    message: `Votre préinscription sous le numéro ${studentNumber} a été enregistrée avec succès. Votre dossier est en attente de validation par l'administration. Vous serez notifié dès que votre compte sera activé.`,
     type: "admission",
   });
 
   return newStudent;
+}
+
+export async function validateStudent(id: number, adminName?: string, note?: string) {
+  await ensureDatabaseSeeded();
+  const [student] = await db.select().from(students).where(eq(students.id, id));
+  if (!student) throw new Error("Étudiant introuvable");
+  if (student.status === "rejete") throw new Error("Cet étudiant a déjà été rejeté. Modifiez d'abord son statut.");
+
+  const [updated] = await db
+    .update(students)
+    .set({
+      status: "inscrit",
+      profileVisible: true,
+      validationNote: note || null,
+      validatedBy: adminName || null,
+      validatedAt: new Date(),
+    })
+    .where(eq(students.id, id))
+    .returning();
+
+  await db.insert(notifications).values({
+    studentId: id,
+    title: "Compte activé 🎉",
+    message: `Félicitations ${student.firstName} ! Votre dossier a été validé par l'administration. Vous pouvez maintenant vous connecter à votre espace étudiant et finaliser vos frais d'inscription.`,
+    type: "admission",
+  });
+
+  return updated;
+}
+
+export async function rejectStudent(id: number, adminName?: string, note?: string) {
+  await ensureDatabaseSeeded();
+  const [student] = await db.select().from(students).where(eq(students.id, id));
+  if (!student) throw new Error("Étudiant introuvable");
+
+  const [updated] = await db
+    .update(students)
+    .set({
+      status: "rejete",
+      profileVisible: false,
+      validationNote: note || null,
+      validatedBy: adminName || null,
+      validatedAt: new Date(),
+    })
+    .where(eq(students.id, id))
+    .returning();
+
+  await db.insert(notifications).values({
+    studentId: id,
+    title: "Dossier non retenu",
+    message: note
+      ? `Bonjour ${student.firstName}, votre dossier n'a pas été validé. Raison : ${note}.`
+      : `Bonjour ${student.firstName}, votre dossier n'a pas été validé par l'administration. Veuillez nous contacter pour plus d'informations.`,
+    type: "admission",
+  });
+
+  return updated;
+}
+
+export async function getValidatedStudents() {
+  await ensureDatabaseSeeded();
+  const rows = await db.select().from(students).where(eq(students.profileVisible, true));
+  return rows.map((student) => ({
+    ...student,
+    createdAt: student.createdAt instanceof Date ? student.createdAt.toISOString() : new Date(student.createdAt).toISOString(),
+  }));
+}
+
+export async function getValidatedStudentTalents() {
+  await ensureDatabaseSeeded();
+  const rows = await db
+    .select({
+      id: students.id,
+      studentNumber: students.studentNumber,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      city: students.city,
+      avatarUrl: students.avatarUrl,
+      status: students.status,
+      formationTitle: formations.title,
+      formationTools: formations.tools,
+      validatedAt: students.validatedAt,
+    })
+    .from(students)
+    .innerJoin(formations, eq(students.formationId, formations.id))
+    .where(eq(students.profileVisible, true));
+
+  return rows.map((r) => {
+    let tools: string[] = [];
+    try {
+      const parsed = JSON.parse(r.formationTools || "[]");
+      if (Array.isArray(parsed)) tools = parsed.slice(0, 6).map(String);
+    } catch {
+      tools = [];
+    }
+    return {
+      name: `${r.firstName} ${r.lastName}`,
+      formation: r.formationTitle,
+      skills: tools.length ? tools : ["—"],
+      status: r.status === "actif" ? "Disponible immédiatement" : "Recherche de stage",
+      campus: r.city || "Cotonou, Bénin",
+      matricule: r.studentNumber,
+      photoUrl: r.avatarUrl || undefined,
+      cvUrl: undefined,
+    };
+  });
 }
 
 export async function recordPayment(data: {
