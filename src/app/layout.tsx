@@ -151,6 +151,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         </ToastProvider>
         <Script
+          id="sw-register"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `

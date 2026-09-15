@@ -486,7 +486,7 @@ export default async function FormationDetailPage(props: {
                   Une question sur cette filière ?
                 </span>
                 <p className="text-[var(--color-fc-primary)]/80">
-                  Échangez instantanément avec notre conseiller d'orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
+                  Échangez instantanément avec notre conseiller d&apos;orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
                 </p>
                 <a
                   href="https://wa.me/22943327832"

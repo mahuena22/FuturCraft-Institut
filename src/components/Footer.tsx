@@ -238,7 +238,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/recu" className="hover:text-[var(--color-fc-cyan)] transition-colors text-[var(--color-fc-cyan)] font-medium">
-                  Vérifier l'authenticité d'un reçu
+                  Vérifier l&apos;authenticité d&apos;un reçu
                 </Link>
               </li>
               <li>

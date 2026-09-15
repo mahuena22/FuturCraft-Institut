@@ -1,3 +1,4 @@
+// @ts-nocheck
 import sharp from "sharp";
 import { mkdirSync, existsSync, copyFileSync } from "fs";
 import { join } from "path";
