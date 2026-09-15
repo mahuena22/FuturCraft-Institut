@@ -1,8 +1,8 @@
-import { getCompanyOffers } from "@/lib/data-service";
+import { getCompanyOffers, getValidatedStudentTalents } from "@/lib/data-service";
 import { CompanyPortal } from "@/components/CompanyPortal";
 import { Building2, CheckCircle2 } from "lucide-react";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Espace Entreprises | FuturCraft Institut Bénin",
   description:
@@ -10,7 +10,10 @@ export const metadata = {
 };
 
 export default async function EntreprisesPage() {
-  const offers = await getCompanyOffers();
+  const [offers, talents] = await Promise.all([
+    getCompanyOffers(),
+    getValidatedStudentTalents(),
+  ]);
 
   return (
     <div className="bg-white min-h-screen py-16">
@@ -29,7 +32,7 @@ export default async function EntreprisesPage() {
         </div>
 
         {/* Interactive Company Component */}
-        <CompanyPortal initialOffers={offers} />
+        <CompanyPortal initialOffers={offers} initialTalents={talents} />
       </div>
     </div>
   );

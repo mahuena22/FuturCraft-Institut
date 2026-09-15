@@ -9,6 +9,10 @@ function secret(): string {
   return process.env.ADMIN_PASSWORD || "";
 }
 
+export function getAdminName(): string {
+  return process.env.ADMIN_NAME || "Yoan Melson DANSOU";
+}
+
 function sign(value: string): string {
   const hash = createHash("sha256").update(`${value}:${secret()}`).digest("hex");
   return `${value}.${hash}`;

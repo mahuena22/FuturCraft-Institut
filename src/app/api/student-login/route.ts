@@ -55,6 +55,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (student.status === "preinscrit") {
+      return NextResponse.json(
+        {
+          error:
+            "Votre compte est en attente de validation par l'administration. Vous pourrez vous connecter dès que votre dossier aura été validé.",
+          pendingValidation: true,
+        },
+        { status: 403 }
+      );
+    }
+
+    if (student.status === "rejete") {
+      return NextResponse.json(
+        {
+          error:
+            student.validationNote
+              ? `Votre dossier n'a pas été validé. Raison : ${student.validationNote}. Veuillez contacter l'administration pour plus d'informations.`
+              : "Votre dossier n'a pas été validé par l'administration. Veuillez nous contacter pour plus d'informations.",
+          rejected: true,
+        },
+        { status: 403 }
+      );
+    }
+
     await resetAttempts(matriculeKey);
     await createStudentSession(student.id);
     return NextResponse.json({ success: true, studentId: student.id, name: student.firstName });

@@ -1,0 +1,1 @@
+ALTER TABLE "students" ADD COLUMN IF NOT EXISTS "cv_url" text;
