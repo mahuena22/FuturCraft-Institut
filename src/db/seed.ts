@@ -1,13 +1,7 @@
 import { db } from "./index";
 import {
-  users,
   formations,
   promotions,
-  students,
-  paymentSchedules,
-  payments,
-  receipts,
-  notifications,
   studentProjects,
   companyOffers,
   events,
@@ -25,42 +19,7 @@ export async function seedDatabase() {
 
     console.log("Seeding database for FuturCraft Institut...");
 
-    // 1. Users
-    const seededUsers = await db
-      .insert(users)
-      .values([
-        {
-          name: "Gauthier I. ORE",
-          email: "direction@futurcraft.bj",
-          phone: "+229 97 00 12 34",
-          role: "super_admin",
-          avatarUrl: "https://images.pexels.com/photos/9159042/pexels-photo-9159042.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=200&w=200",
-        },
-        {
-          name: "Sarah Menou",
-          email: "comptabilite@futurcraft.bj",
-          phone: "+229 95 11 22 33",
-          role: "financier",
-          avatarUrl: "https://images.pexels.com/photos/8197509/pexels-photo-8197509.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=200&w=200",
-        },
-        {
-          name: "Marcelle Agossou",
-          email: "scolarite@futurcraft.bj",
-          phone: "+229 96 44 55 66",
-          role: "agent",
-          avatarUrl: "https://images.pexels.com/photos/12662811/pexels-photo-12662811.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=200&w=200",
-        },
-        {
-          name: "Onesim Graça",
-          email: "onesim.tokpo@etudiant.futurcraft.bj",
-          phone: "+229 97 88 99 00",
-          role: "etudiant",
-          avatarUrl: "https://images.pexels.com/photos/9159001/pexels-photo-9159001.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=200&w=200",
-        },
-      ])
-      .returning();
-
-    // 2. Formations (all 12 from specification)
+    // 1. Formations (all 12 from specification)
     const insertedFormations = await db
       .insert(formations)
       .values([
@@ -608,14 +567,13 @@ export async function seedDatabase() {
       ])
       .returning();
 
-    // 3. Promotions for Web Fullstack and others
+    // 2. Promotions for Web Fullstack and others
     const fullstack = insertedFormations.find((f) => f.slug === "developpement-web-fullstack")!;
     const iaDev = insertedFormations.find((f) => f.slug === "developpement-intelligence-artificielle")!;
     const drone = insertedFormations.find((f) => f.slug === "pilotage-de-drone")!;
     const uiux = insertedFormations.find((f) => f.slug === "web-design-ui-ux")!;
 
-    const insertedPromotions = await db
-      .insert(promotions)
+    await db.insert(promotions)
       .values([
         {
           formationId: fullstack.id,
@@ -668,307 +626,7 @@ export async function seedDatabase() {
       ])
       .returning();
 
-    // 4. Students
-    // Onesim Tokpo (as specified in the Cahier des Charges: total 300 000 FCFA, paid 240 000 FCFA, remaining 60 000 FCFA, Fullstack)
-    const promoFullstackActive = insertedPromotions[0];
-    const onesimUser = seededUsers.find((u) => u.email === "onesim.tokpo@etudiant.futurcraft.bj");
-
-    const insertedStudents = await db
-      .insert(students)
-      .values([
-        {
-          studentNumber: "FC-2025-0142",
-          userId: onesimUser?.id,
-          firstName: "Onesim",
-          lastName: "Graça",
-          gender: "M",
-          birthDate: "2002-04-14",
-          birthPlace: "Cotonou",
-          nationality: "Béninoise",
-          residenceCountry: "Bénin",
-          city: "Cotonou",
-          address: "Haie Vive, Rue 412",
-          phone: "+229 97 88 99 00",
-          whatsapp: "+229 97 88 99 00",
-          email: "onesim.tokpo@etudiant.futurcraft.bj",
-          avatarUrl: "https://images.pexels.com/photos/9159001/pexels-photo-9159001.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300",
-          previousDiploma: "Baccalauréat Série C",
-          studyLevel: "BAC+2 (Licence 2 en Informatique)",
-          previousSchool: "UAC - Université d'Abomey-Calavi",
-          studyField: "Sciences Mathématiques et Informatique",
-          previousExperience: "Stage découverte développeur web chez WebSolutions Bénin",
-          guardianName: "M. Paul TOKPO",
-          guardianRelation: "Père",
-          guardianPhone: "+229 95 33 22 11",
-          guardianEmail: "p.tokpo@gmail.com",
-          formationId: fullstack.id,
-          promotionId: promoFullstackActive.id,
-          status: "actif",
-          totalAmount: 300000,
-          paidAmount: 240000,
-          remainingAmount: 60000,
-        },
-        {
-          studentNumber: "FC-2025-0089",
-          firstName: "Amina",
-          lastName: "SOSSOU",
-          gender: "F",
-          birthDate: "2003-08-22",
-          birthPlace: "Porto-Novo",
-          nationality: "Béninoise",
-          residenceCountry: "Bénin",
-          city: "Porto-Novo",
-          address: "Quartier Ouando",
-          phone: "+229 96 12 34 56",
-          whatsapp: "+229 96 12 34 56",
-          email: "amina.sossou@gmail.com",
-          avatarUrl: "https://images.pexels.com/photos/8197509/pexels-photo-8197509.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300",
-          previousDiploma: "Baccalauréat Série D",
-          studyLevel: "BAC",
-          previousSchool: "Lycée Béhanzin",
-          studyField: "Sciences de la Vie",
-          previousExperience: "Passionnée de graphisme et création de logos",
-          guardianName: "Mme Claire SOSSOU",
-          guardianRelation: "Mère",
-          guardianPhone: "+229 97 10 20 30",
-          guardianEmail: "claire.sossou@yahoo.fr",
-          formationId: uiux.id,
-          promotionId: insertedPromotions.find((p) => p.formationId === uiux.id)?.id,
-          status: "actif",
-          totalAmount: 240000,
-          paidAmount: 180000,
-          remainingAmount: 60000,
-        },
-        {
-          studentNumber: "FC-2025-0204",
-          firstName: "Koffi",
-          lastName: "MENSAH",
-          gender: "M",
-          birthDate: "2001-11-05",
-          birthPlace: "Parakou",
-          nationality: "Béninoise",
-          residenceCountry: "Bénin",
-          city: "Cotonou",
-          address: "Agla Les Pylônes",
-          phone: "+229 94 44 88 12",
-          whatsapp: "+229 94 44 88 12",
-          email: "koffi.mensah@gmail.com",
-          avatarUrl: "https://images.pexels.com/photos/33955752/pexels-photo-33955752.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300",
-          previousDiploma: "Licence en Géographie",
-          studyLevel: "BAC+3",
-          previousSchool: "Université de Parakou",
-          studyField: "Aménagement du territoire",
-          previousExperience: "Relevés de terrain pour projets agricoles",
-          guardianName: "M. Daniel MENSAH",
-          guardianRelation: "Oncle",
-          guardianPhone: "+229 95 77 66 55",
-          guardianEmail: "d.mensah@yahoo.fr",
-          formationId: drone.id,
-          promotionId: insertedPromotions.find((p) => p.formationId === drone.id)?.id,
-          status: "inscrit",
-          totalAmount: 280000,
-          paidAmount: 100000,
-          remainingAmount: 180000,
-        },
-        {
-          studentNumber: "FC-2025-0310",
-          firstName: "Bérénice",
-          lastName: "DOSSOU",
-          gender: "F",
-          birthDate: "2004-02-18",
-          birthPlace: "Abomey-Calavi",
-          nationality: "Béninoise",
-          residenceCountry: "Bénin",
-          city: "Abomey-Calavi",
-          address: "Godomey",
-          phone: "+229 61 22 33 44",
-          whatsapp: "+229 61 22 33 44",
-          email: "berenice.dossou@gmail.com",
-          avatarUrl: "https://images.pexels.com/photos/12662811/pexels-photo-12662811.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300",
-          previousDiploma: "Baccalauréat Série C",
-          studyLevel: "BAC+1",
-          previousSchool: "UAC",
-          studyField: "Informatique Fondamentale",
-          previousExperience: "Débutante motivée pour l'IA",
-          formationId: iaDev.id,
-          promotionId: insertedPromotions.find((p) => p.formationId === iaDev.id)?.id,
-          status: "actif",
-          totalAmount: 350000,
-          paidAmount: 200000,
-          remainingAmount: 150000,
-        },
-        {
-          studentNumber: "FC-2025-0451",
-          firstName: "Landry",
-          lastName: "HOUNGBO",
-          gender: "M",
-          birthDate: "2000-09-12",
-          birthPlace: "Cotonou",
-          nationality: "Béninoise",
-          residenceCountry: "Bénin",
-          city: "Cotonou",
-          address: "Fidjrossè Calvaire",
-          phone: "+229 97 15 26 37",
-          whatsapp: "+229 97 15 26 37",
-          email: "landry.houngbo@gmail.com",
-          avatarUrl: "https://images.pexels.com/photos/8197499/pexels-photo-8197499.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300",
-          previousDiploma: "BEPC & CAP Electricité",
-          studyLevel: "BEPC",
-          previousSchool: "Lycée Technique de Coulibaly",
-          studyField: "Électricité Bâtiment",
-          previousExperience: "Dépannage d'ordinateurs dans un cybercafé",
-          formationId: fullstack.id,
-          status: "preinscrit",
-          totalAmount: 300000,
-          paidAmount: 0,
-          remainingAmount: 300000,
-        },
-      ])
-      .returning();
-
-    const onesim = insertedStudents.find((s) => s.studentNumber === "FC-2025-0142")!;
-
-    // 5. Payment Schedules for Onesim matching specification:
-    // Inscription: 25 000 FCFA - Payé (10 septembre)
-    // Mensualité 1: 50 000 FCFA - Payé (05 octobre)
-    // Mensualité 2: 50 000 FCFA - Payé (05 novembre)
-    // Mensualité 3: 50 000 FCFA - Payé (05 décembre)
-    // Mensualité 4: 65 000 FCFA - Payé (05 janvier) -> Total payé = 240 000 FCFA
-    // Mensualité 5: 60 000 FCFA - En attente (05 avril 2025) -> Reste = 60 000 FCFA
-    const onesimSchedules = await db
-      .insert(paymentSchedules)
-      .values([
-        {
-          studentId: onesim.id,
-          title: "Frais d'inscription & dossier",
-          amount: 25000,
-          dueDate: "10 Septembre 2024",
-          status: "paye",
-          paidAt: "08 Septembre 2024",
-          transactionRef: "MTN-BJ-240908-1142",
-        },
-        {
-          studentId: onesim.id,
-          title: "Mensualité 1 — Démarrage formation",
-          amount: 50000,
-          dueDate: "05 Octobre 2024",
-          status: "paye",
-          paidAt: "04 Octobre 2024",
-          transactionRef: "MTN-BJ-241004-9021",
-        },
-        {
-          studentId: onesim.id,
-          title: "Mensualité 2 — Frontend & React",
-          amount: 50000,
-          dueDate: "05 Novembre 2024",
-          status: "paye",
-          paidAt: "05 Novembre 2024",
-          transactionRef: "CAISSE-COT-241105-03",
-        },
-        {
-          studentId: onesim.id,
-          title: "Mensualité 3 — Backend & APIs Node",
-          amount: 50000,
-          dueDate: "05 Décembre 2024",
-          status: "paye",
-          paidAt: "03 Décembre 2024",
-          transactionRef: "MOOV-BJ-241203-7714",
-        },
-        {
-          studentId: onesim.id,
-          title: "Mensualité 4 — Bases de données & Projets",
-          amount: 65000,
-          dueDate: "05 Février 2025",
-          status: "paye",
-          paidAt: "04 Février 2025",
-          transactionRef: "MTN-BJ-250204-5582",
-        },
-        {
-          studentId: onesim.id,
-          title: "Mensualité 5 (Solde final) — Soutenance & Stage",
-          amount: 60000,
-          dueDate: "05 Avril 2025",
-          status: "en_attente",
-          paidAt: null,
-          transactionRef: null,
-        },
-      ])
-      .returning();
-
-    // 6. Payments and Receipts for Onesim
-    const paidSchedules = onesimSchedules.filter((s) => s.status === "paye");
-    const paymentMethods = [
-      "MTN Mobile Money",
-      "MTN Mobile Money",
-      "Caisse / Espèces",
-      "Moov Money",
-      "MTN Mobile Money",
-    ];
-
-    for (let i = 0; i < paidSchedules.length; i++) {
-      const schedule = paidSchedules[i];
-      const recNum = `REC-2025-${String(1420 + i).padStart(5, "0")}`;
-      const vCode = `FC-SEC-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-
-      const [paymentRecord] = await db
-        .insert(payments)
-        .values({
-          receiptNumber: recNum,
-          studentId: onesim.id,
-          scheduleId: schedule.id,
-          amount: schedule.amount,
-          paymentMethod: paymentMethods[i] || "MTN Mobile Money",
-          transactionRef: schedule.transactionRef || `TRX-${Date.now()}`,
-          status: "valide",
-          notes: `Règlement validé pour: ${schedule.title}`,
-          recordedBy: i === 2 ? "Sarah Menou (Caisse Cotonou)" : "Passerelle Automatique Mobile Money",
-          paidAt: schedule.paidAt || "2025-01-10",
-        })
-        .returning();
-
-      await db.insert(receipts).values({
-        receiptNumber: recNum,
-        paymentId: paymentRecord.id,
-        studentId: onesim.id,
-        verificationCode: vCode,
-        qrData: `https://futurcraft.bj/recu/${recNum}?code=${vCode}&etudiant=FC-2025-0142`,
-        issuedAt: schedule.paidAt || "2025-01-10",
-      });
-    }
-
-    // 7. Notifications for Onesim
-    await db.insert(notifications).values([
-      {
-        studentId: onesim.id,
-        title: "Paiement validé avec succès",
-        message: "Votre versement de 65 000 FCFA (Mensualité 4) a été validé. Votre reçu REC-2025-01424 est disponible au téléchargement.",
-        type: "payment",
-        isRead: true,
-      },
-      {
-        studentId: onesim.id,
-        title: "Prochaine échéance de scolarité",
-        message: "Rappel : la mensualité finale de 60 000 FCFA arrive à échéance le 05 Avril 2025.",
-        type: "payment",
-        isRead: false,
-      },
-      {
-        studentId: onesim.id,
-        title: "Hackathon FuturTech 2025 annoncé !",
-        message: "Les inscriptions pour le grand Hackathon annuel de FuturCraft sont ouvertes. 1 500 000 FCFA de prix à gagner.",
-        type: "event",
-        isRead: false,
-      },
-      {
-        studentId: onesim.id,
-        title: "Attestation d'inscription disponible",
-        message: "Votre attestation officielle d'inscription pour l'année académique 2024-2025 est téléchargeable dans 'Mes documents'.",
-        type: "document",
-        isRead: true,
-      },
-    ]);
-
-    // 8. Student Projects (matching Cahier des charges: GEN3RVTO + others)
+    // 3. Student Projects (matching Cahier des charges: GEN3RVTO + others)
     await db.insert(studentProjects).values([
       {
         slug: "gen3rvto-rh",
@@ -1057,7 +715,7 @@ export async function seedDatabase() {
       },
     ]);
 
-    // 9. Company Offers
+    // 4. Company Offers
     await db.insert(companyOffers).values([
       {
         companyName: "InnovTech Bénin",
@@ -1103,7 +761,7 @@ export async function seedDatabase() {
       },
     ]);
 
-    // 10. Events
+    // 5. Events
     await db.insert(events).values([
       {
         title: "Hackathon FuturTech 2025 : L'IA au service de l'Afrique",
@@ -1137,7 +795,7 @@ export async function seedDatabase() {
       },
     ]);
 
-    // 11. Blog Articles / Actualités
+    // 6. Blog Articles / Actualités
     await db.insert(blogArticles).values([
       {
         slug: "pourquoi-se-former-au-numerique-au-benin-en-2025",

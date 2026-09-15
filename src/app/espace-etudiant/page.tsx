@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getStudentById } from "@/lib/data-service";
-import { getStudentSession } from "@/lib/student-auth";
+import { getStudentSession, destroyStudentSession } from "@/lib/student-auth";
 import { StudentPortal } from "@/components/StudentPortal";
 import { redirect } from "next/navigation";
 
@@ -20,6 +20,12 @@ export default async function EspaceEtudiantPage() {
   const studentData = await getStudentById(studentId);
 
   if (!studentData) {
+    redirect("/espace-etudiant/connexion");
+  }
+
+  // Block accounts that are not yet validated or were rejected
+  if (studentData.student.status === "preinscrit" || studentData.student.status === "rejete") {
+    await destroyStudentSession();
     redirect("/espace-etudiant/connexion");
   }
 

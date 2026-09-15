@@ -369,7 +369,7 @@ export default async function HomePage() {
                             Témoignages
                         </p>
                         <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
-                            Ce que nos apprenants racontent
+                            Des parcours qui inspirent, des réussites qui témoignent.
                         </h2>
                     </div>
                     <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">

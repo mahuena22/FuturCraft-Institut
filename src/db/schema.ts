@@ -63,6 +63,7 @@ export const students = pgTable("students", {
   whatsapp: text("whatsapp"),
   email: text("email").notNull(),
   avatarUrl: text("avatar_url"),
+  cvUrl: text("cv_url"),
   previousDiploma: text("previous_diploma"),
   studyLevel: text("study_level"),
   previousSchool: text("previous_school"),
@@ -74,7 +75,11 @@ export const students = pgTable("students", {
   guardianEmail: text("guardian_email"),
   formationId: integer("formation_id").references(() => formations.id).notNull(),
   promotionId: integer("promotion_id").references(() => promotions.id),
-  status: text("status").notNull().default("preinscrit"), // 'preinscrit' | 'en_attente' | 'inscrit' | 'actif' | 'termine' | 'suspendu' | 'alumni'
+  status: text("status").notNull().default("preinscrit"), // 'preinscrit' | 'rejete' | 'inscrit' | 'actif' | 'termine' | 'suspendu' | 'alumni'
+  profileVisible: boolean("profile_visible").notNull().default(false), // validated students appear on the Entreprise page
+  validationNote: text("validation_note"), // admin message on reject/approve
+  validatedBy: text("validated_by"), // admin name who reviewed this student
+  validatedAt: timestamp("validated_at"),
   totalAmount: integer("total_amount").notNull().default(0),
   paidAmount: integer("paid_amount").notNull().default(0),
   remainingAmount: integer("remaining_amount").notNull().default(0),

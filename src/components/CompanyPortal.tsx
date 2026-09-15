@@ -41,10 +41,17 @@ interface TalentItem {
   cvUrl?: string;
 }
 
-export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] }) {
+export function CompanyPortal({
+  initialOffers,
+  initialTalents = [],
+}: {
+  initialOffers: OfferItem[];
+  initialTalents?: TalentItem[];
+}) {
   const [activeTab, setActiveTab] = useState<"recruter" | "publier" | "partenariat">("recruter");
   const [skillSearch, setSkillSearch] = useState("");
   const [offers, setOffers] = useState<OfferItem[]>(initialOffers);
+  const [talents, setTalents] = useState<TalentItem[]>(initialTalents);
 
   // Form for posting an offer
   const [offerForm, setOfferForm] = useState({
@@ -72,62 +79,6 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
     message: "",
   });
   const [partnerSuccess, setPartnerSuccess] = useState(false);
-
-  // Mock available talents profile directory
-  const talents: TalentItem[] = [
-    {
-      name: "Loïc Assogba",
-      formation: "Développeur Web Full-Stack",
-      skills: ["HTML", "CSS", "JavaScript", "React", "Node.js", "Bases de données"],
-      status: "Recherche de stage",
-      campus: "Cotonou, Bénin",
-      matricule: "",
-      promotion: "Promotion 2026",
-      photoUrl: "/images/samuel.jpeg",
-      cvUrl: "/cv/CV_ASSOGBA_K._Samuel_Jean-Loïc.pdf",
-    },
-    {
-      name: "Ange AKONDE",
-      formation: "Développeur Full-Stack",
-      skills: ["React", "Next.js", "Node.js", "PostgreSQL", "TypeScript", "Tailwind CSS"],
-      status: "Disponible immédiatement",
-      campus: "Abomey-Calavi",
-      matricule: "FC-2025-0106",
-      cvUrl: "/cv/bigsixteen%20(1).pdf",
-    },
-    {
-      name: "Onesim T.",
-      formation: "Développement Web Fullstack",
-      skills: ["React", "Next.js", "Node.js", "PostgreSQL", "Tailwind CSS", "TypeScript"],
-      status: "En recherche de stage / CDI",
-      campus: "Cotonou",
-      matricule: "FC-2025-0142",
-    },
-    {
-      name: "Amina S.",
-      formation: "Web Design (UI/UX)",
-      skills: ["Figma", "Design Systems", "Prototypage", "Mobile UI", "Wireframing"],
-      status: "Disponible immédiatement",
-      campus: "Porto-Novo / Cotonou",
-      matricule: "FC-2025-0089",
-    },
-    {
-      name: "Koffi M.",
-      formation: "Pilotage Professionnel de Drone",
-      skills: ["DJI Mavic 3", "Photogrammétrie", "Pix4D", "Cartographie", "ANAC Bénin"],
-      status: "Disponible missions freelance & CDI",
-      campus: "Godomey, Supermarché O Bénin Avant pk14",
-      matricule: "FC-2025-0204",
-    },
-    {
-      name: "Bérénice D.",
-      formation: "Développement en Intelligence Artificielle",
-      skills: ["Python", "PyTorch", "OpenCV", "LangChain", "LLMs & RAG", "Pandas"],
-      status: "En recherche d'alternance / stage",
-      campus: "Cotonou",
-      matricule: "FC-2025-0310",
-    },
-  ];
 
   const filteredTalents = talents.filter((t) => {
     if (!skillSearch.trim()) return true;
@@ -263,7 +214,16 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredTalents.map((t, idx) => (
+            {filteredTalents.length === 0 ? (
+              <div className="col-span-full p-10 rounded-2xl bg-white border border-slate-200 text-center space-y-2">
+                <Building className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="text-sm font-bold text-slate-700">Aucun profil disponible pour le moment</p>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Notre vivier de talents se constitue au fil des validations de dossiers. Revenez bientôt : chaque étudiant validé apparaîtra automatiquement ici.
+                </p>
+              </div>
+            ) : (
+              filteredTalents.map((t, idx) => (
               <div
                 key={idx}
                 className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 hover:border-blue-300 transition-colors"
@@ -326,7 +286,8 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
                   </a>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}

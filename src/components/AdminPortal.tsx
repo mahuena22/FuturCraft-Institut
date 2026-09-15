@@ -133,6 +133,22 @@ interface ArticleItem {
   publishedAt: string;
 }
 
+interface AdmissionItem {
+  id: number;
+  studentNumber: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  city: string | null;
+  status: string;
+  profileVisible: boolean;
+  validationNote: string | null;
+  validatedBy: string | null;
+  formationTitle: string | null;
+  createdAt: string;
+}
+
 export function AdminPortal({
   initialStats,
   initialStudents,
@@ -155,19 +171,25 @@ export function AdminPortal({
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequestItem[]>([]);
   const [articles, setArticles] = useState<ArticleItem[]>(initialArticles || []);
   const [formations, setFormations] = useState<FormationItem[]>(formationsList);
+  const [admissions, setAdmissions] = useState<AdmissionItem[]>([]);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats" | "rappels">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "validations" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats" | "rappels">("dashboard");
 
   const router = useRouter();
 
   // Load online payment requests on mount
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/payment-requests")
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled && Array.isArray(data)) setPaymentRequests(data);
+    Promise.all([
+      fetch("/api/payment-requests").then((r) => r.json()),
+      fetch("/api/admin/admissions").then((r) => r.json()),
+    ])
+      .then(([reqData, admData]) => {
+        if (!cancelled) {
+          if (Array.isArray(reqData)) setPaymentRequests(reqData);
+          if (Array.isArray(admData)) setAdmissions(admData);
+        }
       })
       .catch(() => {});
     return () => {
@@ -210,6 +232,47 @@ export function AdminPortal({
   // Edit status modal
   const [selectedStudentForStatus, setSelectedStudentForStatus] = useState<StudentItem | null>(null);
   const [newStatusValue, setNewStatusValue] = useState("");
+
+  // Admission (validation) modal
+  const [validationTarget, setValidationTarget] = useState<AdmissionItem | null>(null);
+  const [validationAction, setValidationAction] = useState<"validate" | "reject">("validate");
+  const [validationNote, setValidationNote] = useState("");
+  const [validationBusy, setValidationBusy] = useState(false);
+
+  const pendingValidations = admissions.filter((a) => a.status === "preinscrit").length;
+
+  const handleOpenValidation = (a: AdmissionItem, action: "validate" | "reject") => {
+    setValidationTarget(a);
+    setValidationAction(action);
+    setValidationNote("");
+    setValidationBusy(false);
+  };
+
+  const handleConfirmValidation = async () => {
+    if (!validationTarget) return;
+    setValidationBusy(true);
+    try {
+      const res = await fetch("/api/admin/admissions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId: validationTarget.id,
+          action: validationAction,
+          note: validationNote.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur lors de la validation");
+      await reloadData();
+      setValidationTarget(null);
+      setValidationNote("");
+    } catch (e: any) {
+      console.error(e);
+      window.alert(e.message || "Erreur lors de la validation");
+    } finally {
+      setValidationBusy(false);
+    }
+  };
 
   // Formation edit modal
   const [editingFormation, setEditingFormation] = useState<FormationItem | null>(null);
@@ -262,18 +325,20 @@ export function AdminPortal({
   // Reload data helper
   const reloadData = async () => {
     try {
-      const [resStats, resStudents, resPayments, resPartnerships, resPaymentRequests] = await Promise.all([
+      const [resStats, resStudents, resPayments, resPartnerships, resPaymentRequests, resAdmissions] = await Promise.all([
         fetch("/api/admin/stats").then((r) => r.json()),
         fetch("/api/students").then((r) => r.json()),
         fetch("/api/payments").then((r) => r.json()),
         fetch("/api/partnerships").then((r) => r.json()),
         fetch("/api/payment-requests").then((r) => r.json()),
+        fetch("/api/admin/admissions").then((r) => r.json()),
       ]);
       setStats(resStats);
       setStudents(resStudents);
       setPayments(resPayments);
       setPartnerships(resPartnerships);
       setPaymentRequests(resPaymentRequests);
+      if (Array.isArray(resAdmissions)) setAdmissions(resAdmissions);
     } catch (e) {
       console.error(e);
     }
@@ -621,6 +686,23 @@ export function AdminPortal({
           </button>
 
           <button
+            onClick={() => setActiveTab("validations")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "validations"
+                ? "border-violet-600 text-violet-600"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Validations</span>
+            {pendingValidations > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+                {pendingValidations}
+              </span>
+            )}
+          </button>
+
+          <button
             onClick={() => setActiveTab("etudiants")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "etudiants"
@@ -710,6 +792,21 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* KPI Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                  Dossiers en attente
+                </span>
+                <div className="text-3xl font-black text-amber-600">{pendingValidations}</div>
+                <div className="flex items-center gap-2 text-xs pt-1">
+                  <button
+                    onClick={() => setActiveTab("validations")}
+                    className="text-blue-600 font-bold hover:underline"
+                  >
+                    Valider les comptes →
+                  </button>
+                </div>
+              </div>
+
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
                   Total Étudiants
@@ -851,6 +948,150 @@ export function AdminPortal({
           </div>
         )}
 
+        {/* 31. TAB VALIDATIONS D'ADMISSION */}
+        {activeTab === "validations" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Validation des Comptes Étudiants</h2>
+                <p className="text-xs text-slate-500">
+                  Chaque nouvel étudiant doit être validé avant de pouvoir se connecter et apparaître sur la page Entreprises.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                  pendingValidations > 0 ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                }`}>
+                  {pendingValidations > 0 ? `${pendingValidations} dossiers en attente` : "Aucun dossier en attente"}
+                </span>
+              </div>
+            </div>
+
+            {/* Pending validations */}
+            {pendingValidations > 0 && (
+              <div className="bg-white rounded-2xl border border-amber-200 overflow-hidden shadow-xs">
+                <div className="bg-amber-50 px-5 py-3 border-b border-amber-200 flex items-center justify-between">
+                  <span className="text-sm font-bold text-amber-800 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Dossiers en attente de validation
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                      <tr>
+                        <th className="py-3 px-4">Matricule</th>
+                        <th className="py-3 px-4">Étudiant</th>
+                        <th className="py-3 px-4">Contact</th>
+                        <th className="py-3 px-4">Formation</th>
+                        <th className="py-3 px-4">Date d&apos;inscription</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {admissions.filter((a) => a.status === "preinscrit").map((a) => (
+                        <tr key={a.id} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-blue-600">{a.studentNumber}</td>
+                          <td className="py-3 px-4">
+                            <strong className="text-slate-900 block">{a.firstName} {a.lastName}</strong>
+                            <span className="text-[10px] text-slate-400">{a.city || "Cotonou"}</span>
+                          </td>
+                          <td className="py-3 px-4 text-slate-600">
+                            <div>{a.phone}</div>
+                            <div className="text-[10px] text-slate-400">{a.email}</div>
+                          </td>
+                          <td className="py-3 px-4 text-slate-600">{a.formationTitle || "—"}</td>
+                          <td className="py-3 px-4 text-slate-500 text-[10px]">
+                            {a.createdAt ? new Date(a.createdAt).toLocaleDateString("fr-FR") : "—"}
+                          </td>
+                          <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+                            <button
+                              onClick={() => handleOpenValidation(a, "validate")}
+                              className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
+                            >
+                              Valider
+                            </button>
+                            <button
+                              onClick={() => handleOpenValidation(a, "reject")}
+                              className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors"
+                            >
+                              Rejeter
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Recent reviews (validated / rejected) */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                <span className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Dossiers traités récemment
+                </span>
+              </div>
+              {admissions.filter((a) => a.status !== "preinscrit").length === 0 ? (
+                <div className="p-8 text-center text-sm text-slate-400">
+                  Aucun dossier traité pour le moment.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                      <tr>
+                        <th className="py-3 px-4">Matricule</th>
+                        <th className="py-3 px-4">Étudiant</th>
+                        <th className="py-3 px-4">Formation</th>
+                        <th className="py-3 px-4">Statut</th>
+                        <th className="py-3 px-4">Note</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {admissions
+                        .filter((a) => a.status !== "preinscrit")
+                        .slice(0, 20)
+                        .map((a) => (
+                          <tr key={a.id} className="hover:bg-slate-50/70 transition-colors">
+                            <td className="py-3 px-4 font-mono font-bold text-blue-600">{a.studentNumber}</td>
+                            <td className="py-3 px-4">
+                              <strong className="text-slate-900 block">{a.firstName} {a.lastName}</strong>
+                              <span className="text-[10px] text-slate-400">{a.email}</span>
+                            </td>
+                            <td className="py-3 px-4 text-slate-600">{a.formationTitle || "—"}</td>
+                            <td className="py-3 px-4">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  a.status === "inscrit" || a.status === "actif" || a.status === "termine"
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : a.status === "rejete"
+                                    ? "bg-rose-100 text-rose-700"
+                                    : "bg-slate-100 text-slate-600"
+                                }`}
+                              >
+                                {a.status === "inscrit" && "Validé (inscrit)"}
+                                {a.status === "actif" && "Actif"}
+                                {a.status === "termine" && "Formation terminée"}
+                                {a.status === "rejete" && "Rejeté"}
+                                {!["inscrit", "actif", "termine", "rejete"].includes(a.status) && a.status}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-slate-500 italic max-w-[220px]">
+                              {a.validationNote || "—"}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* 26 & 30. TAB GESTION DES ÉTUDIANTS */}
         {activeTab === "etudiants" && (
           <div className="space-y-6 animate-in fade-in duration-200">
@@ -892,9 +1133,10 @@ export function AdminPortal({
                   className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
                 >
                   <option value="all">Tous les statuts</option>
+                  <option value="preinscrit">En attente de validation</option>
+                  <option value="rejete">Rejetés</option>
+                  <option value="inscrit">Inscrits (validés)</option>
                   <option value="actif">Étudiants actifs</option>
-                  <option value="preinscrit">Préinscrits</option>
-                  <option value="inscrit">Inscrits</option>
                   <option value="termine">Formation terminée</option>
                 </select>
               </div>
@@ -950,12 +1192,17 @@ export function AdminPortal({
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               st.status === "actif"
                                 ? "bg-emerald-100 text-emerald-800"
+                                : st.status === "inscrit" || st.status === "termine" || st.status === "alumni"
+                                ? "bg-emerald-100 text-emerald-700"
                                 : st.status === "preinscrit"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-amber-100 text-amber-800"
+                                ? "bg-amber-100 text-amber-800"
+                                : st.status === "rejete"
+                                ? "bg-rose-100 text-rose-700"
+                                : "bg-slate-100 text-slate-600"
                             }`}
                           >
-                            {st.status}
+                            {st.status === "preinscrit" && "En attente de validation"}
+                            {!["preinscrit"].includes(st.status) && st.status}
                           </span>
                         </td>
                         <td className="py-3 px-4">
@@ -1683,9 +1930,9 @@ export function AdminPortal({
                 onChange={(e) => setNewStatusValue(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-medium"
               >
-                <option value="preinscrit">Préinscrit</option>
-                <option value="en_attente">Inscription en attente</option>
-                <option value="inscrit">Inscrit</option>
+                <option value="preinscrit">Préinscrit (en attente de validation)</option>
+                <option value="rejete">Rejeté</option>
+                <option value="inscrit">Inscrit (validé)</option>
                 <option value="actif">Étudiant actif</option>
                 <option value="termine">Formation terminée</option>
                 <option value="suspendu">Suspendu</option>
@@ -1701,6 +1948,63 @@ export function AdminPortal({
               </button>
               <button
                 onClick={() => setSelectedStudentForStatus(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {validationTarget && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto ${
+              validationAction === "validate" ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
+            }`}>
+              {validationAction === "validate" ? (
+                <CheckCircle2 className="w-6 h-6" />
+              ) : (
+                <AlertTriangle className="w-6 h-6" />
+              )}
+            </div>
+            <h3 className="text-base font-bold text-slate-900 text-center">
+              {validationAction === "validate"
+                ? `Valider ${validationTarget.firstName} ${validationTarget.lastName} ?`
+                : `Rejeter le dossier de ${validationTarget.firstName} ${validationTarget.lastName} ?`}
+            </h3>
+            <p className="text-xs text-slate-500 text-center leading-relaxed">
+              {validationAction === "validate"
+                ? "Le compte sera activé, une notification sera envoyée à l'étudiant et son profil apparaîtra sur la page Entreprises."
+                : "Le compte restera fermé et l'étudiant sera notifié de la décision."}
+            </p>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-600">
+                Note pour l&apos;étudiant {validationAction === "validate" ? "(optionnel)" : ""}
+              </label>
+              <textarea
+                value={validationNote}
+                onChange={(e) => setValidationNote(e.target.value)}
+                rows={3}
+                placeholder={validationAction === "reject" ? "Précisez la raison du rejet (ex : dossier incomplet)..." : "Ajoutez un message de bienvenue..."}
+                className="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs"
+              />
+            </div>
+
+            <div className="pt-1 flex gap-2">
+              <button
+                onClick={handleConfirmValidation}
+                disabled={validationBusy}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50 ${
+                  validationAction === "validate" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
+                }`}
+              >
+                {validationBusy ? "Traitement..." : validationAction === "validate" ? "Valider le compte" : "Rejeter le dossier"}
+              </button>
+              <button
+                onClick={() => setValidationTarget(null)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
               >
                 Annuler

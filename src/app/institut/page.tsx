@@ -38,15 +38,15 @@ export default function InstitutPage() {
     },
     {
       name: "Yoan Melson DANSOU",
-      role: "Directeur des stages et emplois",
+      role: "Co-founder & Prompt engineer ",
       image: "/images/Yoan-DANSOU.jpg",
-      bio: "Connecte les talents de FuturCraft aux entreprises et startups pour traduire les compétences acquises en opportunités professionnelles concrètes.",
+      bio: " Co-fondateur et expert en prompt engineering, il explore les usages avancés de l'IA générative pour former la prochaine génération.",
     },
     {
       name: "Gauthier I. ORE",
-      role: "Co-founder & Prompt engineer",
+      role: "Directeur des stages et emplois  ",
       image: "/images/gauthier.jpg",
-      bio: "Co-fondateur et expert en prompt engineering, il explore les usages avancés de l'IA générative pour former la prochaine génération.",
+      bio: "Organise les stages et insertions professionnelles des étudiants de FuturCraft pour garantir leur transition réussie du monde de la formation vers celui de l'emploi.",
     },
     {
       name: "SEDAGONGJI Hugues Mahugnon",

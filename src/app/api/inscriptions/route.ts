@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createStudentWithPlan, getFormations } from "@/lib/data-service";
-import { createStudentSession } from "@/lib/student-auth";
 import { sendInscriptionEmails } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
@@ -32,10 +31,9 @@ export async function POST(req: NextRequest) {
       residenceCountry: body.residenceCountry,
     });
 
-    // Auto-authenticate the newly registered student
-    await createStudentSession(student.id);
+    // No auto-authentication: the student must be validated by the admin first.
 
-    // Notifications par email (Resend si configuré, sinon log)
+    // Notification par email (Resend si configuré, sinon log)
     const [formation] = await getFormations().then((rows) =>
       rows.filter((f) => f.id === student.formationId)
     );
@@ -51,7 +49,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Préinscription enregistrée avec succès",
+      message: "Préinscription enregistrée. Votre dossier est en attente de validation par l'administration.",
+      pendingValidation: true,
+      studentNumber: student.studentNumber,
       student,
     });
   } catch (error: any) {

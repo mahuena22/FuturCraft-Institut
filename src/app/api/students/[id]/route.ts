@@ -34,22 +34,38 @@ export async function PATCH(
     const { id } = await context.params;
     const body = await req.json();
 
+    const patch: Record<string, unknown> = {
+      ...(body.firstName && { firstName: body.firstName }),
+      ...(body.lastName && { lastName: body.lastName }),
+      ...(body.phone && { phone: body.phone }),
+      ...(body.whatsapp && { whatsapp: body.whatsapp }),
+      ...(body.email && { email: body.email }),
+      ...(body.city && { city: body.city }),
+      ...(body.address && { address: body.address }),
+      ...(body.status && { status: body.status }),
+      ...(body.promotionId !== undefined && { promotionId: body.promotionId }),
+      ...(body.avatarUrl && { avatarUrl: body.avatarUrl }),
+      ...(body.guardianName && { guardianName: body.guardianName }),
+      ...(body.guardianPhone && { guardianPhone: body.guardianPhone }),
+      ...(body.validationNote !== undefined && { validationNote: body.validationNote }),
+    };
+
+    // Keep the Entreprise-page visibility in sync with the student status.
+    if (body.status) {
+      const visibleStatuses = ["inscrit", "actif", "termine", "alumni"];
+      patch.profileVisible = visibleStatuses.includes(body.status);
+      if (visibleStatuses.includes(body.status) && !patch.validatedBy) {
+        patch.validatedBy = "Administration";
+        patch.validatedAt = new Date();
+      }
+      if (body.status === "rejete" || body.status === "preinscrit") {
+        patch.profileVisible = false;
+      }
+    }
+
     const [updated] = await db
       .update(students)
-      .set({
-        ...(body.firstName && { firstName: body.firstName }),
-        ...(body.lastName && { lastName: body.lastName }),
-        ...(body.phone && { phone: body.phone }),
-        ...(body.whatsapp && { whatsapp: body.whatsapp }),
-        ...(body.email && { email: body.email }),
-        ...(body.city && { city: body.city }),
-        ...(body.address && { address: body.address }),
-        ...(body.status && { status: body.status }),
-        ...(body.promotionId !== undefined && { promotionId: body.promotionId }),
-        ...(body.avatarUrl && { avatarUrl: body.avatarUrl }),
-        ...(body.guardianName && { guardianName: body.guardianName }),
-        ...(body.guardianPhone && { guardianPhone: body.guardianPhone }),
-      })
+      .set(patch)
       .where(eq(students.id, Number(id)))
       .returning();
 

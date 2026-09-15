@@ -15,6 +15,8 @@ import {
   AlertCircle,
   Copy,
   Check,
+  FileText,
+  Clock,
 } from "lucide-react";
 
 interface FormationOption {
@@ -43,6 +45,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     studentName: string;
     studentId: number;
     email: string;
+    pendingValidation: boolean;
   } | null>(null);
   const [copied, setCopied] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -181,6 +184,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
         studentName: `${data.student.firstName} ${data.student.lastName}`,
         studentId: data.student.id,
         email: data.student.email,
+        pendingValidation: Boolean(data.pendingValidation),
       });
     } catch (err: any) {
       setErrorMsg(err.message || "Une erreur est survenue");
@@ -201,19 +205,34 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
   if (successData) {
     return (
       <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-2xl max-w-2xl mx-auto text-center space-y-6 animate-in zoom-in-95 duration-300">
-        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-          <CheckCircle2 className="w-10 h-10" />
+        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+          <FileText className="w-10 h-10" />
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            Candidature Enregistrée avec Succès
+          <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+            Préinscription Enregistrée
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-            Félicitations, {successData.studentName} !
+            Merci {successData.studentName} !
           </h2>
           <p className="text-sm text-slate-600 max-w-md mx-auto">
-            Votre dossier d&apos;inscription pour la formation <strong>{selectedFormation?.title}</strong> a été validé par notre système.
+            Votre dossier d&apos;inscription pour la formation <strong>{selectedFormation?.title}</strong> a bien été transmis à notre administration.
+          </p>
+        </div>
+
+        {/* Pending validation notice */}
+        <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-left space-y-2">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-amber-600" />
+            <span className="text-sm font-bold text-amber-800">
+              Votre compte est en attente de validation
+            </span>
+          </div>
+          <p className="text-xs text-amber-700 leading-relaxed">
+            Un administrateur de FuturCraft Institut va valider votre dossier dans les meilleurs délais.
+            Vous recevrez une notification dès que votre compte sera activé. Votre profil apparaîtra alors sur
+            notre page Entreprises pour les recruteurs.
           </p>
         </div>
 
@@ -235,25 +254,25 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
             {successData.studentNumber}
           </div>
           <p className="text-[11px] text-slate-500 text-center">
-            Conservez ce matricule. Il vous permet d&apos;accéder à votre espace étudiant et de régler vos mensualités.
+            Conservez ce matricule. Il vous permettra d&apos;accéder à votre espace étudiant une fois votre compte validé.
           </p>
         </div>
 
         {/* Direct Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <Link
-            href="/espace-etudiant"
+            href="/"
             className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
           >
-            <span>Accéder à Mon Espace Étudiant</span>
+            <span>Retour à l&apos;accueil</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link
-            href="/"
+          <a
+            href="mailto:info@futurcraft.bj"
             className="px-6 py-3.5 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-all"
           >
-            Retour à l&apos;accueil
-          </Link>
+            Contacter l&apos;administration
+          </a>
         </div>
       </div>
     );
