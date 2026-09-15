@@ -85,8 +85,9 @@ self.addEventListener('fetch', (event) => {
           return caches.match('/');
         }
       });
-  });
-};
+    })
+  );
+});
 
 // Background sync for offline form submissions
 self.addEventListener('sync', (event) => {
