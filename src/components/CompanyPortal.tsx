@@ -95,38 +95,6 @@ export function CompanyPortal({ initialOffers }: { initialOffers: OfferItem[] })
       matricule: "FC-2025-0106",
       cvUrl: "/cv/bigsixteen%20(1).pdf",
     },
-    {
-      name: "Onesim T.",
-      formation: "Développement Web Fullstack",
-      skills: ["React", "Next.js", "Node.js", "PostgreSQL", "Tailwind CSS", "TypeScript"],
-      status: "En recherche de stage / CDI",
-      campus: "Cotonou",
-      matricule: "FC-2025-0142",
-    },
-    {
-      name: "Amina S.",
-      formation: "Web Design (UI/UX)",
-      skills: ["Figma", "Design Systems", "Prototypage", "Mobile UI", "Wireframing"],
-      status: "Disponible immédiatement",
-      campus: "Porto-Novo / Cotonou",
-      matricule: "FC-2025-0089",
-    },
-    {
-      name: "Koffi M.",
-      formation: "Pilotage Professionnel de Drone",
-      skills: ["DJI Mavic 3", "Photogrammétrie", "Pix4D", "Cartographie", "ANAC Bénin"],
-      status: "Disponible missions freelance & CDI",
-      campus: "Godomey, Supermarché O Bénin Avant pk14",
-      matricule: "FC-2025-0204",
-    },
-    {
-      name: "Bérénice D.",
-      formation: "Développement en Intelligence Artificielle",
-      skills: ["Python", "PyTorch", "OpenCV", "LangChain", "LLMs & RAG", "Pandas"],
-      status: "En recherche d'alternance / stage",
-      campus: "Cotonou",
-      matricule: "FC-2025-0310",
-    },
   ];
 
   const filteredTalents = talents.filter((t) => {
