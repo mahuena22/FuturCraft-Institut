@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { students, formations } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, getAdminName } from "@/lib/auth";
 import { validateStudent, rejectStudent } from "@/lib/data-service";
 
 // GET /api/admin/admissions - list all students with formation for the admissions dashboard
@@ -58,8 +58,8 @@ export async function PATCH(req: NextRequest) {
 
     const result =
       action === "validate"
-        ? await validateStudent(Number(studentId), "Yoan Melson DANSOU", note)
-        : await rejectStudent(Number(studentId), "Yoan Melson DANSOU", note);
+        ? await validateStudent(Number(studentId), getAdminName(), note)
+        : await rejectStudent(Number(studentId), getAdminName(), note);
 
     return NextResponse.json({ success: true, student: result });
   } catch (error) {

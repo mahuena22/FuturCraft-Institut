@@ -3,7 +3,7 @@ import { getStudentById } from "@/lib/data-service";
 import { db } from "@/db";
 import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, getAdminName } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
@@ -55,7 +55,7 @@ export async function PATCH(
       const visibleStatuses = ["inscrit", "actif", "termine", "alumni"];
       patch.profileVisible = visibleStatuses.includes(body.status);
       if (visibleStatuses.includes(body.status) && !patch.validatedBy) {
-        patch.validatedBy = "Administration";
+        patch.validatedBy = getAdminName();
         patch.validatedAt = new Date();
       }
       if (body.status === "rejete" || body.status === "preinscrit") {
