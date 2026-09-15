@@ -27,6 +27,9 @@ import {
   MapPin,
   Phone,
   Mail,
+  Upload,
+  Camera,
+  Trash2,
 } from "lucide-react";
 
 interface StudentData {
@@ -43,6 +46,7 @@ interface StudentData {
     whatsapp: string | null;
     email: string;
     avatarUrl: string | null;
+    cvUrl: string | null;
     studyLevel: string | null;
     status: string;
     totalAmount: number;
@@ -148,6 +152,8 @@ export function StudentPortal({
   const [addressEdit, setAddressEdit] = useState(data.student.address || "");
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileSaveSuccess, setProfileSaveSuccess] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
 
   // Reload current student (authenticated session)
   const reloadStudent = async () => {
@@ -231,6 +237,41 @@ setProfileSaveSuccess(true);
       }
     } finally {
       setIsSavingProfile(false);
+    }
+  };
+
+  // Upload avatar / CV (multipart → /api/student-upload)
+  const handleUploadFile = async (kind: "avatar" | "cv", file: File) => {
+    if (kind === "avatar") setIsUploadingAvatar(true);
+    else setIsUploadingCv(true);
+    try {
+      const fd = new FormData();
+      fd.append("kind", kind);
+      fd.append("file", file);
+      const res = await fetch("/api/student-upload", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur lors de l'envoi du fichier");
+      setProfileSaveSuccess(true);
+      setTimeout(() => setProfileSaveSuccess(false), 3000);
+      await reloadStudent();
+    } catch (err: any) {
+      alert(err.message || "Erreur lors de l'envoi du fichier");
+    } finally {
+      if (kind === "avatar") setIsUploadingAvatar(false);
+      else setIsUploadingCv(false);
+    }
+  };
+
+  const handleRemoveFile = async (kind: "avatar" | "cv") => {
+    if (!window.confirm(kind === "avatar" ? "Supprimer votre photo de profil ?" : "Supprimer votre CV ?")) return;
+    try {
+      const fd = new FormData();
+      fd.append("kind", kind);
+      fd.append("remove", "1");
+      const res = await fetch("/api/student-upload", { method: "POST", body: fd });
+      if (res.ok) await reloadStudent();
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -1033,6 +1074,123 @@ setProfileSaveSuccess(true);
         {/* TAB 7: MON PROFIL */}
         {activeTab === "profil" && (
           <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Identité visuelle & CV */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 max-w-2xl">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Photo de profil &amp; Curriculum Vitae</h2>
+                <p className="text-xs text-slate-500">
+                  Ces éléments sont mis en avant sur notre page Entreprises pour les recruteurs, une fois votre compte validé.
+                </p>
+              </div>
+
+              {profileSaveSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Profil mis à jour avec succès !</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* Avatar */}
+                <div className="rounded-2xl border border-slate-200 p-4 space-y-3">
+                  <span className="text-xs font-bold text-slate-700 block">Photo de profil</span>
+                  <div className="flex items-center gap-3">
+                    {data.student.avatarUrl ? (
+                      <Image
+                        src={data.student.avatarUrl}
+                        alt="Photo de profil"
+                        width={64}
+                        height={64}
+                        unoptimized
+                        className="w-16 h-16 rounded-full object-cover border-2 border-blue-100"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
+                        <Camera className="w-6 h-6 text-slate-400" />
+                      </div>
+                    )}
+                    <div className="space-y-1.5 flex-1">
+                      <label className="block">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          {isUploadingAvatar ? "Envoi..." : "Choisir une photo"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          className="hidden"
+                          disabled={isUploadingAvatar}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) void handleUploadFile("avatar", f);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      {data.student.avatarUrl && (
+                        <button
+                          onClick={() => void handleRemoveFile("avatar")}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Supprimer
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CV */}
+                <div className="rounded-2xl border border-slate-200 p-4 space-y-3">
+                  <span className="text-xs font-bold text-slate-700 block">Curriculum Vitae (PDF)</span>
+                  <div className="space-y-2">
+                    {data.student.cvUrl ? (
+                      <a
+                        href={data.student.cvUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-[11px] font-bold text-blue-600 hover:underline"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Voir mon CV actuel
+                      </a>
+                    ) : (
+                      <p className="text-[11px] text-slate-400 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Aucun CV déposé pour le moment.
+                      </p>
+                    )}
+                    <label className="block">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors">
+                        <Upload className="w-3.5 h-3.5" />
+                        {isUploadingCv ? "Envoi..." : data.student.cvUrl ? "Remplacer le CV" : "Déposer mon CV"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        disabled={isUploadingCv}
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) void handleUploadFile("cv", f);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {data.student.cvUrl && (
+                      <button
+                        onClick={() => void handleRemoveFile("cv")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Supprimer le CV
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6 max-w-2xl">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Coordonnées Étudiant</h2>

@@ -63,6 +63,7 @@ export const students = pgTable("students", {
   whatsapp: text("whatsapp"),
   email: text("email").notNull(),
   avatarUrl: text("avatar_url"),
+  cvUrl: text("cv_url"),
   previousDiploma: text("previous_diploma"),
   studyLevel: text("study_level"),
   previousSchool: text("previous_school"),

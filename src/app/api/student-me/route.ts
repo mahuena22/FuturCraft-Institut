@@ -36,6 +36,8 @@ export async function PATCH(req: NextRequest) {
         ...(body.whatsapp && { whatsapp: String(body.whatsapp) }),
         ...(body.city !== undefined && { city: body.city ? String(body.city) : null }),
         ...(body.address !== undefined && { address: body.address ? String(body.address) : null }),
+        ...(body.avatarUrl !== undefined && { avatarUrl: body.avatarUrl ? String(body.avatarUrl) : null }),
+        ...(body.cvUrl !== undefined && { cvUrl: body.cvUrl ? String(body.cvUrl) : null }),
       })
       .where(eq(students.id, studentId))
       .returning();

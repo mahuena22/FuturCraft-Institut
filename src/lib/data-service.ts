@@ -17,6 +17,7 @@ import {
 import { ensureDatabaseSeeded } from "@/db/ensure-seed";
 import { eq, desc, sql } from "drizzle-orm";
 import { randomBytes } from "crypto";
+import { sendValidationEmail } from "@/lib/email";
 
 export async function getFormations() {
   await ensureDatabaseSeeded();
@@ -240,6 +241,17 @@ export async function validateStudent(id: number, adminName?: string, note?: str
     type: "admission",
   });
 
+  const [formation] = await db.select().from(formations).where(eq(formations.id, student.formationId));
+  void sendValidationEmail({
+    studentNumber: student.studentNumber,
+    firstName: student.firstName,
+    lastName: student.lastName,
+    email: student.email,
+    formationTitle: formation?.title,
+    status: "validate",
+    note: note || undefined,
+  });
+
   return updated;
 }
 
@@ -269,16 +281,16 @@ export async function rejectStudent(id: number, adminName?: string, note?: strin
     type: "admission",
   });
 
-  return updated;
-}
+  void sendValidationEmail({
+    studentNumber: student.studentNumber,
+    firstName: student.firstName,
+    lastName: student.lastName,
+    email: student.email,
+    status: "reject",
+    note: note || undefined,
+  });
 
-export async function getValidatedStudents() {
-  await ensureDatabaseSeeded();
-  const rows = await db.select().from(students).where(eq(students.profileVisible, true));
-  return rows.map((student) => ({
-    ...student,
-    createdAt: student.createdAt instanceof Date ? student.createdAt.toISOString() : new Date(student.createdAt).toISOString(),
-  }));
+  return updated;
 }
 
 export async function getValidatedStudentTalents() {
@@ -291,6 +303,7 @@ export async function getValidatedStudentTalents() {
       lastName: students.lastName,
       city: students.city,
       avatarUrl: students.avatarUrl,
+      cvUrl: students.cvUrl,
       status: students.status,
       formationTitle: formations.title,
       formationTools: formations.tools,
@@ -316,7 +329,7 @@ export async function getValidatedStudentTalents() {
       campus: r.city || "Cotonou, Bénin",
       matricule: r.studentNumber,
       photoUrl: r.avatarUrl || undefined,
-      cvUrl: undefined,
+      cvUrl: r.cvUrl || undefined,
     };
   });
 }
@@ -392,7 +405,7 @@ export async function recordPayment(data: {
   // Update student amounts and status if needed
   const newPaid = student.paidAmount + data.amount;
   const newRemaining = Math.max(0, student.totalAmount - newPaid);
-  const newStatus = student.status === "preinscrit" ? "actif" : student.status;
+  const newStatus = student.status === "preinscrit" || student.status === "inscrit" ? "actif" : student.status;
 
   await db
     .update(students)

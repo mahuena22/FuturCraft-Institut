@@ -100,6 +100,39 @@ export async function sendInscriptionEmails(params: {
   );
 }
 
+export async function sendValidationEmail(params: {
+  studentNumber: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  formationTitle?: string;
+  status: "validate" | "reject";
+  note?: string;
+}) {
+  const isValidated = params.status === "validate";
+  const html = layout(
+    isValidated ? "Compte activé 🎉" : "Dossier non retenu",
+    isValidated
+      ? `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
+         <p>Félicitations ! Votre dossier de candidature a été <strong>validé</strong> par l'administration (Yoan Melson DANSOU).</p>
+         <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("N° matricule", params.studentNumber)}${params.formationTitle ? field("Formation", params.formationTitle) : ""}</table>
+         <p style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:12px 16px;"><strong>✅ Compte actif :</strong> votre profil est désormais visible par les recruteurs sur notre <a href="https://futurcraft.bj/entreprises" style="color:#4f46e5;font-weight:700;">page Entreprises</a>.</p>
+         ${params.note ? `<p><em>Note de l'administration : ${params.note.replace(/[\n]/g, "<br/>")}</em></p>` : ""}
+         <p>Connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#4f46e5;font-weight:700;">espace étudiant</a> pour finaliser vos frais d'inscription, déposer votre photo de profil et votre CV.</p>`
+      : `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
+         <p>Après examen de votre dossier (matricule ${params.studentNumber}), l'administration de FuturCraft Institut n'a pas retenu votre candidature à ce stade.</p>
+         ${params.note ? `<p style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px 16px;"><strong>Motif :</strong> ${params.note.replace(/[\n]/g, "<br/>")}</p>` : ""}
+         <p>Vous pouvez déposer une nouvelle demande, ou nous contacter pour toute question : <a href="mailto:contact@futurcraft.bj" style="color:#4f46e5;font-weight:700;">contact@futurcraft.bj</a>.</p>`
+  );
+  if (params.email) {
+    void sendEmail({
+      to: params.email,
+      subject: isValidated ? "Compte activé — FuturCraft Institut 🎉" : "Nouvelle concernant votre dossier — FuturCraft Institut",
+      html,
+    }).catch((e) => console.error("[email] échec validation étudiant:", e));
+  }
+}
+
 export async function sendPartnershipEmail(params: {
   companyName: string;
   contactName: string;
