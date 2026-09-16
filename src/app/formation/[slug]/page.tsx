@@ -152,7 +152,6 @@ export default async function FormationDetailPage(props: {
             fill
             priority
             sizes="100vw"
-            placeholder="blur"
             className="object-cover object-center blur-xs"
           />
           <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
@@ -372,7 +371,6 @@ export default async function FormationDetailPage(props: {
                           alt={proj.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 25vw"
-                          placeholder="blur"
                           className="object-cover"
                         />
                       </div>
@@ -485,7 +483,7 @@ export default async function FormationDetailPage(props: {
                   Une question sur cette filière ?
                 </span>
                 <p className="text-[var(--color-fc-primary)]/80">
-                  Échangez instantanément avec notre conseiller d'orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
+                  Échangez instantanément avec notre conseiller d&apos;orientation sur WhatsApp au <strong>+229 43 32 78 32</strong>.
                 </p>
                 <a
                   href="https://wa.me/22943327832"

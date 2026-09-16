@@ -189,7 +189,7 @@ export async function seedDatabase() {
             "Formation intensive accélérée de 3 mois pour booster sa productivité professionnelle grâce aux meilleurs outils d'IA du marché.",
           fullDescription:
             "Un condensé ultra-pratique pour entrepreneurs, cadres, freelances et créateurs de contenu. Apprenez à dompter ChatGPT, Claude, Midjourney, Perplexity, Cursor, Make et Canva IA pour automatiser vos tâches quotidiennes et multiplier par 5 votre efficacité. Frais de dossier comprenant l'inscription, la tenue, les documents et le badge.",
-          duration: "1 mois intensif",
+          duration: "1 mois",
           level: "Tous niveaux (Professionnels & Étudiants)",
           price: 70000,
           registrationFee: 20000,
@@ -539,7 +539,7 @@ export async function seedDatabase() {
             "Apprenez le pilotage certifié de drones civils pour la cartographie, l'inspection technique, la production audiovisuelle et l'agriculture.",
           fullDescription:
             "Une formation de pointe alliant théorie aéronautique, réglementation aérienne de l'ANAC Bénin et heures de vol intensives en extérieur. Apprenez à réaliser des prises de vue cinématiques spectaculaires, des relevés topographiques et des inspections d'ouvrages industriels.",
-          duration: "1 mois (Théorie + Pratique terrain)",
+          duration: "1 mois",
           level: "Tous niveaux (à partir de 18 ans)",
           price: 100000,
           registrationFee: 25000,
