@@ -200,6 +200,7 @@ export function ReminderMonitor() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchOverdue();
     const interval = setInterval(fetchOverdue, 5 * 60 * 1000);
     return () => clearInterval(interval);

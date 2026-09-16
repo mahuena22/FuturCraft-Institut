@@ -26,40 +26,40 @@ export const metadata = {
 export default async function AdmissionsPage() {
     const formations = await getFormations();
 
-    const steps = [
-        {
-            num: '01',
-            title: 'Exploration & Choix',
-            desc: 'Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.',
-            icon: GraduationCap,
-            color: 'var(--color-fc-primary)',
-            highlight: 'Catalogue gratuit',
-        },
-        {
-            num: '02',
-            title: 'Candidature en ligne',
-            desc: 'Remplissez le formulaire en quelques minutes et obtenez instantanément votre numéro de dossier unique.',
-            icon: CheckCircle2,
-            color: 'var(--color-fc-cyan)',
-            highlight: 'Réponse instantanée',
-        },
-        {
-            num: '03',
-            title: 'Validation & Paiement',
-            desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
-            icon: CreditCard,
-            color: 'var(--color-fc-light)',
-            highlight: 'Paiement sécurisé',
-        },
-        {
-            num: '04',
-            title: 'Accès & Rentrée',
-            desc: 'Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.',
-            icon: Star,
-            color: 'var(--color-fc-cyan)',
-            highlight: 'Accès immédiat',
-        },
-    ];
+  const steps = [
+    {
+      num: "01",
+      title: "Exploration & Choix",
+      desc: "Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.",
+      icon: GraduationCap,
+      color: "var(--color-fc-primary)",
+      highlight: "Catalogue gratuit",
+    },
+    {
+      num: "02",
+      title: "Candidature en ligne",
+      desc: "Remplissez le formulaire en quelques minutes et obtenez instantanément votre numéro de dossier unique.",
+      icon: CheckCircle2,
+      color: "var(--color-fc-cyan)",
+      highlight: "Réponse instantanée",
+    },
+    {
+      num: "03",
+      title: "Validation & Paiement",
+      desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
+      icon: CreditCard,
+      color: "var(--color-fc-light)",
+      highlight: "Paiement sécurisé",
+    },
+    {
+      num: "04",
+      title: "Accès & Rentrée",
+      desc: "Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.",
+      icon: Star,
+      color: "var(--color-fc-cyan)",
+      highlight: "Accès immédiat",
+    },
+  ];
 
     const faqs = [
         {
@@ -182,12 +182,10 @@ export default async function AdmissionsPage() {
                                     {st.num}
                                 </span>
 
-                                {/* Icon */}
-                                <div
-                                    className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${st.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                                >
-                                    <Icon className="w-6 h-6 text-white" />
-                                </div>
+                {/* Icon */}
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${st.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
 
                                 {/* Badge */}
                                 <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wide mb-3">

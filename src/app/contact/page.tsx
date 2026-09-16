@@ -34,7 +34,7 @@ export default function ContactPage() {
     });
   };
 
-return (
+  return (
     <div className="bg-[var(--color-fc-bg)] min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
@@ -87,8 +87,8 @@ return (
                   </div>
                   <div>
                     <strong className="text-[var(--color-fc-black)] text-sm block">Courrier Électronique</strong>
-                    <span className="text-[var(--color-fc-gray-mid)] block">eentreprisebenin@gmail.com</span>
-                    <span className="text-[var(--color-fc-gray-mid)] block">contact@futurcraftinstitut.com</span>
+                    <span className="text-[var(--color-fc-gray-mid)] block">futurcraftinstitut@gmail.com</span>
+                    <span className="text-[var(--color-fc-gray-mid)] block">entreprisebenin@gmail.com</span>
                   </div>
                 </div>
 
@@ -98,7 +98,7 @@ return (
                   </div>
                   <div>
                     <strong className="text-[var(--color-fc-black)] text-sm block">Horaires d&apos;Ouverture</strong>
-                    <span className="text-[var(--color-fc-gray-mid)] block">Du Lundi au Vendredi : 08h00 — 18h30</span>
+                    <span className="text-[var(--color-fc-gray-mid)] block">Du Lundi au Vendredi : 09h00 — 13h00 / 19h00 — 22h30</span>
                     <span className="text-[var(--color-fc-gray-mid)] block">Samedi : 09h00 — 14h00</span>
                   </div>
                 </div>

@@ -209,7 +209,7 @@ return (
                 href="/inscription"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] transition-colors"
               >
-                S'inscrire
+                S&apos;inscrire
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 duration-200" />
               </Link>
             </div>
