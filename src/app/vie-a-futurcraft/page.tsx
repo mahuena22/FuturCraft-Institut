@@ -1,6 +1,6 @@
-import { getEvents } from "@/lib/data-service";
-import Link from "next/link";
-import Image from "next/image";
+import { getEvents } from '@/lib/data-service';
+import Link from 'next/link';
+import Image from 'next/image';
 import {
   CalendarDays,
   Users,
@@ -10,11 +10,11 @@ import {
   Trophy,
   Coffee,
   Code2,
-} from "lucide-react";
+} from 'lucide-react';
 
 export const revalidate = 3600;
 export const metadata = {
-  title: "Vie à FuturCraft | FuturCraft Institut Bénin",
+  title: 'Vie à FuturCraft | FuturCraft Institut Bénin',
   description:
     "Découvrez l'ambiance, les hackathons, ateliers pratiques, sorties de promotion et moments de vie sur les campus de FuturCraft Institut.",
 };
@@ -24,22 +24,28 @@ export default async function ViePage() {
 
   const lifeMoments = [
     {
-      title: "Challenge Coding ",
-      desc: "Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.",
-      image: "/images/projet-vano-baby.jpg",
-      tag: "Coding Night",
+      title: 'Ateliers Code & Développement',
+      desc: 'Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.',
+      image: '/images/CodingNight.jpg',
+      tag: 'Coding Night',
     },
     {
-      title: "Sorties & Vol Drone",
-      desc: "Pratique en plein air à Ouidah et Calavi pour cartographier des parcelles agricoles et capturer des plans cinématiques.",
-      image: "/images/Excution-Ganvie.jpg",
-      tag: "Pratique Terrain",
+      title: 'Sortie sur Ouidah',
+      desc: "Pratique en plein air à Ouidah : les étudiants en Audiovisuel de FuturCraft Institut ont mis leurs compétences en pratique en capturant des plans cinématiques au cœur de la richesse culturelle de la ville. Une immersion sur le terrain pour travailler cadrage, lumière et mouvements de caméra, tout en racontant une histoire à travers l'image.",
+      image: '/images/sortieSurOuidah.jpg',
+      tag: 'Pratique Terrain',
     },
     {
-      title: "Studio Design & Shootings Médias",
-      desc: "Prise en main des boîtiers Sony, éclairages studio trois points et conception d'identités de marque.",
-      image: "/images/Montage-Video.jpg",
-      tag: "Atelier Créatif",
+      title: 'Du campus au terrain : place au professionnalisme !',
+      desc: 'En immersion professionnelle. Les étudiants de FuturCraft Institut ont effectué une sortie professionnelle, vêtus de leur tenue professionnelle, pour découvrir les réalités du terrain et mettre en pratique les attitudes et compétences acquises en formation.',
+      image: '/images/photoProfessionnelle.jpg',
+      tag: 'Immersion professionnelle',
+    },
+    {
+      title: 'Atelier en Maintenance Informatique',
+      desc: "Pratique en maintenance informatique : les étudiants de FuturCraft Institut passent à l'action pour découvrir les techniques de diagnostic et d'entretien des équipements informatiques. Une immersion pratique pour développer leur autonomie et apprendre à résoudre concrètement les problèmes techniques.",
+      image: '/images/maintenanceInformatique2.jpg',
+      tag: 'Maintenance Informatique',
     },
   ];
 
@@ -152,7 +158,7 @@ export default async function ViePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {lifeMoments.map((m, i) => (
               <div
                 key={i}
@@ -163,7 +169,7 @@ export default async function ViePage() {
                     src={m.image}
                     alt={m.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">
