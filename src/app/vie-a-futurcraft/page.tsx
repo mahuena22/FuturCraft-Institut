@@ -24,22 +24,16 @@ export default async function ViePage() {
 
   const lifeMoments = [
     {
-      title: "Ateliers Code & Pizza",
+      title: "Challenge Coding ",
       desc: "Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.",
       image: "/images/projet-vano-baby.jpg",
       tag: "Coding Night",
     },
     {
-      title: "Sorties Terrain & Vol Drone",
+      title: "Sorties & Vol Drone",
       desc: "Pratique en plein air à Ouidah et Calavi pour cartographier des parcelles agricoles et capturer des plans cinématiques.",
       image: "/images/Excution-Ganvie.jpg",
       tag: "Pratique Terrain",
-    },
-    {
-      title: "Masterclasses & Conférences Tech",
-      desc: "Interventions régulières d'ingénieurs de la Silicon Valley, d'experts de Sèmè City et de fondateurs de startups béninoises.",
-      image: "/images/projet-vano-baby.jpg",
-      tag: "Masterclass",
     },
     {
       title: "Studio Design & Shootings Médias",
@@ -52,18 +46,37 @@ export default async function ViePage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero */}
-      <section className="bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <span className="text-xs font-bold uppercase tracking-widest text-violet-400 bg-violet-950 px-3 py-1 rounded-full border border-violet-800">
+      <section className="relative bg-[var(--color-fc-deep)] text-white py-20 lg:py-28 overflow-hidden">
+        {/* Background photo */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/bg-banniere.jpeg"
+            alt="FuturCraft Institut"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 relative z-10">
+          <span className="text-xs font-bold uppercase tracking-widest text-blue-300 bg-blue-900/60 px-3.5 py-1.5 rounded-full border border-blue-400/30">
             Immersion &amp; Communauté
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight">
-            La Vie à FuturCraft Institut
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight max-w-4xl mx-auto">
+            La Vie à
+            <span className="block text-gradient-brand mt-1">
+              FuturCraft Institut
+            </span>
           </h1>
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-blue-100/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             Plus qu&apos;une école, une communauté passionnée. Découvrez l&apos;ambiance sur nos campus, les hackathons effervescents et les moments inoubliables.
           </p>
         </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
@@ -139,7 +152,7 @@ export default async function ViePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {lifeMoments.map((m, i) => (
               <div
                 key={i}
@@ -150,7 +163,7 @@ export default async function ViePage() {
                     src={m.image}
                     alt={m.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">

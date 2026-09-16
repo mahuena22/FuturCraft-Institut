@@ -66,8 +66,19 @@ export function ProjectsShowcase({ projects }: { projects: ProjectItem[] }) {
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filtered.map((proj) => {
+      {filtered.length === 0 ? (
+        <div className="py-16 text-center text-slate-500 bg-white rounded-3xl border border-slate-200 p-8">
+          <p className="font-semibold text-base text-slate-700">Aucun projet dans cette catégorie pour le moment.</p>
+          <button
+            onClick={() => setSelectedCategory("Tous")}
+            className="mt-4 px-4 py-2 rounded-xl text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 transition-colors"
+          >
+            Voir tous les projets
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filtered.map((proj) => {
           const techList = JSON.parse(proj.technologies || "[]") as string[];
           const team = JSON.parse(proj.teamMembers || "[]") as { name: string; role: string }[];
 
@@ -152,6 +163,7 @@ export function ProjectsShowcase({ projects }: { projects: ProjectItem[] }) {
           );
         })}
       </div>
+      )}
 
       {/* DETAIL MODAL */}
       {activeModalProject && (

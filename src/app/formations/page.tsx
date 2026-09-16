@@ -1,6 +1,7 @@
 import { getFormations } from "@/lib/data-service";
 import { FormationsExplorer } from "@/components/FormationsExplorer";
 import { FormationsExplorerWrapper } from "@/components/FormationsExplorerWrapper";
+import Image from "next/image";
 import {
   Layers,
   GraduationCap,
@@ -36,17 +37,31 @@ export default async function FormationsPage() {
 
       {/* ── Hero Header ── */}
       <section className="relative bg-[var(--color-fc-deep)] text-white overflow-hidden">
-        <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none" />
-        <div className="absolute inset-0 bg-grid-dark opacity-10 pointer-events-none" />
+        {/* Background photo */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/bg-banniere.jpeg"
+            alt="FuturCraft Institut"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none z-[1]" />
+        <div className="absolute inset-0 bg-grid-dark opacity-10 pointer-events-none z-[1]" />
 
         {/* Orbs */}
-        <div className="absolute right-0 top-0 w-96 h-96 rounded-full bg-[var(--color-fc-primary)]/20 blur-[100px] pointer-events-none" />
-        <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-[var(--color-fc-cyan)]/15 blur-[80px] pointer-events-none" />
+        <div className="absolute right-0 top-0 w-96 h-96 rounded-full bg-[var(--color-fc-primary)]/20 blur-[100px] pointer-events-none z-[1]" />
+        <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-[var(--color-fc-cyan)]/15 blur-[80px] pointer-events-none z-[1]" />
 
         {/* Top line */}
-        <div className="h-0.5 bg-[var(--color-fc-primary)]/50" />
+        <div className="h-0.5 bg-[var(--color-fc-primary)]/50 relative z-10" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
           <div className="text-center max-w-4xl mx-auto">
             {/* Badge */}
             <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-light)] text-xs font-bold mb-8 animate-fade-up">

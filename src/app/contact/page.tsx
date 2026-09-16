@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useToast } from "@/components/Toast";
 import {
   MapPin,
@@ -35,20 +36,42 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-[var(--color-fc-bg)] min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-3 py-1 rounded-full border border-[var(--color-fc-primary)]/20">
-            Échange Direct & Orientation
+    <div className="bg-[var(--color-fc-bg)] min-h-screen">
+      {/* Hero Header */}
+      <section className="relative bg-[var(--color-fc-deep)] text-white py-20 lg:py-28 overflow-hidden">
+        {/* Background photo */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/bg-banniere.jpeg"
+            alt="FuturCraft Institut"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+          <span className="text-xs font-bold uppercase tracking-widest text-blue-300 bg-blue-900/60 px-3.5 py-1.5 rounded-full border border-blue-400/30">
+            Échange Direct &amp; Orientation
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-[var(--color-fc-black)] tracking-tight">
-            Contactez FuturCraft Institut
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight max-w-3xl mx-auto">
+            Contactez
+            <span className="block text-gradient-brand mt-1">
+              FuturCraft Institut
+            </span>
           </h1>
-          <p className="text-[var(--color-fc-gray-mid)] text-sm sm:text-base">
+          <p className="text-blue-100/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             Nos équipes pédagogiques et administratives sont à votre écoute pour vous guider vers le métier du numérique qui vous correspond.
           </p>
         </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--color-fc-bg)] to-transparent pointer-events-none" />
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
 
         {/* 2 Column Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">

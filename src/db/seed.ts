@@ -33,8 +33,8 @@ export async function seedDatabase() {
             "La formation Développement Web Fullstack de FuturCraft Institut forme des développeurs polyvalents et opérationnels dès leur sortie. Du frontend réactif avec React et Tailwind CSS au backend robuste avec Node.js, Express, PostgreSQL et Drizzle/Prisma, vous concevrez de bout en bout des solutions logicielles conformes aux normes internationales.",
           duration: "2 ans",
           level: "Débutant à Avancé (BAC ou équivalent)",
-          price: 600000,
-          registrationFee: 25000,
+          price: 300000, // 300 000 FCFA / an (2 ans)
+          registrationFee: 40000,
           installmentsCount: 6,
           campus: "Godomey (Cotonou)",
           mode: "Présentiel & Hybride",
@@ -677,40 +677,6 @@ export async function seedDatabase() {
         ]),
         projectUrl: "https://agroconnect.demo.futurcraft.bj",
         githubUrl: "https://github.com/futurcraft-students/agroconnect-bj",
-        isFeatured: true,
-      },
-      {
-        slug: "skyfarm-drone-ai",
-        title: "SkyFarm Drone Vision",
-        tagline: "Système de télédétection par drone et IA pour la détection précoce des maladies des cultures",
-        description:
-          "Fusionnant le pilotage de drone et la vision par ordinateur avec PyTorch, ce projet permet de survoler les champs et cartographier les foyers d'infestation avec une précision centimétrique.",
-        coverImage: "https://images.pexels.com/photos/14484029/pexels-photo-14484029.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-        formationTitle: "Pilotage de Drone & Intelligence Artificielle",
-        technologies: JSON.stringify(["Python", "PyTorch", "DJI SDK", "OpenCV", "FastAPI", "React"]),
-        teamMembers: JSON.stringify([
-          { name: "Koffi MENSAH", role: "Télépilote & Cartographie" },
-          { name: "Bérénice DOSSOU", role: "Modélisation IA & Vision" },
-        ]),
-        projectUrl: "https://skyfarm.demo.futurcraft.bj",
-        githubUrl: "https://github.com/futurcraft-students/skyfarm-vision",
-        isFeatured: true,
-      },
-      {
-        slug: "djidjo-esante",
-        title: "DjiDjo Santé",
-        tagline: "Dossier médical patient numérique et télé-orientation pour cliniques béninoises",
-        description:
-          "Interface fluide pensée pour les centres de santé en zone péri-urbaine, facilitant les rendez-vous, les prescriptions sécurisées et l'historique vaccinal.",
-        coverImage: "https://images.pexels.com/photos/7014919/pexels-photo-7014919.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-        formationTitle: "Web Design (UI/UX) & Fullstack",
-        technologies: JSON.stringify(["Figma", "React", "TypeScript", "Tailwind CSS"]),
-        teamMembers: JSON.stringify([
-          { name: "Amina SOSSOU", role: "Lead UI/UX Designer" },
-          { name: "Félicien ZANNOU", role: "Développeur Frontend" },
-        ]),
-        projectUrl: "https://djidjo.demo.futurcraft.bj",
-        githubUrl: "https://github.com/futurcraft-students/djidjo-esante",
         isFeatured: true,
       },
     ]);

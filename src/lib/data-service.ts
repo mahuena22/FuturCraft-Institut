@@ -294,44 +294,49 @@ export async function rejectStudent(id: number, adminName?: string, note?: strin
 }
 
 export async function getValidatedStudentTalents() {
-  await ensureDatabaseSeeded();
-  const rows = await db
-    .select({
-      id: students.id,
-      studentNumber: students.studentNumber,
-      firstName: students.firstName,
-      lastName: students.lastName,
-      city: students.city,
-      avatarUrl: students.avatarUrl,
-      cvUrl: students.cvUrl,
-      status: students.status,
-      formationTitle: formations.title,
-      formationTools: formations.tools,
-      validatedAt: students.validatedAt,
-    })
-    .from(students)
-    .innerJoin(formations, eq(students.formationId, formations.id))
-    .where(eq(students.profileVisible, true));
+  try {
+    await ensureDatabaseSeeded();
+    const rows = await db
+      .select({
+        id: students.id,
+        studentNumber: students.studentNumber,
+        firstName: students.firstName,
+        lastName: students.lastName,
+        city: students.city,
+        avatarUrl: students.avatarUrl,
+        cvUrl: students.cvUrl,
+        status: students.status,
+        formationTitle: formations.title,
+        formationTools: formations.tools,
+        validatedAt: students.validatedAt,
+      })
+      .from(students)
+      .innerJoin(formations, eq(students.formationId, formations.id))
+      .where(eq(students.profileVisible, true));
 
-  return rows.map((r) => {
-    let tools: string[] = [];
-    try {
-      const parsed = JSON.parse(r.formationTools || "[]");
-      if (Array.isArray(parsed)) tools = parsed.slice(0, 6).map(String);
-    } catch {
-      tools = [];
-    }
-    return {
-      name: `${r.firstName} ${r.lastName}`,
-      formation: r.formationTitle,
-      skills: tools.length ? tools : ["—"],
-      status: r.status === "actif" ? "Disponible immédiatement" : "Recherche de stage",
-      campus: r.city || "Cotonou, Bénin",
-      matricule: r.studentNumber,
-      photoUrl: r.avatarUrl || undefined,
-      cvUrl: r.cvUrl || undefined,
-    };
-  });
+    return rows.map((r) => {
+      let tools: string[] = [];
+      try {
+        const parsed = JSON.parse(r.formationTools || "[]");
+        if (Array.isArray(parsed)) tools = parsed.slice(0, 6).map(String);
+      } catch {
+        tools = [];
+      }
+      return {
+        name: `${r.firstName} ${r.lastName}`,
+        formation: r.formationTitle,
+        skills: tools.length ? tools : ["—"],
+        status: r.status === "actif" ? "Disponible immédiatement" : "Recherche de stage",
+        campus: r.city || "Cotonou, Bénin",
+        matricule: r.studentNumber,
+        photoUrl: r.avatarUrl || undefined,
+        cvUrl: r.cvUrl || undefined,
+      };
+    });
+  } catch (error) {
+    console.error("Error in getValidatedStudentTalents:", error);
+    return [];
+  }
 }
 
 export async function recordPayment(data: {
@@ -501,8 +506,13 @@ export async function getBlogArticleBySlug(slug: string) {
 }
 
 export async function getCompanyOffers() {
-  await ensureDatabaseSeeded();
-  return await db.select().from(companyOffers).orderBy(desc(companyOffers.createdAt));
+  try {
+    await ensureDatabaseSeeded();
+    return await db.select().from(companyOffers).orderBy(desc(companyOffers.createdAt));
+  } catch (error) {
+    console.error("Error in getCompanyOffers:", error);
+    return [];
+  }
 }
 
 export async function getPartnershipRequests() {

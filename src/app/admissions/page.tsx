@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     GraduationCap,
     CreditCard,
@@ -26,40 +27,40 @@ export const metadata = {
 export default async function AdmissionsPage() {
     const formations = await getFormations();
 
-  const steps = [
-    {
-      num: "01",
-      title: "Exploration & Choix",
-      desc: "Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.",
-      icon: GraduationCap,
-      color: "var(--color-fc-primary)",
-      highlight: "Catalogue gratuit",
-    },
-    {
-      num: "02",
-      title: "Candidature en ligne",
-      desc: "Remplissez le formulaire en quelques minutes et obtenez instantanément votre numéro de dossier unique.",
-      icon: CheckCircle2,
-      color: "var(--color-fc-cyan)",
-      highlight: "Réponse instantanée",
-    },
-    {
-      num: "03",
-      title: "Validation & Paiement",
-      desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
-      icon: CreditCard,
-      color: "var(--color-fc-light)",
-      highlight: "Paiement sécurisé",
-    },
-    {
-      num: "04",
-      title: "Accès & Rentrée",
-      desc: "Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.",
-      icon: Star,
-      color: "var(--color-fc-cyan)",
-      highlight: "Accès immédiat",
-    },
-  ];
+    const steps = [
+        {
+            num: "01",
+            title: "Exploration & Choix",
+            desc: "Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.",
+            icon: GraduationCap,
+            color: "var(--color-fc-primary)",
+            highlight: "Catalogue gratuit",
+        },
+        {
+            num: "02",
+            title: "Candidature en ligne",
+            desc: "Remplissez le formulaire en quelques minutes et obtenez instantanément votre numéro de dossier unique.",
+            icon: CheckCircle2,
+            color: "var(--color-fc-cyan)",
+            highlight: "Réponse instantanée",
+        },
+        {
+            num: "03",
+            title: "Validation & Paiement",
+            desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
+            icon: CreditCard,
+            color: "var(--color-fc-light)",
+            highlight: "Paiement sécurisé",
+        },
+        {
+            num: "04",
+            title: "Accès & Rentrée",
+            desc: "Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.",
+            icon: Star,
+            color: "var(--color-fc-cyan)",
+            highlight: "Accès immédiat",
+        },
+    ];
 
     const faqs = [
         {
@@ -96,17 +97,27 @@ export default async function AdmissionsPage() {
     return (
         <div className="min-h-screen bg-[var(--color-fc-bg)]">
             {/* Hero */}
-            <section className="relative bg-[var(--color-fc-deep)]/90 text-white overflow-hidden">
-                <div className="absolute inset-0 bg-grid-dark opacity-15 pointer-events-none" />
-                <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
-                <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+            <section className="relative bg-[var(--color-fc-deep)] text-white overflow-hidden">
+                {/* Background photo */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/images/bg-banniere.jpeg"
+                        alt="FuturCraft Institut"
+                        fill
+                        priority
+                        sizes="100vw"
+                        className="object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
+                    <div className="absolute inset-0 bg-black/40" />
+                </div>
 
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
-                    <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 text-emerald-200 text-xs font-bold mb-8 animate-fade-up">
-                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        Admissions Ouvertes — Session 2026 · Inscriptions en
-                        cours
-                    </div>
+                <div className="absolute inset-0 bg-grid-dark opacity-15 pointer-events-none z-[1]" />
+                <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] pointer-events-none z-[1]" />
+                <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent relative z-10" />
+
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
+
 
                     <h1 className="animate-fade-up delay-100 font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight">
                         Admissions &
@@ -170,11 +181,11 @@ export default async function AdmissionsPage() {
                         return (
                             <div
                                 key={i}
-                                className="relative p-7 rounded-3xl bg-white border border-slate-200 shadow-sm card-hover group hover:border-blue-200"
+                                className="relative p-7 rounded-3xl bg-white border border-slate-200 shadow-sm card-hover group hover:border-blue-300 transition-all"
                             >
                                 {/* Connector line */}
                                 {i < steps.length - 1 && (
-                                    <div className="hidden lg:block absolute top-10 right-0 translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-slate-200 to-slate-100 z-10" />
+                                    <div className="hidden lg:block absolute top-10 right-0 translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-blue-200 to-slate-100 z-10" />
                                 )}
 
                                 {/* Step number */}
@@ -182,10 +193,10 @@ export default async function AdmissionsPage() {
                                     {st.num}
                                 </span>
 
-                {/* Icon */}
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${st.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
+                                {/* Icon in blue */}
+                                <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-5 shadow-xs group-hover:scale-110 group-hover:bg-blue-100 transition-all duration-300">
+                                    <Icon className="w-7 h-7 text-blue-600" />
+                                </div>
 
                                 {/* Badge */}
                                 <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wide mb-3">
@@ -207,7 +218,7 @@ export default async function AdmissionsPage() {
                 <div className="mt-12 flex justify-center">
                     <Link href="/inscription" className="btn-primary">
                         Démarrer mon inscription
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4 text-white" />
                     </Link>
                 </div>
             </section>
@@ -216,16 +227,8 @@ export default async function AdmissionsPage() {
             <section className="py-20 bg-white border-y border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                     <div className="text-center max-w-2xl mx-auto">
-                        <div
-                            className="badge-brand mb-5 mx-auto w-fit"
-                            style={{
-                                background:
-                                    'linear-gradient(135deg, #f0fdf4, #dcfce7)',
-                                color: '#065f46',
-                                borderColor: 'rgba(16,185,129,0.2)',
-                            }}
-                        >
-                            <ShieldCheck className="w-3 h-3" />
+                        <div className="badge-brand mb-5 mx-auto w-fit text-blue-700 bg-blue-50 border border-blue-200">
+                            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                             Transparence totale
                         </div>
                         <h2 className="font-display text-3xl sm:text-4xl font-black text-[var(--color-fc-black)]">
@@ -297,8 +300,8 @@ export default async function AdmissionsPage() {
                                                 </span>
                                             </td>
                                             <td className="py-4 px-5">
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--color-fc-cyan)]/10 text-[var(--color-fc-cyan)] font-bold text-[11px] border border-[var(--color-fc-cyan)]/20">
-                                                    <CheckCircle2 className="w-3 h-3" />
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-[11px] border border-blue-200">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
                                                     {f.installmentsCount}{' '}
                                                     tranches
                                                 </span>
@@ -320,26 +323,26 @@ export default async function AdmissionsPage() {
 
                         {/* Table footer */}
                         <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-                                <span className="flex items-center gap-1.5">
-                                    <Smartphone className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
+                            <div className="flex flex-wrap gap-4 text-xs text-slate-600">
+                                <span className="flex items-center gap-1.5 font-medium">
+                                    <Smartphone className="w-4 h-4 text-blue-600" />
                                     MTN MoMo accepté
                                 </span>
-                                <span className="flex items-center gap-1.5">
-                                    <Smartphone className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
+                                <span className="flex items-center gap-1.5 font-medium">
+                                    <Smartphone className="w-4 h-4 text-blue-600" />
                                     Moov Money accepté
                                 </span>
-                                <span className="flex items-center gap-1.5">
-                                    <CreditCard className="w-3.5 h-3.5 text-[var(--color-fc-gray-mid)]" />
+                                <span className="flex items-center gap-1.5 font-medium">
+                                    <CreditCard className="w-4 h-4 text-blue-600" />
                                     Carte Visa/Mastercard
                                 </span>
                             </div>
                             <Link
                                 href="/inscription"
-                                className="text-xs font-bold text-[var(--color-fc-primary)] hover:text-[var(--color-fc-deep)] flex items-center gap-1"
+                                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
                             >
-                                &apos;inscrire maintenant{' '}
-                                <ArrowRight className="w-3 h-3" />
+                                S&apos;inscrire maintenant{' '}
+                                <ArrowRight className="w-3 h-3 text-blue-600" />
                             </Link>
                         </div>
                     </div>
@@ -349,7 +352,10 @@ export default async function AdmissionsPage() {
             {/* ── FAQ ── */}
             <section className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-14">
-                    <div className="badge-brand mb-5 mx-auto w-fit">FAQ</div>
+                    <div className="badge-brand mb-5 mx-auto w-fit text-blue-700 bg-blue-50 border border-blue-200">
+                        <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                        FAQ
+                    </div>
                     <h2 className="font-display text-3xl sm:text-4xl font-black text-slate-950">
                         Questions Fréquentes
                     </h2>

@@ -1,7 +1,7 @@
 import { getBlogArticles } from "@/lib/data-service";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Clock, ArrowRight } from "lucide-react";
+import { Calendar, Clock, ArrowRight, Sparkles } from "lucide-react";
 
 export const revalidate = 3600;
 export const metadata = {
@@ -14,20 +14,46 @@ export default async function ActualitesPage() {
   const articles = await getBlogArticles();
 
   return (
-    <div className="bg-white min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
+      {/* Hero Header */}
+      <section className="relative bg-[var(--color-fc-deep)] text-white py-20 lg:py-28 overflow-hidden">
+        {/* Background photo */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/bg-banniere.jpeg"
+            alt="FuturCraft Institut"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+          <div className="badge-brand mb-2 mx-auto w-fit text-blue-300 border-blue-400/30">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
             Insights &amp; Médias
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-950 tracking-tight">
-            Actualités &amp; Publications
+          </div>
+
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight max-w-3xl mx-auto">
+            Actualités &amp;
+            <span className="block text-gradient-brand mt-1">
+              Publications Tech
+            </span>
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base">
+
+          <p className="mt-4 text-blue-100/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             Analyses du marché de la tech en Afrique, conseils pour réussir son insertion professionnelle et retours sur nos promotions.
           </p>
         </div>
 
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--color-fc-bg)] to-transparent pointer-events-none" />
+      </section>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {articles.map((art) => (
             <article

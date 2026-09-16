@@ -36,8 +36,8 @@ const testimonials = [
             "Grâce à FuturCraft Institut, j'ai ma sœur qui a pu acquérir des compétences concrètes et trouver un emploi rapidement. Les formateurs sont passionnés et toujours à l'écoute.",
     },
     {
-        name: "Président DJANGOUN",
-        role: "Entrepreneur digital / Étudiant",
+        name: "Bernard MIDOKPE",
+        role: " Étudiant",
         avatar: "/images/president.jpg",
         quote:
             "FuturCraft offre un cadre dynamique, une pédagogie axée sur la pratique et un accompagnement qui fait vraiment la différence dans le parcours des apprenants.",
@@ -45,7 +45,7 @@ const testimonials = [
     {
         name: "Onesim Graça Ema-Ayé ",
         role: "Développeur web",
-        avatar: "/images/wiliam.jpg",
+        avatar: "/images/Onesim-Graca.jpg",
         quote:
             "Les projets concrets m'ont permis de progresser rapidement et de prendre confiance. J'ai appris à travailler comme dans une véritable équipe produit.",
     },
@@ -59,14 +59,14 @@ const testimonials = [
     {
         name: "Ange AKONDE",
         role: "Développeur web Full-stack",
-        avatar: "/images/nicodem.jpg",
+        avatar: "/images/ange.jpeg",
         quote:
             "J'ai trouvé à FuturCraft une communauté motivée et les outils nécessaires pour transformer mes idées en compétences et résultats concrets.",
     },
     {
-        name: "Cédric Magloire AKOFODJI",
-        role: "Consultant numérique",
-        avatar: "/images/cedric.jpg",
+        name: "Eunice GANSOU",
+        role: "Etudiante en cyber sécurité",
+        avatar: "/images/eunice.jpeg",
         quote:
             "La force de l'institut est son approche par la pratique. On apprend, on teste et on construit avec des objectifs professionnels clairs dès le premier mois.",
     },
@@ -96,16 +96,16 @@ const trainingPricing = [
 
 const instructors = [
     {
-        name: "Prosper SOSSOU",
+        name: "Herman HOUNPKE",
         role: "Intervenant Référent en Développement Web & Technologies Fullstack",
     },
     {
-        name: "Herman HOUNKPE",
-        role: "Intervenant Spécialiste en Marketing Digital & Stratégie d'Acquisition",
+        name: "Nelson Napoléon",
+        role: "Intervenant Spécialiste en Réseaux informatique",
     },
     {
-        name: "Gauthier DOSSOU",
-        role: "Intervenant en Design Graphique, Direction Artistique & Communication",
+        name: "Armel GANGAN",
+        role: "Intervenant en photographie, cadrage et montage vidéo",
     },
 ];
 

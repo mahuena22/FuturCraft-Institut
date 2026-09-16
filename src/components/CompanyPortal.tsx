@@ -156,40 +156,40 @@ export function CompanyPortal({
   return (
     <div className="space-y-8">
       {/* Navigation tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 text-xs font-bold pb-1">
+      <div className="flex items-center gap-2 border-b border-slate-200 text-xs sm:text-sm font-bold pb-1 overflow-x-auto">
         <button
           onClick={() => setActiveTab("recruter")}
-          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "recruter"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-slate-600 hover:text-slate-900"
+              ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)] font-extrabold"
+              : "border-transparent text-slate-500 hover:text-slate-900"
           }`}
         >
-          <Search className="w-4 h-4" />
-          <span>Trouver un talent</span>
+          <Search className="w-4 h-4 text-blue-600" />
+          <span>Trouver un talent ({talents.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab("publier")}
-          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "publier"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-slate-600 hover:text-slate-900"
+              ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)] font-extrabold"
+              : "border-transparent text-slate-500 hover:text-slate-900"
           }`}
         >
-          <Briefcase className="w-4 h-4" />
+          <Briefcase className="w-4 h-4 text-blue-600" />
           <span>Déposer une offre ({offers.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab("partenariat")}
-          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "partenariat"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-slate-600 hover:text-slate-900"
+              ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)] font-extrabold"
+              : "border-transparent text-slate-500 hover:text-slate-900"
           }`}
         >
-          <Handshake className="w-4 h-4" />
+          <Handshake className="w-4 h-4 text-blue-600" />
           <span>Devenir Entreprise Partenaire</span>
         </button>
       </div>
