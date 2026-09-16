@@ -38,7 +38,7 @@ export default async function ViePage() {
         {
             title: 'Du campus au terrain : place au professionnalisme !',
             desc: 'En immersion professionnelle. Les étudiants de FuturCraft Institut ont effectué une sortie professionnelle, vêtus de leur tenue professionnelle, pour découvrir les réalités du terrain et mettre en pratique les attitudes et compétences acquises en formation.',
-            image: '/images/projet-vano-baby.jpg',
+            image: '/images/photoProfessionnelle.jpg',
             tag: 'Immersion professionnelle',
         },
         {
@@ -54,7 +54,7 @@ export default async function ViePage() {
             {/* Hero */}
             <section className="bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-                    <span className="text-xs font-bold uppercase tracking-widest text-violet-400 bg-violet-950 px-3 py-1 rounded-full border border-violet-800">
+                    <span className="text-xs font-bold uppercase tracking-widest text-violet-400 bg-violet-950 px-3 py-1 rounded-full border border-violet-800 relative -top-2">
                         Immersion &amp; Communauté
                     </span>
                     <h1 className="text-3xl sm:text-5xl font-black tracking-tight">
