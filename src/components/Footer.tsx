@@ -250,15 +250,59 @@ export function Footer() {
           </div>
 
 
+          {/* Portails & Administration */}
+          <div className="space-y-3 text-sm">
+            <h4 className="font-semibold text-[var(--color-fc-bg)] uppercase tracking-wider text-xs border-b border-[var(--color-fc-primary)]/30 pb-2">
+              Portails &amp; Accès
+            </h4>
+            <ul className="space-y-2 text-[var(--color-fc-gray-mid)] text-xs">
+              <li>
+                <Link
+                  href="/admin"
+                  className="inline-flex items-center gap-1.5 font-bold text-[var(--color-fc-cyan)] hover:text-white transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Portail Administration</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/espace-etudiant" className="hover:text-[var(--color-fc-cyan)] transition-colors">
+                  Espace Étudiant
+                </Link>
+              </li>
+              <li>
+                <Link href="/entreprises" className="hover:text-[var(--color-fc-cyan)] transition-colors">
+                  Espace Entreprises &amp; Talents
+                </Link>
+              </li>
+              <li>
+                <Link href="/recu" className="hover:text-[var(--color-fc-cyan)] transition-colors">
+                  Authentification de reçu
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-[var(--color-fc-cyan)] transition-colors">
+                  Contact &amp; Assistance
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-[var(--color-fc-primary)]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-fc-gray-mid)]">
           <p>© {new Date().getFullYear()} FuturCraft Institut. Tous droits réservés. Enregistré en République du Bénin.</p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <Link href="/institut" className="hover:text-[var(--color-fc-cyan)]">À propos de l&apos;Institut</Link>
             <Link href="/admissions" className="hover:text-[var(--color-fc-cyan)]">Conditions d&apos;inscription</Link>
-            <Link href="/contact" className="hover:text-[var(--color-fc-cyan)]">Contact & Support</Link>
+            <Link href="/contact" className="hover:text-[var(--color-fc-cyan)]">Contact &amp; Support</Link>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1 font-semibold text-[var(--color-fc-cyan)] hover:underline"
+            >
+              <ShieldCheck className="w-3 h-3" />
+              <span>Administration</span>
+            </Link>
           </div>
         </div>
       </div>

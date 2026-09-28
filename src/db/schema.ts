@@ -80,6 +80,9 @@ export const students = pgTable("students", {
   validationNote: text("validation_note"), // admin message on reject/approve
   validatedBy: text("validated_by"), // admin name who reviewed this student
   validatedAt: timestamp("validated_at"),
+  skills: text("skills"), // JSON string array of competencies e.g. ["React", "TypeScript"]
+  professionalStatus: text("professional_status"), // e.g. "À la recherche d'un stage", "Disponible immédiatement", "À la recherche d'une alternance"
+  customFormation: text("custom_formation"), // allows admin to type custom formation followed by student
   totalAmount: integer("total_amount").notNull().default(0),
   paidAmount: integer("paid_amount").notNull().default(0),
   remainingAmount: integer("remaining_amount").notNull().default(0),

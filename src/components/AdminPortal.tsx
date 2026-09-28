@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Users,
   CreditCard,
@@ -32,7 +32,14 @@ import {
   Mail,
   AlertCircle,
   Download,
+  Eye,
+  EyeOff,
+  Upload,
+  Sparkles,
+  ExternalLink,
+  X,
 } from "lucide-react";
+import Image from "next/image";
 
 import { ReminderMonitor } from "./ReminderMonitor";
 
@@ -54,12 +61,24 @@ interface StudentItem {
   lastName: string;
   email: string;
   phone: string;
+  whatsapp?: string | null;
   city: string | null;
   status: string;
+  professionalStatus?: string | null;
+  skills?: string | null;
+  avatarUrl?: string | null;
+  cvUrl?: string | null;
+  profileVisible: boolean;
   totalAmount: number;
   paidAmount: number;
   remainingAmount: number;
   formationId: number;
+  customFormation?: string | null;
+  formationTitle?: string | null;
+  validationNote?: string | null;
+  validatedBy?: string | null;
+  validatedAt?: string | Date | null;
+  createdAt?: string | Date;
 }
 
 interface PaymentItem {
@@ -106,6 +125,8 @@ interface FormationItem {
   mode: string;
   isActive: boolean | null;
   isPopular: boolean | null;
+  tools?: string | null;
+  competencies?: string | null;
 }
 
 interface PartnershipItem {
@@ -174,9 +195,48 @@ export function AdminPortal({
   const [admissions, setAdmissions] = useState<AdmissionItem[]>([]);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "validations" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats" | "rappels">("dashboard");
+  const [activeTab, setActiveTab] = useState<
+    | "dashboard"
+    | "validations"
+    | "talents"
+    | "etudiants"
+    | "paiements"
+    | "formations"
+    | "articles"
+    | "roles"
+    | "partenariats"
+    | "rappels"
+  >("dashboard");
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Support direct navigation from /entreprises (?tab=talents&edit=ID)
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "talents") {
+      setActiveTab("talents");
+    }
+    const editId = searchParams.get("edit");
+    if (editId && students.length > 0) {
+      const found = students.find((s) => s.id === Number(editId));
+      if (found) {
+        setActiveTab("talents");
+        handleOpenEditStudent(found);
+      }
+    }
+  }, [searchParams, students]);
+
+  // Group all formations by category (matches /formations catalog)
+  const formationsByCategory = useMemo(() => {
+    const groups: Record<string, FormationItem[]> = {};
+    formations.forEach((f) => {
+      const cat = f.category || "Autres Formations";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(f);
+    });
+    return groups;
+  }, [formations]);
 
   // Load online payment requests on mount
   useEffect(() => {
@@ -206,6 +266,13 @@ export function AdminPortal({
   const [searchStudent, setSearchStudent] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [formationFilter, setFormationFilter] = useState("all");
+  const [visibilityFilter, setVisibilityFilter] = useState<"all" | "visible" | "hidden">("all");
+
+  // Filters & Search for Talents tab (defaults to "visible" to immediately show profiles displayed on /entreprises)
+  const [searchTalent, setSearchTalent] = useState("");
+  const [talentStatusFilter, setTalentStatusFilter] = useState("all");
+  const [talentFormationFilter, setTalentFormationFilter] = useState("all");
+  const [talentVisibilityFilter, setTalentVisibilityFilter] = useState<"all" | "visible" | "hidden">("visible");
 
   // Manual payment recording modal
   const [showManualPaymentModal, setShowManualPaymentModal] = useState(false);
@@ -215,7 +282,7 @@ export function AdminPortal({
   const [manualPayNotes, setManualPayNotes] = useState<string>("Règlement physique à la caisse du campus de Cotonou");
   const [isRecordingPayment, setIsRecordingPayment] = useState(false);
 
-  // Manual student creation modal
+  // Student / Talent creation modal
   const [showNewStudentModal, setShowNewStudentModal] = useState(false);
   const [newStudentForm, setNewStudentForm] = useState({
     firstName: "",
@@ -224,10 +291,39 @@ export function AdminPortal({
     phone: "",
     city: "Cotonou",
     formationId: formationsList[0]?.id || 1,
-    studyLevel: "BAC",
-    previousDiploma: "Baccalauréat",
+    customFormation: formationsList[0]?.title || "Développement Web Fullstack",
+    status: "actif",
+    professionalStatus: "Disponible immédiatement",
+    skills: [] as string[],
+    newSkillInput: "",
+    avatarUrl: "",
+    cvUrl: "",
+    profileVisible: true,
   });
   const [isCreatingStudent, setIsCreatingStudent] = useState(false);
+
+  // Edit student / talent modal
+  const [editingStudent, setEditingStudent] = useState<StudentItem | null>(null);
+  const [editStudentForm, setEditStudentForm] = useState({
+    id: 0,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    city: "Cotonou",
+    formationId: 1,
+    customFormation: "",
+    status: "actif",
+    professionalStatus: "Disponible immédiatement",
+    skills: [] as string[],
+    newSkillInput: "",
+    avatarUrl: "",
+    cvUrl: "",
+    profileVisible: true,
+  });
+  const [isSavingStudent, setIsSavingStudent] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
 
   // Edit status modal
   const [selectedStudentForStatus, setSelectedStudentForStatus] = useState<StudentItem | null>(null);
@@ -306,32 +402,65 @@ export function AdminPortal({
 
   // Filter students
   const filteredStudents = students.filter((s) => {
-    const query = searchStudent.toLowerCase();
+    const query = searchStudent.toLowerCase().trim();
     const matchesSearch =
       query === "" ||
       s.firstName.toLowerCase().includes(query) ||
       s.lastName.toLowerCase().includes(query) ||
       s.studentNumber.toLowerCase().includes(query) ||
       s.email.toLowerCase().includes(query) ||
-      s.phone.toLowerCase().includes(query);
+      s.phone.toLowerCase().includes(query) ||
+      (s.skills && s.skills.toLowerCase().includes(query)) ||
+      (s.professionalStatus && s.professionalStatus.toLowerCase().includes(query)) ||
+      (s.formationTitle && s.formationTitle.toLowerCase().includes(query));
 
     const matchesStatus = statusFilter === "all" || s.status === statusFilter;
     const matchesFormation =
       formationFilter === "all" || s.formationId === Number(formationFilter);
+    const matchesVisibility =
+      visibilityFilter === "all" ||
+      (visibilityFilter === "visible" ? s.profileVisible : !s.profileVisible);
 
-    return matchesSearch && matchesStatus && matchesFormation;
+    return matchesSearch && matchesStatus && matchesFormation && matchesVisibility;
+  });
+
+  // Filter talents specifically for the Vivier de Talents tab
+  const filteredTalentsList = students.filter((s) => {
+    const query = searchTalent.toLowerCase().trim();
+    const matchesSearch =
+      query === "" ||
+      s.firstName.toLowerCase().includes(query) ||
+      s.lastName.toLowerCase().includes(query) ||
+      s.studentNumber.toLowerCase().includes(query) ||
+      s.email.toLowerCase().includes(query) ||
+      s.phone.toLowerCase().includes(query) ||
+      (s.skills && s.skills.toLowerCase().includes(query)) ||
+      (s.professionalStatus && s.professionalStatus.toLowerCase().includes(query)) ||
+      (s.formationTitle && s.formationTitle.toLowerCase().includes(query));
+
+    const matchesStatus =
+      talentStatusFilter === "all" ||
+      (s.professionalStatus && s.professionalStatus.toLowerCase().includes(talentStatusFilter.toLowerCase()));
+    const matchesFormation =
+      talentFormationFilter === "all" || s.formationId === Number(talentFormationFilter);
+    const matchesVisibility =
+      talentVisibilityFilter === "all" ||
+      (talentVisibilityFilter === "visible" ? s.profileVisible : !s.profileVisible);
+
+    return matchesSearch && matchesStatus && matchesFormation && matchesVisibility;
   });
 
   // Reload data helper
   const reloadData = async () => {
     try {
-      const [resStats, resStudents, resPayments, resPartnerships, resPaymentRequests, resAdmissions] = await Promise.all([
+      const [resStats, resStudents, resPayments, resPartnerships, resPaymentRequests, resAdmissions, resFormations] = await Promise.all([
         fetch("/api/admin/stats").then((r) => r.json()),
         fetch("/api/students").then((r) => r.json()),
         fetch("/api/payments").then((r) => r.json()),
         fetch("/api/partnerships").then((r) => r.json()),
         fetch("/api/payment-requests").then((r) => r.json()),
         fetch("/api/admin/admissions").then((r) => r.json()),
+        fetch("/api/formations").then((r) => r.json()).catch(() => null),
       ]);
       setStats(resStats);
       setStudents(resStudents);
@@ -339,6 +468,7 @@ export function AdminPortal({
       setPartnerships(resPartnerships);
       setPaymentRequests(resPaymentRequests);
       if (Array.isArray(resAdmissions)) setAdmissions(resAdmissions);
+      if (Array.isArray(resFormations)) setFormations(resFormations);
     } catch (e) {
       console.error(e);
     }
@@ -538,30 +668,210 @@ export function AdminPortal({
     }
   };
 
-  // Create manual student
+  // Upload photo or CV file via /api/admin/upload
+  const handleUploadFile = async (
+    file: File,
+    kind: "avatar" | "cv",
+    target: "new" | "edit"
+  ) => {
+    const isPhoto = kind === "avatar";
+    if (isPhoto) setIsUploadingPhoto(true);
+    else setIsUploadingCv(true);
+
+    try {
+      const fd = new FormData();
+      fd.append("kind", kind);
+      fd.append("file", file);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur de téléversement");
+
+      if (target === "new") {
+        setNewStudentForm((prev) => ({
+          ...prev,
+          ...(isPhoto ? { avatarUrl: data.url } : { cvUrl: data.url }),
+        }));
+      } else {
+        setEditStudentForm((prev) => ({
+          ...prev,
+          ...(isPhoto ? { avatarUrl: data.url } : { cvUrl: data.url }),
+        }));
+      }
+    } catch (err: any) {
+      alert(err.message || "Erreur lors du téléversement du fichier");
+    } finally {
+      if (isPhoto) setIsUploadingPhoto(false);
+      else setIsUploadingCv(false);
+    }
+  };
+
+  // Create student / talent profile
   const handleCreateStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudentForm.firstName || !newStudentForm.lastName || !newStudentForm.phone || !newStudentForm.email) {
-      alert("Veuillez renseigner tous les champs obligatoires.");
+    if (!newStudentForm.firstName.trim() || !newStudentForm.lastName.trim() || !newStudentForm.phone.trim() || !newStudentForm.email.trim()) {
+      alert("Veuillez renseigner le nom, le prénom, le numéro de téléphone et l'email.");
       return;
     }
 
     setIsCreatingStudent(true);
     try {
+      const payload = {
+        firstName: newStudentForm.firstName.trim(),
+        lastName: newStudentForm.lastName.trim(),
+        email: newStudentForm.email.trim(),
+        phone: newStudentForm.phone.trim(),
+        city: newStudentForm.city.trim() || "Cotonou",
+        formationId: Number(newStudentForm.formationId),
+        customFormation: newStudentForm.customFormation.trim() || undefined,
+        status: newStudentForm.status,
+        professionalStatus: newStudentForm.professionalStatus,
+        skills: newStudentForm.skills,
+        avatarUrl: newStudentForm.avatarUrl.trim() || undefined,
+        cvUrl: newStudentForm.cvUrl.trim() || undefined,
+        profileVisible: newStudentForm.profileVisible,
+      };
+
       const res = await fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newStudentForm),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Erreur création étudiant");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Erreur création profil étudiant");
+      }
+
       await reloadData();
       setShowNewStudentModal(false);
-      alert("Nouvel étudiant créé et matricule généré avec succès !");
+      setNewStudentForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        city: "Cotonou",
+        formationId: formations[0]?.id || 1,
+        customFormation: formations[0]?.title || "Développement Web Fullstack",
+        status: "actif",
+        professionalStatus: "Disponible immédiatement",
+        skills: [],
+        newSkillInput: "",
+        avatarUrl: "",
+        cvUrl: "",
+        profileVisible: true,
+      });
+      alert("Profil étudiant et talent créé avec succès !");
     } catch (err: any) {
       alert(err.message || "Erreur");
     } finally {
       setIsCreatingStudent(false);
+    }
+  };
+
+  // Open edit modal for student
+  const handleOpenEditStudent = (st: StudentItem) => {
+    let parsedSkills: string[] = [];
+    if (st.skills) {
+      try {
+        const parsed = JSON.parse(st.skills);
+        if (Array.isArray(parsed)) parsedSkills = parsed.map(String).map((s) => s.trim()).filter(Boolean);
+      } catch {
+        parsedSkills = st.skills.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+    }
+    setEditingStudent(st);
+    setEditStudentForm({
+      id: st.id,
+      firstName: st.firstName,
+      lastName: st.lastName,
+      email: st.email,
+      phone: st.phone,
+      city: st.city || "Cotonou",
+      formationId: st.formationId,
+      customFormation: st.customFormation || st.formationTitle || "",
+      status: st.status,
+      professionalStatus: st.professionalStatus || (st.profileVisible ? "Disponible immédiatement" : "Recherche de stage"),
+      skills: parsedSkills,
+      newSkillInput: "",
+      avatarUrl: st.avatarUrl || "",
+      cvUrl: st.cvUrl || "",
+      profileVisible: Boolean(st.profileVisible),
+    });
+  };
+
+  // Save edit student
+  const handleSaveEditStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingStudent) return;
+    setIsSavingStudent(true);
+    try {
+      const payload = {
+        firstName: editStudentForm.firstName.trim(),
+        lastName: editStudentForm.lastName.trim(),
+        email: editStudentForm.email.trim(),
+        phone: editStudentForm.phone.trim(),
+        city: editStudentForm.city.trim() || "Cotonou",
+        formationId: Number(editStudentForm.formationId),
+        customFormation: editStudentForm.customFormation.trim() || null,
+        status: editStudentForm.status,
+        professionalStatus: editStudentForm.professionalStatus,
+        skills: editStudentForm.skills,
+        avatarUrl: editStudentForm.avatarUrl.trim() || null,
+        cvUrl: editStudentForm.cvUrl.trim() || null,
+        profileVisible: editStudentForm.profileVisible,
+      };
+
+      const res = await fetch(`/api/students/${editingStudent.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Erreur mise à jour profil étudiant");
+      }
+
+      await reloadData();
+      setEditingStudent(null);
+      alert("Profil talent mis à jour avec succès ! Les modifications sont immédiatement synchronisées sur la page Entreprises.");
+    } catch (err: any) {
+      alert(err.message || "Erreur");
+    } finally {
+      setIsSavingStudent(false);
+    }
+  };
+
+  // Toggle visibility on Entreprises page
+  const handleToggleVisibility = async (st: StudentItem) => {
+    const nextVal = !st.profileVisible;
+    try {
+      const res = await fetch(`/api/students/${st.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileVisible: nextVal }),
+      });
+      if (!res.ok) throw new Error("Erreur mise à jour visibilité");
+      await reloadData();
+    } catch (err: any) {
+      alert(err.message || "Erreur");
+    }
+  };
+
+  // Delete student
+  const handleDeleteStudent = async (st: StudentItem) => {
+    if (!window.confirm(`Supprimer définitivement le profil de l'étudiant ${st.firstName} ${st.lastName} (${st.studentNumber}) ?\nCette action est irréversible.`)) return;
+    try {
+      const res = await fetch(`/api/students/${st.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Erreur suppression étudiant");
+      await reloadData();
+      alert("Profil étudiant supprimé.");
+    } catch (err: any) {
+      alert(err.message || "Erreur");
     }
   };
 
@@ -700,6 +1010,18 @@ export function AdminPortal({
                 {pendingValidations}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("talents")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "talents"
+                ? "border-blue-600 text-blue-600 font-extrabold"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <span>Vivier de Talents ({students.filter((s) => s.profileVisible).length})</span>
           </button>
 
           <button
@@ -852,6 +1174,27 @@ export function AdminPortal({
                   Tous campus (Godomey, Supermarché O Bénin Avant pk14)
                 </span>
               </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                    Talents en Ligne
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <div className="text-3xl font-black text-blue-600">
+                  {students.filter((s) => s.profileVisible).length}
+                </div>
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <span className="text-slate-400">Sur {students.length} profils</span>
+                  <button
+                    onClick={() => setActiveTab("talents")}
+                    className="text-blue-600 font-bold hover:underline flex items-center gap-1"
+                  >
+                    Gérer les talents →
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Quick Actions & Recent Activity */}
@@ -930,6 +1273,17 @@ export function AdminPortal({
                       Inscrire un étudiant au guichet
                     </span>
                     <Plus className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("talents")}
+                    className="w-full p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-indigo-600" />
+                      Vivier de talents ({students.filter((s) => s.profileVisible).length} en ligne)
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 text-indigo-400" />
                   </button>
 
                   <Link
@@ -1092,140 +1446,774 @@ export function AdminPortal({
           </div>
         )}
 
-        {/* 26 & 30. TAB GESTION DES ÉTUDIANTS */}
-        {activeTab === "etudiants" && (
+        {/* TAB VIVIER DE TALENTS & PROFILS ENTREPRISES */}
+        {activeTab === "talents" && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Header + Add Student button */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">Répertoire des Candidats &amp; Étudiants</h2>
-                <p className="text-xs text-slate-500">
-                  Recherchez par nom, matricule, téléphone et gérez les statuts d&apos;admission.
+            {/* Header + Add Talent button */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-blue-600" /> Vivier de Talents Certifiés
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    {students.filter((s) => s.profileVisible).length} profil(s) en ligne sur Entreprises
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                  Gestion des Talents &amp; Profils Entreprises
+                </h2>
+                <p className="text-xs text-slate-500 max-w-2xl">
+                  Créez, modifiez et supprimez les profils étudiants valorisés auprès des recruteurs et entreprises partenaires.
+                  Gérez leurs compétences, CV (PDF), photo d&apos;identité et statut de disponibilité en un clic.
                 </p>
               </div>
 
-              <button
-                onClick={() => setShowNewStudentModal(true)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Inscrire un nouvel étudiant</span>
-              </button>
-            </div>
-
-            {/* 30. RECHERCHE & FILTRES RAPIDES */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
-              <div className="sm:col-span-6 relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Rechercher par nom, matricule FC-..., email, téléphone..."
-                  value={searchStudent}
-                  onChange={(e) => setSearchStudent(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs"
-                />
-              </div>
-
-              <div className="sm:col-span-3">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  href="/entreprises"
+                  target="_blank"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center gap-1.5 transition-colors shadow-2xs"
+                  title="Ouvrir la page Entreprises dans un nouvel onglet"
                 >
-                  <option value="all">Tous les statuts</option>
-                  <option value="preinscrit">En attente de validation</option>
-                  <option value="rejete">Rejetés</option>
-                  <option value="inscrit">Inscrits (validés)</option>
-                  <option value="actif">Étudiants actifs</option>
-                  <option value="termine">Formation terminée</option>
-                </select>
-              </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Voir la page Entreprises</span>
+                </Link>
 
-              <div className="sm:col-span-3">
-                <select
-                  value={formationFilter}
-                  onChange={(e) => setFormationFilter(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                <button
+                  onClick={() => {
+                    setNewStudentForm({
+                      firstName: "",
+                      lastName: "",
+                      email: "",
+                      phone: "",
+                      city: "Cotonou",
+                      formationId: formations[0]?.id || 1,
+                      customFormation: formations[0]?.title || "Développement Web Fullstack",
+                      status: "actif",
+                      professionalStatus: "Disponible immédiatement",
+                      skills: [],
+                      newSkillInput: "",
+                      avatarUrl: "",
+                      cvUrl: "",
+                      profileVisible: true,
+                    });
+                    setShowNewStudentModal(true);
+                  }}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 transition-all hover:shadow-lg"
                 >
-                  <option value="all">Toutes les formations</option>
-                  {formations.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.title}
-                    </option>
-                  ))}
-                </select>
+                  <Plus className="w-4 h-4" />
+                  <span>+ Créer un Nouveau Talent</span>
+                </button>
               </div>
             </div>
 
-            {/* Students Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            {/* Quick KPI stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  En ligne sur Entreprises
+                </span>
+                <div className="text-2xl font-black text-emerald-600">
+                  {students.filter((s) => s.profileVisible).length}
+                </div>
+                <span className="text-[11px] text-slate-400">Visibles par les recruteurs</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Disponible immédiatement
+                </span>
+                <div className="text-2xl font-black text-blue-600">
+                  {
+                    students.filter(
+                      (s) =>
+                        s.profileVisible &&
+                        (s.professionalStatus || "").toLowerCase().includes("disponible")
+                    ).length
+                  }
+                </div>
+                <span className="text-[11px] text-slate-400">Prêts pour embauche directe</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Recherche d&apos;alternance
+                </span>
+                <div className="text-2xl font-black text-indigo-600">
+                  {
+                    students.filter(
+                      (s) =>
+                        s.profileVisible &&
+                        (s.professionalStatus || "").toLowerCase().includes("alternance")
+                    ).length
+                  }
+                </div>
+                <span className="text-[11px] text-slate-400">Rythme école / entreprise</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Recherche de stage
+                </span>
+                <div className="text-2xl font-black text-amber-600">
+                  {
+                    students.filter(
+                      (s) =>
+                        s.profileVisible &&
+                        (s.professionalStatus || "").toLowerCase().includes("stage")
+                    ).length
+                  }
+                </div>
+                <span className="text-[11px] text-slate-400">Stages pratiques 3 à 6 mois</span>
+              </div>
+            </div>
+
+            {/* RECHERCHE & FILTRES RAPIDES TALENTS */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div className="sm:col-span-6 relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher par compétence (ex: React, Python, Drone, Figma), nom ou formation..."
+                    value={searchTalent}
+                    onChange={(e) => setSearchTalent(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  />
+                </div>
+
+                <div className="sm:col-span-3">
+                  <select
+                    value={talentStatusFilter}
+                    onChange={(e) => setTalentStatusFilter(e.target.value)}
+                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                  >
+                    <option value="all">Tous les statuts professionnels</option>
+                    <option value="disponible">Disponible immédiatement</option>
+                    <option value="alternance">Recherche d&apos;alternance</option>
+                    <option value="stage">Recherche de stage</option>
+                    <option value="diplômé">Diplômé / En poste</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-3">
+                  <select
+                    value={talentFormationFilter}
+                    onChange={(e) => setTalentFormationFilter(e.target.value)}
+                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                  >
+                    <option value="all">Toutes les formations ({formations.length})</option>
+                    {Object.entries(formationsByCategory).map(([cat, items]) => (
+                      <optgroup key={cat} label={`📂 ${cat}`}>
+                        {items.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.title}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Visibility quick toggle filters */}
+              <div className="flex items-center gap-2 pt-1 border-t border-slate-100 overflow-x-auto text-[11px] font-semibold text-slate-600">
+                <span className="text-slate-400">Filtrer par visibilité :</span>
+                <button
+                  onClick={() => setTalentVisibilityFilter("visible")}
+                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                    talentVisibilityFilter === "visible"
+                      ? "bg-emerald-600 text-white font-black shadow-xs ring-2 ring-emerald-300"
+                      : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 font-bold"
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>En ligne sur Entreprises ({students.filter((s) => s.profileVisible).length})</span>
+                </button>
+
+                <button
+                  onClick={() => setTalentVisibilityFilter("all")}
+                  className={`px-3.5 py-1.5 rounded-xl transition-all ${
+                    talentVisibilityFilter === "all"
+                      ? "bg-slate-900 text-white font-bold shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  Tous ({students.length})
+                </button>
+
+                <button
+                  onClick={() => setTalentVisibilityFilter("hidden")}
+                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                    talentVisibilityFilter === "hidden"
+                      ? "bg-slate-800 text-white font-bold shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  <EyeOff className="w-3.5 h-3.5" />
+                  <span>Masqués ({students.filter((s) => !s.profileVisible).length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Talents Table */}
+            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                     <tr>
-                      <th className="py-3 px-4">Matricule</th>
-                      <th className="py-3 px-4">Étudiant</th>
-                      <th className="py-3 px-4">Contact</th>
-                      <th className="py-3 px-4">Statut</th>
-                      <th className="py-3 px-4">Payé / Total</th>
+                      <th className="py-3 px-4">Talent &amp; Photo</th>
+                      <th className="py-3 px-4">Formation Suivie</th>
+                      <th className="py-3 px-4">Disponibilité Recrutement</th>
+                      <th className="py-3 px-4">Compétences validées</th>
+                      <th className="py-3 px-4">CV</th>
+                      <th className="py-3 px-4 text-center">Page Entreprises</th>
+                      <th className="py-3 px-4 text-right">Actions (Modifier / Supprimer)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-150">
+                    {filteredTalentsList.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-10 text-center text-slate-400 space-y-2">
+                          <Sparkles className="w-8 h-8 text-slate-300 mx-auto" />
+                          <p className="font-bold text-slate-600">Aucun talent trouvé avec les critères actuels.</p>
+                          <button
+                            onClick={() => {
+                              setSearchTalent("");
+                              setTalentStatusFilter("all");
+                              setTalentFormationFilter("all");
+                              setTalentVisibilityFilter("all");
+                            }}
+                            className="text-xs text-blue-600 font-bold hover:underline"
+                          >
+                            Réinitialiser les filtres
+                          </button>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredTalentsList.map((st) => {
+                        let parsedSkills: string[] = [];
+                        if (st.skills) {
+                          try {
+                            const p = JSON.parse(st.skills);
+                            if (Array.isArray(p))
+                              parsedSkills = p.map(String).map((s) => s.trim()).filter(Boolean);
+                          } catch {
+                            parsedSkills = st.skills.split(",").map((s) => s.trim()).filter(Boolean);
+                          }
+                        }
+
+                        const initials = `${st.firstName?.[0] || ""}${st.lastName?.[0] || ""}`.toUpperCase() || "FC";
+                        const displayFormation =
+                          st.formationTitle ||
+                          formations.find((f) => f.id === st.formationId)?.title ||
+                          "Formation générale";
+
+                        return (
+                          <tr key={st.id} className="hover:bg-slate-50/70 transition-colors">
+                            {/* Talent & Photo */}
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-3">
+                                {st.avatarUrl ? (
+                                  <Image
+                                    src={st.avatarUrl}
+                                    alt={`${st.firstName} ${st.lastName}`}
+                                    width={44}
+                                    height={44}
+                                    unoptimized
+                                    className="w-11 h-11 rounded-2xl object-cover border-2 border-blue-200 shrink-0 shadow-2xs"
+                                  />
+                                ) : (
+                                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white font-black text-xs flex items-center justify-center shrink-0 border-2 border-blue-100 shadow-2xs">
+                                    {initials}
+                                  </div>
+                                )}
+                                <div>
+                                  <strong className="text-slate-900 block font-bold text-sm">
+                                    {st.firstName} {st.lastName}
+                                  </strong>
+                                  <span className="text-[10px] font-mono text-blue-600 font-bold block">
+                                    {st.studentNumber}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400">
+                                    {st.phone} • {st.email}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Formation */}
+                            <td className="py-3 px-4">
+                              <span className="font-semibold text-slate-800 block text-xs">
+                                {displayFormation}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                Campus: {st.city || "Cotonou"}
+                              </span>
+                            </td>
+
+                            {/* Disponibilité Recrutement */}
+                            <td className="py-3 px-4">
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold inline-flex items-center gap-1.5 border ${
+                                  (st.professionalStatus || "").toLowerCase().includes("disponible")
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                    : (st.professionalStatus || "").toLowerCase().includes("alternance")
+                                    ? "bg-blue-50 text-blue-700 border-blue-200"
+                                    : (st.professionalStatus || "").toLowerCase().includes("stage")
+                                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                                    : "bg-purple-50 text-purple-700 border-purple-200"
+                                }`}
+                              >
+                                {(st.professionalStatus || "").toLowerCase().includes("disponible") && (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                )}
+                                {st.professionalStatus || "Disponible immédiatement"}
+                              </span>
+                            </td>
+
+                            {/* Compétences validées */}
+                            <td className="py-3 px-4">
+                              {parsedSkills.length > 0 ? (
+                                <div className="flex flex-wrap gap-1 max-w-[240px]">
+                                  {parsedSkills.slice(0, 5).map((sk, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                                    >
+                                      #{sk}
+                                    </span>
+                                  ))}
+                                  {parsedSkills.length > 5 && (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600">
+                                      +{parsedSkills.length - 5}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-[11px] text-slate-400 italic">Compétences non renseignées</span>
+                              )}
+                            </td>
+
+                            {/* CV */}
+                            <td className="py-3 px-4 whitespace-nowrap">
+                              {st.cvUrl ? (
+                                <a
+                                  href={st.cvUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+                                  title="Consulter ou télécharger le CV (PDF)"
+                                >
+                                  <FileText className="w-3.5 h-3.5 text-red-600" />
+                                  <span>CV PDF ↗</span>
+                                </a>
+                              ) : (
+                                <span className="text-[11px] text-slate-400 italic">Aucun CV</span>
+                              )}
+                            </td>
+
+                            {/* Page Entreprises Toggle */}
+                            <td className="py-3 px-4 text-center whitespace-nowrap">
+                              <button
+                                onClick={() => handleToggleVisibility(st)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold transition-all border ${
+                                  st.profileVisible
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300"
+                                    : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
+                                }`}
+                                title={
+                                  st.profileVisible
+                                    ? "Visible sur /entreprises. Cliquer pour masquer."
+                                    : "Masqué. Cliquer pour afficher sur /entreprises."
+                                }
+                              >
+                                {st.profileVisible ? (
+                                  <>
+                                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>En ligne sur Entreprises</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <EyeOff className="w-3.5 h-3.5 text-slate-400" />
+                                    <span>Masqué</span>
+                                  </>
+                                )}
+                              </button>
+                            </td>
+
+                            {/* Actions (Modifier / Supprimer) */}
+                            <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+                              <button
+                                onClick={() => handleOpenEditStudent(st)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors"
+                                title="Modifier toutes les informations du profil"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                                <span>Modifier</span>
+                              </button>
+
+                              <button
+                                onClick={() => handleDeleteStudent(st)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors"
+                                title="Supprimer définitivement ce talent"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Supprimer</span>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 26 & 30. TAB GESTION DES ÉTUDIANTS & TALENTS ENTREPRISES */}
+        {activeTab === "etudiants" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header + Add Student button */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-xs">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-blue-600" /> Vivier de Talents &amp; Candidats
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    {students.filter((s) => s.profileVisible).length} profil(s) en ligne sur Entreprises
+                  </span>
+                </div>
+                <h2 className="text-xl font-black text-slate-900 tracking-tight">Répertoire des Candidats &amp; Profils Entreprises</h2>
+                <p className="text-xs text-slate-500">
+                  Créez et administrez les profils étudiants, compétences validées, CV, photos d&apos;identité et leur mise en avant auprès des recruteurs.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  href="/entreprises"
+                  target="_blank"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center gap-1.5 transition-colors shadow-2xs"
+                  title="Ouvrir la page Entreprises dans un nouvel onglet"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Voir la page Entreprises</span>
+                </Link>
+
+                <button
+                  onClick={() => setShowNewStudentModal(true)}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 transition-all hover:shadow-lg"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Nouveau profil étudiant / Talent</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 30. RECHERCHE & FILTRES RAPIDES */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div className="sm:col-span-6 relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher par nom, matricule, compétence (React, Figma...), email, tél..."
+                    value={searchStudent}
+                    onChange={(e) => setSearchStudent(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  />
+                </div>
+
+                <div className="sm:col-span-3">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                  >
+                    <option value="all">Tous les statuts administratifs</option>
+                    <option value="preinscrit">En attente de validation</option>
+                    <option value="rejete">Rejetés</option>
+                    <option value="inscrit">Inscrits (validés)</option>
+                    <option value="actif">Étudiants actifs</option>
+                    <option value="termine">Formation terminée</option>
+                    <option value="alumni">Alumni</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-3">
+                  <select
+                    value={formationFilter}
+                    onChange={(e) => setFormationFilter(e.target.value)}
+                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                  >
+                    <option value="all">Toutes les formations</option>
+                    {formations.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Visibility quick toggle filters */}
+              <div className="flex items-center gap-2 pt-1 border-t border-slate-100 overflow-x-auto text-[11px] font-semibold text-slate-600">
+                <span className="text-slate-400">Affichage Entreprises :</span>
+                <button
+                  onClick={() => setVisibilityFilter("all")}
+                  className={`px-3 py-1 rounded-lg transition-all ${
+                    visibilityFilter === "all"
+                      ? "bg-slate-900 text-white font-bold"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  Tous ({students.length})
+                </button>
+                <button
+                  onClick={() => setVisibilityFilter("visible")}
+                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                    visibilityFilter === "visible"
+                      ? "bg-emerald-600 text-white font-bold shadow-xs"
+                      : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                  }`}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>En ligne sur Entreprises ({students.filter((s) => s.profileVisible).length})</span>
+                </button>
+                <button
+                  onClick={() => setVisibilityFilter("hidden")}
+                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                    visibilityFilter === "hidden"
+                      ? "bg-slate-700 text-white font-bold shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  <EyeOff className="w-3.5 h-3.5" />
+                  <span>Masqués ({students.filter((s) => !s.profileVisible).length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Students Table */}
+            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="py-3 px-4">Étudiant &amp; Photo</th>
+                      <th className="py-3 px-4">Formation</th>
+                      <th className="py-3 px-4">Statut &amp; Disponibilité</th>
+                      <th className="py-3 px-4">Compétences validées</th>
+                      <th className="py-3 px-4">CV</th>
+                      <th className="py-3 px-4 text-center">Page Entreprises</th>
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-150">
-                    {filteredStudents.map((st) => (
-                      <tr key={st.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-blue-600">
-                          {st.studentNumber}
-                        </td>
-                        <td className="py-3 px-4">
-                          <strong className="text-slate-900 block">
-                            {st.firstName} {st.lastName}
-                          </strong>
-                          <span className="text-[10px] text-slate-400">{st.city || "Cotonou"}</span>
-                        </td>
-                        <td className="py-3 px-4 text-slate-600">
-                          <div>{st.phone}</div>
-                          <div className="text-[10px] text-slate-400">{st.email}</div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              st.status === "actif"
-                                ? "bg-emerald-100 text-emerald-800"
-                                : st.status === "inscrit" || st.status === "termine" || st.status === "alumni"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : st.status === "preinscrit"
-                                ? "bg-amber-100 text-amber-800"
-                                : st.status === "rejete"
-                                ? "bg-rose-100 text-rose-700"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            {st.status === "preinscrit" && "En attente de validation"}
-                            {!["preinscrit"].includes(st.status) && st.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="font-bold text-slate-900">
-                            {st.paidAmount.toLocaleString("fr-FR")} / {st.totalAmount.toLocaleString("fr-FR")} FCFA
-                          </div>
-                          <div className="text-[10px] text-rose-600">
-                            Reste : {st.remainingAmount.toLocaleString("fr-FR")} FCFA
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-right space-x-2">
-                          <button
-                            onClick={() => {
-                              setSelectedStudentForStatus(st);
-                              setNewStatusValue(st.status);
-                            }}
-                            className="text-xs font-bold text-blue-600 hover:underline"
-                          >
-                            Changer statut
-                          </button>
+                    {filteredStudents.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-400">
+                          Aucun étudiant trouvé avec les critères sélectionnés.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredStudents.map((st) => {
+                        let parsedSkills: string[] = [];
+                        if (st.skills) {
+                          try {
+                            const p = JSON.parse(st.skills);
+                            if (Array.isArray(p)) parsedSkills = p.map(String).map((s) => s.trim()).filter(Boolean);
+                          } catch {
+                            parsedSkills = st.skills.split(",").map((s) => s.trim()).filter(Boolean);
+                          }
+                        }
+
+                        const initials = `${st.firstName?.[0] || ""}${st.lastName?.[0] || ""}`.toUpperCase() || "FC";
+                        const displayFormation = st.formationTitle || formations.find((f) => f.id === st.formationId)?.title || "Formation générale";
+
+                        return (
+                          <tr key={st.id} className="hover:bg-slate-50/70 transition-colors">
+                            {/* Étudiant & Photo */}
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-3">
+                                {st.avatarUrl ? (
+                                  <Image
+                                    src={st.avatarUrl}
+                                    alt={`${st.firstName} ${st.lastName}`}
+                                    width={40}
+                                    height={40}
+                                    unoptimized
+                                    className="w-10 h-10 rounded-full object-cover border-2 border-blue-200 shrink-0"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black text-xs flex items-center justify-center shrink-0 border-2 border-blue-200">
+                                    {initials}
+                                  </div>
+                                )}
+                                <div>
+                                  <strong className="text-slate-900 block font-bold">
+                                    {st.firstName} {st.lastName}
+                                  </strong>
+                                  <span className="text-[10px] font-mono text-blue-600 font-bold block">
+                                    {st.studentNumber}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400">
+                                    {st.phone} • {st.city || "Cotonou"}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Formation */}
+                            <td className="py-3 px-4">
+                              <span className="font-semibold text-slate-800 block text-xs">
+                                {displayFormation}
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                {st.paidAmount.toLocaleString("fr-FR")} / {st.totalAmount.toLocaleString("fr-FR")} FCFA
+                              </span>
+                            </td>
+
+                            {/* Statut & Disponibilité */}
+                            <td className="py-3 px-4 space-y-1">
+                              <div>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${
+                                    st.status === "actif"
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : st.status === "inscrit" || st.status === "termine" || st.status === "alumni"
+                                      ? "bg-blue-100 text-blue-800"
+                                      : st.status === "preinscrit"
+                                      ? "bg-amber-100 text-amber-800"
+                                      : st.status === "rejete"
+                                      ? "bg-rose-100 text-rose-700"
+                                      : "bg-slate-100 text-slate-600"
+                                  }`}
+                                >
+                                  {st.status === "preinscrit" && "En attente validation"}
+                                  {st.status === "actif" && "Actif"}
+                                  {st.status === "inscrit" && "Validé (Inscrit)"}
+                                  {st.status === "termine" && "Diplômé"}
+                                  {st.status === "rejete" && "Rejeté"}
+                                  {!["preinscrit", "actif", "inscrit", "termine", "rejete"].includes(st.status) && st.status}
+                                </span>
+                              </div>
+                              {st.professionalStatus && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-200 block w-fit">
+                                  {st.professionalStatus}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Compétences validées */}
+                            <td className="py-3 px-4">
+                              {parsedSkills.length > 0 ? (
+                                <div className="flex flex-wrap gap-1 max-w-[220px]">
+                                  {parsedSkills.slice(0, 4).map((sk, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                                    >
+                                      {sk}
+                                    </span>
+                                  ))}
+                                  {parsedSkills.length > 4 && (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600">
+                                      +{parsedSkills.length - 4}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-[11px] text-slate-400 italic">Non renseignées</span>
+                              )}
+                            </td>
+
+                            {/* CV */}
+                            <td className="py-3 px-4 whitespace-nowrap">
+                              {st.cvUrl ? (
+                                <a
+                                  href={st.cvUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+                                  title="Consulter le CV (PDF)"
+                                >
+                                  <FileText className="w-3.5 h-3.5 text-red-600" />
+                                  <span>CV PDF ↗</span>
+                                </a>
+                              ) : (
+                                <span className="text-[11px] text-slate-400 italic">Aucun CV</span>
+                              )}
+                            </td>
+
+                            {/* Page Entreprises Toggle */}
+                            <td className="py-3 px-4 text-center whitespace-nowrap">
+                              <button
+                                onClick={() => handleToggleVisibility(st)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold transition-all border ${
+                                  st.profileVisible
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300"
+                                    : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
+                                }`}
+                                title={st.profileVisible ? "Visible sur Entreprises. Cliquer pour masquer." : "Masqué. Cliquer pour afficher sur Entreprises."}
+                              >
+                                {st.profileVisible ? (
+                                  <>
+                                    <Eye className="w-3 h-3 text-emerald-600" />
+                                    <span>En ligne</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <EyeOff className="w-3 h-3 text-slate-400" />
+                                    <span>Masqué</span>
+                                  </>
+                                )}
+                              </button>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+                              <button
+                                onClick={() => handleOpenEditStudent(st)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                title="Modifier toutes les informations du profil"
+                              >
+                                <Pencil className="w-3 h-3" />
+                                <span>Modifier</span>
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setSelectedStudentForStatus(st);
+                                  setNewStatusValue(st.status);
+                                }}
+                                className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors"
+                                title="Changer le statut administratif"
+                              >
+                                Statut
+                              </button>
+
+                              <button
+                                onClick={() => handleDeleteStudent(st)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                title="Supprimer définitivement ce profil"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1811,103 +2799,1100 @@ export function AdminPortal({
         </div>
       )}
 
-      {/* MODAL: NOUVEL ÉTUDIANT MANUEL */}
+      {/* MODAL: CRÉER UN PROFIL ÉTUDIANT & TALENT ENTREPRISE */}
       {showNewStudentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-600" />
-                <span>Inscrire un étudiant au guichet physique</span>
-              </h3>
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                    Nouveau Profil Étudiant &amp; Talent
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Renseignez les compétences, photo et CV pour alimenter le vivier de la page Entreprises.
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => setShowNewStudentModal(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-slate-400 hover:text-slate-700 font-bold p-1 rounded-lg hover:bg-slate-100"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateStudent} className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Nom *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newStudentForm.lastName}
-                    onChange={(e) =>
-                      setNewStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
-                    }
-                    className="w-full p-2 rounded-xl border border-slate-200"
-                  />
+            <form onSubmit={handleCreateStudent} className="space-y-5 text-xs">
+              {/* SECTION 1: IDENTITÉ & CONTACT */}
+              <div className="space-y-3">
+                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-blue-600" />
+                  <span>1. Identité &amp; Coordonnées</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Nom de famille *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex : DOSSOU"
+                      value={newStudentForm.lastName}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Prénom(s) *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex : Arnaud"
+                      value={newStudentForm.firstName}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Prénom *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newStudentForm.firstName}
-                    onChange={(e) =>
-                      setNewStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
-                    }
-                    className="w-full p-2 rounded-xl border border-slate-200"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Téléphone *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="+229 97 00 00 00"
+                      value={newStudentForm.phone}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, phone: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Email *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="etudiant@futurcraft.bj"
+                      value={newStudentForm.email}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, email: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Ville / Campus</label>
+                    <input
+                      type="text"
+                      value={newStudentForm.city}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, city: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Téléphone *</label>
+              {/* SECTION 2: FORMATION & STATUTS */}
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <span>2. Formation &amp; Statut Professionnel</span>
+                </h4>
+
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <label className="block font-bold text-slate-800 text-xs">
+                      Intitulé de la Formation suivie à FuturCraft *
+                    </label>
+                    <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                      ✍️ Saisie libre ou sélection catalogue
+                    </span>
+                  </div>
+
                   <input
                     type="text"
                     required
-                    placeholder="+229 ..."
-                    value={newStudentForm.phone}
+                    placeholder="Ex : Développement Web Fullstack, Intelligence Artificielle & Robotique, Pilotage de Drone..."
+                    value={newStudentForm.customFormation}
                     onChange={(e) =>
-                      setNewStudentForm((prev) => ({ ...prev, phone: e.target.value }))
+                      setNewStudentForm((prev) => ({ ...prev, customFormation: e.target.value }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2.5 rounded-xl border-2 border-blue-200 bg-white font-bold text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs text-xs"
                   />
+
+                  <div className="pt-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                      Ou sélectionner parmi nos {formations.length} formations du catalogue pour pré-remplir :
+                    </label>
+                    <select
+                      value={newStudentForm.formationId}
+                      onChange={(e) => {
+                        const selId = Number(e.target.value);
+                        const selFormation = formations.find((f) => f.id === selId);
+                        setNewStudentForm((prev) => ({
+                          ...prev,
+                          formationId: selId,
+                          customFormation: selFormation ? selFormation.title : prev.customFormation,
+                        }));
+                      }}
+                      className="w-full p-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-700 hover:bg-white focus:bg-white transition-colors"
+                    >
+                      {Object.entries(formationsByCategory).map(([cat, items]) => (
+                        <optgroup key={cat} label={`📂 ${cat} (${items.length})`}>
+                          {items.map((f) => (
+                            <option key={f.id} value={f.id}>
+                              {f.title} — {f.duration} ({f.price.toLocaleString("fr-FR")} FCFA)
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Aperçu interactif du cursus sélectionné avec import de compétences */}
+                  {(() => {
+                    const selF = formations.find((f) => f.id === Number(newStudentForm.formationId));
+                    if (!selF) return null;
+                    let toolsList: string[] = [];
+                    if (selF.tools) {
+                      try {
+                        const parsed = JSON.parse(selF.tools);
+                        if (Array.isArray(parsed)) toolsList = parsed.map(String);
+                      } catch {}
+                    }
+                    return (
+                      <div className="mt-2 p-3 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white">
+                              {selF.category}
+                            </span>
+                            <span className="font-bold text-slate-800 text-[11px]">{selF.title}</span>
+                          </div>
+                          <span className="text-[11px] font-semibold text-slate-500">
+                            Durée : <strong>{selF.duration}</strong> • {selF.campus}
+                          </span>
+                        </div>
+                        {toolsList.length > 0 && (
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-blue-100">
+                            <div className="flex flex-wrap items-center gap-1">
+                              <span className="text-[10px] font-bold text-slate-500">Compétences du cursus :</span>
+                              {toolsList.slice(0, 6).map((t, idx) => (
+                                <span key={idx} className="text-[10px] font-semibold text-blue-800 bg-white px-1.5 py-0.5 rounded border border-blue-200 shadow-2xs">
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const merged = Array.from(new Set([...newStudentForm.skills, ...toolsList]));
+                                setNewStudentForm((prev) => ({ ...prev, skills: merged }));
+                              }}
+                              className="text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-300 transition-colors shrink-0 shadow-2xs"
+                              title="Ajouter automatiquement toutes les compétences de ce cursus"
+                            >
+                              + Importer ces compétences
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Email *</label>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Statut administratif *</label>
+                    <select
+                      value={newStudentForm.status}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, status: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
+                    >
+                      <option value="actif">Étudiant Actif</option>
+                      <option value="inscrit">Inscrit (Validé)</option>
+                      <option value="termine">Formation terminée / Diplômé</option>
+                      <option value="alumni">Alumni</option>
+                      <option value="preinscrit">Préinscrit</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Disponibilité pour les Entreprises *</label>
+                    <select
+                      value={newStudentForm.professionalStatus}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, professionalStatus: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-semibold text-blue-700"
+                    >
+                      <option value="Disponible immédiatement">Disponible immédiatement</option>
+                      <option value="À la recherche d'un stage">À la recherche d&apos;un stage</option>
+                      <option value="À la recherche d'une alternance">À la recherche d&apos;une alternance</option>
+                      <option value="En poste / Freelance">En poste / Freelance</option>
+                      <option value="En formation active">En formation active</option>
+                      <option value="Diplômé disponible">Diplômé disponible</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: COMPÉTENCES DES ÉTUDIANTS */}
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <span>3. Compétences validées</span>
+                  </h4>
+                  <span className="text-[10px] text-slate-400">
+                    Ces compétences apparaîtront sur la fiche Entreprise
+                  </span>
+                </div>
+
+                {/* Tag Input */}
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div className="flex flex-wrap gap-1.5">
+                    {newStudentForm.skills.length === 0 ? (
+                      <span className="text-slate-400 italic text-[11px]">
+                        Aucune compétence ajoutée. Choisissez parmi les suggestions ci-dessous ou tapez une compétence.
+                      </span>
+                    ) : (
+                      newStudentForm.skills.map((sk, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white text-slate-800 border border-slate-300 shadow-2xs"
+                        >
+                          {sk}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setNewStudentForm((prev) => ({
+                                ...prev,
+                                skills: prev.skills.filter((_, i) => i !== idx),
+                              }))
+                            }
+                            className="text-slate-400 hover:text-rose-600 ml-0.5"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Ajouter une compétence personnalisée (ex: React, Docker, Figma, Python...)"
+                      value={newStudentForm.newSkillInput}
+                      onChange={(e) =>
+                        setNewStudentForm((prev) => ({ ...prev, newSkillInput: e.target.value }))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const val = newStudentForm.newSkillInput.trim();
+                          if (val && !newStudentForm.skills.includes(val)) {
+                            setNewStudentForm((prev) => ({
+                              ...prev,
+                              skills: [...prev.skills, val],
+                              newSkillInput: "",
+                            }));
+                          }
+                        }
+                      }}
+                      className="flex-1 p-2 rounded-xl border border-slate-200 bg-white text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = newStudentForm.newSkillInput.trim();
+                        if (val && !newStudentForm.skills.includes(val)) {
+                          setNewStudentForm((prev) => ({
+                            ...prev,
+                            skills: [...prev.skills, val],
+                            newSkillInput: "",
+                          }));
+                        }
+                      }}
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shrink-0"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
+
+                  {/* Suggestions rapides */}
+                  <div className="pt-1">
+                    <span className="text-[10px] font-bold text-slate-400 block mb-1">
+                      Suggestions rapides (cliquez pour ajouter) :
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {[
+                        "React",
+                        "Next.js",
+                        "TypeScript",
+                        "Node.js",
+                        "PostgreSQL",
+                        "Tailwind CSS",
+                        "Python",
+                        "Figma",
+                        "UI/UX Design",
+                        "Docker",
+                        "Git & GitHub",
+                        "Télépilotage Drone",
+                        "SEO & Ads",
+                        "API REST",
+                      ].map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => {
+                            if (!newStudentForm.skills.includes(tag)) {
+                              setNewStudentForm((prev) => ({
+                                ...prev,
+                                skills: [...prev.skills, tag],
+                              }));
+                            }
+                          }}
+                          disabled={newStudentForm.skills.includes(tag)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-medium border transition-colors ${
+                            newStudentForm.skills.includes(tag)
+                              ? "bg-slate-200 text-slate-400 border-slate-200 cursor-default"
+                              : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50 cursor-pointer"
+                          }`}
+                        >
+                          + {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: PHOTO D'IDENTITÉ & CV */}
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-blue-600" />
+                  <span>4. Photo d&apos;identité &amp; CV (Documents)</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Photo d'identité */}
+                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                    <label className="block font-bold text-slate-700">Photo d&apos;identité</label>
+                    <div className="flex items-center gap-3">
+                      {newStudentForm.avatarUrl ? (
+                        <div className="relative group shrink-0">
+                          <Image
+                            src={newStudentForm.avatarUrl}
+                            alt="Aperçu photo"
+                            width={52}
+                            height={52}
+                            unoptimized
+                            className="w-13 h-13 rounded-full object-cover border-2 border-blue-400 shadow-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setNewStudentForm((p) => ({ ...p, avatarUrl: "" }))}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] shadow"
+                            title="Supprimer la photo"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-13 h-13 rounded-full bg-slate-200 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0 text-xs">
+                          Photo
+                        </div>
+                      )}
+                      <div className="flex-1 space-y-1">
+                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{isUploadingPhoto ? "Envoi..." : "Téléverser photo"}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={isUploadingPhoto}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadFile(f, "avatar", "new");
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ou collez l'URL d'une image..."
+                          value={newStudentForm.avatarUrl}
+                          onChange={(e) =>
+                            setNewStudentForm((p) => ({ ...p, avatarUrl: e.target.value }))
+                          }
+                          className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CV de l'étudiant */}
+                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                    <label className="block font-bold text-slate-700">Curriculum Vitae (CV PDF)</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{isUploadingCv ? "Envoi..." : "Téléverser CV (PDF)"}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,application/pdf"
+                            disabled={isUploadingCv}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadFile(f, "cv", "new");
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                        {newStudentForm.cvUrl && (
+                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>PDF prêt</span>
+                            <button
+                              type="button"
+                              onClick={() => setNewStudentForm((p) => ({ ...p, cvUrl: "" }))}
+                              className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Ou collez l'URL d'un CV en ligne (PDF / Drive)..."
+                        value={newStudentForm.cvUrl}
+                        onChange={(e) =>
+                          setNewStudentForm((p) => ({ ...p, cvUrl: e.target.value }))
+                        }
+                        className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: VISIBILITÉ SUR LA PAGE ENTREPRISES */}
+              <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                    <Eye className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="font-bold text-slate-900 text-xs">
+                      Publier sur la page Entreprises (Recrutement)
+                    </h5>
+                    <p className="text-[11px] text-slate-500">
+                      Ce profil sera immédiatement visible par les recruteurs avec ses compétences, son CV et sa photo.
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
-                    type="email"
-                    required
-                    value={newStudentForm.email}
+                    type="checkbox"
+                    checked={newStudentForm.profileVisible}
                     onChange={(e) =>
-                      setNewStudentForm((prev) => ({ ...prev, email: e.target.value }))
+                      setNewStudentForm((p) => ({ ...p, profileVisible: e.target.checked }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="sr-only peer"
                   />
-                </div>
+                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Formation choisie *</label>
-                <select
-                  value={newStudentForm.formationId}
-                  onChange={(e) =>
-                    setNewStudentForm((prev) => ({ ...prev, formationId: Number(e.target.value) }))
-                  }
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white"
-                >
-                  {formations.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.title} ({f.price.toLocaleString("fr-FR")} FCFA)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="pt-2">
+              {/* Action Buttons */}
+              <div className="pt-2 flex gap-3">
                 <button
                   type="submit"
                   disabled={isCreatingStudent}
-                  className="w-full py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all disabled:opacity-50"
+                  className="flex-1 py-3 rounded-2xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isCreatingStudent ? "Création en cours..." : "Créer le dossier et générer le matricule FC-2025-..."}
+                  <Sparkles className="w-4 h-4" />
+                  <span>
+                    {isCreatingStudent
+                      ? "Création et publication en cours..."
+                      : "Créer et enregistrer le profil étudiant"}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowNewStudentModal(false)}
+                  className="px-5 py-3 rounded-2xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: MODIFIER UN PROFIL ÉTUDIANT & TALENT */}
+      {editingStudent && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-blue-600 text-white flex items-center justify-center shadow-md">
+                  <Pencil className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                      Modifier le Profil de {editingStudent.firstName} {editingStudent.lastName}
+                    </h3>
+                    {editStudentForm.profileVisible ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        En ligne sur Entreprises
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                        Profil Masqué
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                    <span className="font-mono text-blue-600 font-bold">Matricule : {editingStudent.studentNumber}</span>
+                    <span>•</span>
+                    <span>Modifications synchronisées avec la page Entreprises</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingStudent(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold p-1 rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditStudent} className="space-y-5 text-xs">
+              {/* SECTION 1: IDENTITÉ & CONTACT */}
+              <div className="space-y-3">
+                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-blue-600" />
+                  <span>1. Identité &amp; Coordonnées</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Nom de famille *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editStudentForm.lastName}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Prénom(s) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editStudentForm.firstName}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Téléphone *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editStudentForm.phone}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, phone: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Email *</label>
+                    <input
+                      type="email"
+                      required
+                      value={editStudentForm.email}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, email: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Ville / Campus</label>
+                    <input
+                      type="text"
+                      value={editStudentForm.city}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, city: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: FORMATION & STATUTS */}
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <span>2. Formation &amp; Statut Professionnel</span>
+                </h4>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-800 text-xs">
+                      Intitulé de la Formation suivie à FuturCraft *
+                    </label>
+                    <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                      ✍️ Saisie libre ou sélection catalogue
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex : Développement Web Fullstack, Intelligence Artificielle & Robotique, Pilotage de Drone..."
+                    value={editStudentForm.customFormation}
+                    onChange={(e) =>
+                      setEditStudentForm((prev) => ({ ...prev, customFormation: e.target.value }))
+                    }
+                    className="w-full p-2.5 rounded-xl border-2 border-blue-200 bg-white font-bold text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs text-xs"
+                  />
+
+                  <div className="pt-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                      Ou sélectionner parmi nos {formations.length} formations du catalogue pour pré-remplir :
+                    </label>
+                    <select
+                      value={editStudentForm.formationId}
+                      onChange={(e) => {
+                        const selId = Number(e.target.value);
+                        const selFormation = formations.find((f) => f.id === selId);
+                        setEditStudentForm((prev) => ({
+                          ...prev,
+                          formationId: selId,
+                          customFormation: selFormation ? selFormation.title : prev.customFormation,
+                        }));
+                      }}
+                      className="w-full p-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-700 hover:bg-white focus:bg-white transition-colors"
+                    >
+                      {Object.entries(formationsByCategory).map(([cat, items]) => (
+                        <optgroup key={cat} label={`📂 ${cat} (${items.length})`}>
+                          {items.map((f) => (
+                            <option key={f.id} value={f.id}>
+                              {f.title} — {f.duration} ({f.price.toLocaleString("fr-FR")} FCFA)
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Aperçu interactif du cursus sélectionné avec import de compétences */}
+                  {(() => {
+                    const selF = formations.find((f) => f.id === Number(editStudentForm.formationId));
+                    if (!selF) return null;
+                    let toolsList: string[] = [];
+                    if (selF.tools) {
+                      try {
+                        const parsed = JSON.parse(selF.tools);
+                        if (Array.isArray(parsed)) toolsList = parsed.map(String);
+                      } catch {}
+                    }
+                    return (
+                      <div className="mt-2 p-3 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white">
+                              {selF.category}
+                            </span>
+                            <span className="font-bold text-slate-800 text-[11px]">{selF.title}</span>
+                          </div>
+                          <span className="text-[11px] font-semibold text-slate-500">
+                            Durée : <strong>{selF.duration}</strong> • {selF.campus}
+                          </span>
+                        </div>
+                        {toolsList.length > 0 && (
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-blue-100">
+                            <div className="flex flex-wrap items-center gap-1">
+                              <span className="text-[10px] font-bold text-slate-500">Compétences du cursus :</span>
+                              {toolsList.slice(0, 6).map((t, idx) => (
+                                <span key={idx} className="text-[10px] font-semibold text-blue-800 bg-white px-1.5 py-0.5 rounded border border-blue-200 shadow-2xs">
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const merged = Array.from(new Set([...editStudentForm.skills, ...toolsList]));
+                                setEditStudentForm((prev) => ({ ...prev, skills: merged }));
+                              }}
+                              className="text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-300 transition-colors shrink-0 shadow-2xs"
+                              title="Ajouter automatiquement toutes les compétences de ce cursus"
+                            >
+                              + Importer ces compétences
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Statut administratif *</label>
+                    <select
+                      value={editStudentForm.status}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, status: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
+                    >
+                      <option value="actif">Étudiant Actif</option>
+                      <option value="inscrit">Inscrit (Validé)</option>
+                      <option value="termine">Formation terminée / Diplômé</option>
+                      <option value="alumni">Alumni</option>
+                      <option value="preinscrit">Préinscrit</option>
+                      <option value="rejete">Rejeté</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Disponibilité pour les Entreprises *</label>
+                    <select
+                      value={editStudentForm.professionalStatus}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, professionalStatus: e.target.value }))
+                      }
+                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-semibold text-blue-700"
+                    >
+                      <option value="Disponible immédiatement">Disponible immédiatement</option>
+                      <option value="À la recherche d'un stage">À la recherche d&apos;un stage</option>
+                      <option value="À la recherche d'une alternance">À la recherche d&apos;une alternance</option>
+                      <option value="En poste / Freelance">En poste / Freelance</option>
+                      <option value="En formation active">En formation active</option>
+                      <option value="Diplômé disponible">Diplômé disponible</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: COMPÉTENCES */}
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <span>3. Compétences validées</span>
+                  </h4>
+                  <span className="text-[10px] text-slate-400">
+                    Affichées sur la fiche Entreprises
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div className="flex flex-wrap gap-1.5">
+                    {editStudentForm.skills.length === 0 ? (
+                      <span className="text-slate-400 italic text-[11px]">
+                        Aucune compétence renseignée.
+                      </span>
+                    ) : (
+                      editStudentForm.skills.map((sk, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white text-slate-800 border border-slate-300 shadow-2xs"
+                        >
+                          {sk}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEditStudentForm((prev) => ({
+                                ...prev,
+                                skills: prev.skills.filter((_, i) => i !== idx),
+                              }))
+                            }
+                            className="text-slate-400 hover:text-rose-600 ml-0.5"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Ajouter une compétence..."
+                      value={editStudentForm.newSkillInput}
+                      onChange={(e) =>
+                        setEditStudentForm((prev) => ({ ...prev, newSkillInput: e.target.value }))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const val = editStudentForm.newSkillInput.trim();
+                          if (val && !editStudentForm.skills.includes(val)) {
+                            setEditStudentForm((prev) => ({
+                              ...prev,
+                              skills: [...prev.skills, val],
+                              newSkillInput: "",
+                            }));
+                          }
+                        }
+                      }}
+                      className="flex-1 p-2 rounded-xl border border-slate-200 bg-white text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = editStudentForm.newSkillInput.trim();
+                        if (val && !editStudentForm.skills.includes(val)) {
+                          setEditStudentForm((prev) => ({
+                            ...prev,
+                            skills: [...prev.skills, val],
+                            newSkillInput: "",
+                          }));
+                        }
+                      }}
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shrink-0"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
+
+                  {/* Suggestions rapides */}
+                  <div className="pt-1">
+                    <span className="text-[10px] font-bold text-slate-400 block mb-1">
+                      Suggestions rapides :
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {[
+                        "React",
+                        "Next.js",
+                        "TypeScript",
+                        "Node.js",
+                        "PostgreSQL",
+                        "Tailwind CSS",
+                        "Python",
+                        "Figma",
+                        "UI/UX Design",
+                        "Docker",
+                        "Git & GitHub",
+                        "Télépilotage Drone",
+                      ].map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => {
+                            if (!editStudentForm.skills.includes(tag)) {
+                              setEditStudentForm((prev) => ({
+                                ...prev,
+                                skills: [...prev.skills, tag],
+                              }));
+                            }
+                          }}
+                          disabled={editStudentForm.skills.includes(tag)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-medium border transition-colors ${
+                            editStudentForm.skills.includes(tag)
+                              ? "bg-slate-200 text-slate-400 border-slate-200 cursor-default"
+                              : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50 cursor-pointer"
+                          }`}
+                        >
+                          + {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: PHOTO & CV */}
+              <div className="space-y-3 pt-2 border-t border-slate-100">
+                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-blue-600" />
+                  <span>4. Photo d&apos;identité &amp; CV (Documents)</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Photo */}
+                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                    <label className="block font-bold text-slate-700">Photo d&apos;identité</label>
+                    <div className="flex items-center gap-3">
+                      {editStudentForm.avatarUrl ? (
+                        <div className="relative group shrink-0">
+                          <Image
+                            src={editStudentForm.avatarUrl}
+                            alt="Photo"
+                            width={52}
+                            height={52}
+                            unoptimized
+                            className="w-13 h-13 rounded-full object-cover border-2 border-blue-400 shadow-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setEditStudentForm((p) => ({ ...p, avatarUrl: "" }))}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] shadow"
+                            title="Supprimer la photo"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-13 h-13 rounded-full bg-slate-200 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0 text-xs">
+                          Photo
+                        </div>
+                      )}
+                      <div className="flex-1 space-y-1">
+                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{isUploadingPhoto ? "Envoi..." : "Changer photo"}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={isUploadingPhoto}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadFile(f, "avatar", "edit");
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ou collez l'URL d'une image..."
+                          value={editStudentForm.avatarUrl}
+                          onChange={(e) =>
+                            setEditStudentForm((p) => ({ ...p, avatarUrl: e.target.value }))
+                          }
+                          className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CV */}
+                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                    <label className="block font-bold text-slate-700">Curriculum Vitae (PDF)</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{isUploadingCv ? "Envoi..." : "Remplacer le CV (PDF)"}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,application/pdf"
+                            disabled={isUploadingCv}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadFile(f, "cv", "edit");
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                        {editStudentForm.cvUrl && (
+                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>PDF actif</span>
+                            <button
+                              type="button"
+                              onClick={() => setEditStudentForm((p) => ({ ...p, cvUrl: "" }))}
+                              className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Ou collez l'URL d'un CV en ligne (PDF / Drive)..."
+                        value={editStudentForm.cvUrl}
+                        onChange={(e) =>
+                          setEditStudentForm((p) => ({ ...p, cvUrl: e.target.value }))
+                        }
+                        className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: VISIBILITÉ ENTREPRISES */}
+              <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                    <Eye className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="font-bold text-slate-900 text-xs">
+                      Afficher ce profil sur la page Entreprises
+                    </h5>
+                    <p className="text-[11px] text-slate-500">
+                      Rend le profil immédiatement consultable par les recruteurs et entreprises partenaires.
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={editStudentForm.profileVisible}
+                    onChange={(e) =>
+                      setEditStudentForm((p) => ({ ...p, profileVisible: e.target.checked }))
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="submit"
+                  disabled={isSavingStudent}
+                  className="flex-1 py-3 rounded-2xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all disabled:opacity-50"
+                >
+                  {isSavingStudent ? "Enregistrement..." : "Enregistrer les modifications"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingStudent(null)}
+                  className="px-5 py-3 rounded-2xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Annuler
                 </button>
               </div>
             </form>

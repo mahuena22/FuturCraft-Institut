@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile, unlink } from "fs/promises";
-import path from "path";
+import { mkdir, writeFile, unlink } from "node:fs/promises";
+import { join } from "node:path";
 import { getStudentSession } from "@/lib/student-auth";
 import { db } from "@/db";
 import { students } from "@/db/schema";
@@ -10,7 +10,7 @@ import { sendAdminDocumentUploadEmail } from "@/lib/email";
 async function removeFile(url: string | null | undefined) {
   if (!url || !url.startsWith("/uploads/students/")) return;
   try {
-    await unlink(path.join(process.cwd(), "public", url));
+    await unlink(join(process.cwd(), "public", url));
   } catch {
     // ignore missing file
   }
@@ -61,9 +61,9 @@ export async function POST(req: NextRequest) {
 
     const safeKey = existing.studentNumber.replace(/[^a-zA-Z0-9-]/g, "").toLowerCase();
     const filename = `${safeKey}-${kind}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "students");
+    const uploadDir = join(process.cwd(), "public", "uploads", "students");
     await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
+    await writeFile(join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
 
     const publicUrl = `/uploads/students/${filename}`;
 

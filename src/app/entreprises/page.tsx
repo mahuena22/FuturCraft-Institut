@@ -1,5 +1,6 @@
 import { getCompanyOffers, getValidatedStudentTalents } from "@/lib/data-service";
 import { CompanyPortal } from "@/components/CompanyPortal";
+import { isAuthenticated } from "@/lib/auth";
 import Image from "next/image";
 import { Briefcase, Building2, Users, ShieldCheck, Sparkles } from "lucide-react";
 
@@ -11,9 +12,10 @@ export const metadata = {
 };
 
 export default async function EntreprisesPage() {
-  const [offers, talents] = await Promise.all([
+  const [offers, talents, isAdmin] = await Promise.all([
     getCompanyOffers(),
     getValidatedStudentTalents(),
+    isAuthenticated(),
   ]);
 
   return (
@@ -79,7 +81,7 @@ export default async function EntreprisesPage() {
 
       {/* Main Content */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <CompanyPortal initialOffers={offers} initialTalents={talents} />
+        <CompanyPortal initialOffers={offers} initialTalents={talents} isAdmin={isAdmin} />
       </section>
     </div>
   );

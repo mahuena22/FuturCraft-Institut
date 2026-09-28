@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getAdminStats, getAllStudents, getFormations, getPartnershipRequests, getBlogArticles } from "@/lib/data-service";
 import { AdminPortal } from "@/components/AdminPortal";
 import { AdminLogin } from "@/components/AdminLogin";
@@ -47,13 +48,21 @@ export default async function AdminPage() {
     .orderBy(desc(payments.createdAt));
 
   return (
-    <AdminPortal
-      initialStats={stats}
-      initialStudents={rawStudents}
-      initialPayments={rawPayments}
-      formationsList={formationsList}
-      initialPartnerships={partnerships}
-      initialArticles={articles}
-    />
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white font-bold text-sm">
+          Chargement de la Console d&apos;Administration...
+        </div>
+      }
+    >
+      <AdminPortal
+        initialStats={stats}
+        initialStudents={rawStudents}
+        initialPayments={rawPayments}
+        formationsList={formationsList}
+        initialPartnerships={partnerships}
+        initialArticles={articles}
+      />
+    </Suspense>
   );
 }

@@ -446,11 +446,12 @@ export default async function HomePage() {
                             <Reveal key={instructor.name} delay={(index % 3) * 90} className="h-full">
                                 <div className="h-full rounded-3xl border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-deep)]/80 p-6 text-center shadow-lg shadow-[var(--color-fc-black)]/20 transition-all hover:-translate-y-1 hover:border-[var(--color-fc-cyan)]/50">
                                     <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] text-xl font-black text-[var(--color-fc-bg)]">
-                                        {instructor.name
+                                        {(instructor.name || "")
                                             .split(" ")
-                                            .map((part) => part[0])
+                                            .filter(Boolean)
+                                            .map((part) => part[0] || "")
                                             .slice(0, 2)
-                                            .join("")}
+                                            .join("") || "FC"}
                                     </div>
                                     <h3 className="text-lg font-bold text-white">{instructor.name}</h3>
                                     <p className="mt-3 text-sm leading-6 text-[var(--color-fc-light)]">{instructor.role}</p>

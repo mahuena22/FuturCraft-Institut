@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllStudents, createStudentWithPlan } from "@/lib/data-service";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, isAuthenticated, getAdminName } from "@/lib/auth";
 
 export async function GET() {
   const denied = await requireAuth();
@@ -17,6 +17,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const admin = await isAuthenticated();
+    if (admin && body.profileVisible) {
+      body.validatedBy = getAdminName();
+    }
     const student = await createStudentWithPlan(body);
     return NextResponse.json({ success: true, student });
   } catch (error: any) {

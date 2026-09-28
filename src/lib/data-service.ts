@@ -60,7 +60,41 @@ export async function getPromotions(formationId?: number) {
 
 export async function getAllStudents() {
   await ensureDatabaseSeeded();
-  return await db.select().from(students).orderBy(desc(students.createdAt));
+  const rows = await db
+    .select({
+      id: students.id,
+      studentNumber: students.studentNumber,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      email: students.email,
+      phone: students.phone,
+      whatsapp: students.whatsapp,
+      city: students.city,
+      status: students.status,
+      professionalStatus: students.professionalStatus,
+      skills: students.skills,
+      avatarUrl: students.avatarUrl,
+      cvUrl: students.cvUrl,
+      profileVisible: students.profileVisible,
+      validationNote: students.validationNote,
+      validatedBy: students.validatedBy,
+      validatedAt: students.validatedAt,
+      totalAmount: students.totalAmount,
+      paidAmount: students.paidAmount,
+      remainingAmount: students.remainingAmount,
+      formationId: students.formationId,
+      customFormation: students.customFormation,
+      formationTitle: formations.title,
+      createdAt: students.createdAt,
+    })
+    .from(students)
+    .leftJoin(formations, eq(students.formationId, formations.id))
+    .orderBy(desc(students.createdAt));
+
+  return rows.map((r) => ({
+    ...r,
+    formationTitle: r.customFormation || r.formationTitle || "Formation générale",
+  }));
 }
 
 export async function getStudentById(id: number) {
@@ -120,7 +154,7 @@ export async function getStudentByNumber(studentNumber: string) {
 export async function createStudentWithPlan(data: {
   firstName: string;
   lastName: string;
-  gender: string;
+  gender?: string;
   email: string;
   phone: string;
   whatsapp?: string;
@@ -134,11 +168,23 @@ export async function createStudentWithPlan(data: {
   guardianPhone?: string;
   guardianRelation?: string;
   residenceCountry?: string;
+  status?: string;
+  professionalStatus?: string;
+  skills?: string[] | string;
+  avatarUrl?: string;
+  cvUrl?: string;
+  profileVisible?: boolean;
+  validatedBy?: string;
+  customFormation?: string;
 }) {
   await ensureDatabaseSeeded();
 
-  const [formation] = await db.select().from(formations).where(eq(formations.id, data.formationId));
-  if (!formation) throw new Error("Formation introuvable");
+  let [formation] = await db.select().from(formations).where(eq(formations.id, data.formationId));
+  if (!formation) {
+    const allF = await db.select().from(formations).limit(1);
+    formation = allF[0];
+    if (!formation) throw new Error("Aucune formation disponible dans le système");
+  }
 
   const countStudents = await db.select({ maxId: sql<number>`coalesce(max(${students.id}), 0)` }).from(students);
   const nextNum = String(countStudents[0].maxId + 1).padStart(4, "0");
@@ -146,18 +192,36 @@ export async function createStudentWithPlan(data: {
 
   const total = formation.price + (formation.registrationFee || 0);
 
+  let formattedSkills: string | null = null;
+  if (data.skills) {
+    if (Array.isArray(data.skills)) {
+      formattedSkills = JSON.stringify(data.skills.map(String).map((s) => s.trim()).filter(Boolean));
+    } else if (typeof data.skills === "string") {
+      const trimmed = data.skills.trim();
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        formattedSkills = trimmed;
+      } else {
+        formattedSkills = JSON.stringify(trimmed.split(",").map((s) => s.trim()).filter(Boolean));
+      }
+    }
+  }
+
+  const isVisible = data.profileVisible === true;
+  const initialStatus = data.status || (isVisible ? "actif" : "preinscrit");
+
   const [newStudent] = await db
     .insert(students)
     .values({
       studentNumber,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
       gender: data.gender || "M",
-      email: data.email,
-      phone: data.phone,
-      whatsapp: data.whatsapp || data.phone,
-      city: data.city || "Cotonou",
-      formationId: data.formationId,
+      email: data.email.trim(),
+      phone: data.phone.trim(),
+      whatsapp: data.whatsapp?.trim() || data.phone.trim(),
+      city: data.city?.trim() || "Cotonou",
+      formationId: formation.id,
+      customFormation: data.customFormation?.trim() || null,
       promotionId: data.promotionId || null,
       previousDiploma: data.previousDiploma || "BAC",
       studyLevel: data.studyLevel || "BAC",
@@ -166,10 +230,17 @@ export async function createStudentWithPlan(data: {
       guardianPhone: data.guardianPhone || "",
       guardianRelation: data.guardianRelation || "",
       residenceCountry: data.residenceCountry || "Bénin",
-      status: "preinscrit",
+      status: initialStatus,
+      professionalStatus: data.professionalStatus?.trim() || (isVisible ? "Disponible immédiatement" : null),
+      skills: formattedSkills,
+      avatarUrl: data.avatarUrl || null,
+      cvUrl: data.cvUrl || null,
+      profileVisible: isVisible,
+      validatedBy: isVisible ? (data.validatedBy || "Administration") : null,
+      validatedAt: isVisible ? new Date() : null,
       totalAmount: total,
-      paidAmount: 0,
-      remainingAmount: total,
+      paidAmount: isVisible ? total : 0,
+      remainingAmount: isVisible ? 0 : total,
     })
     .returning();
 
@@ -302,35 +373,77 @@ export async function getValidatedStudentTalents() {
         studentNumber: students.studentNumber,
         firstName: students.firstName,
         lastName: students.lastName,
+        email: students.email,
+        phone: students.phone,
         city: students.city,
         avatarUrl: students.avatarUrl,
         cvUrl: students.cvUrl,
         status: students.status,
+        professionalStatus: students.professionalStatus,
+        skills: students.skills,
+        customFormation: students.customFormation,
         formationTitle: formations.title,
         formationTools: formations.tools,
         validatedAt: students.validatedAt,
       })
       .from(students)
-      .innerJoin(formations, eq(students.formationId, formations.id))
-      .where(eq(students.profileVisible, true));
+      .leftJoin(formations, eq(students.formationId, formations.id))
+      .where(eq(students.profileVisible, true))
+      .orderBy(desc(students.validatedAt), desc(students.createdAt));
 
     return rows.map((r) => {
-      let tools: string[] = [];
-      try {
-        const parsed = JSON.parse(r.formationTools || "[]");
-        if (Array.isArray(parsed)) tools = parsed.slice(0, 6).map(String);
-      } catch {
-        tools = [];
+      let talentSkills: string[] = [];
+
+      // 1. Custom skills specified for the student
+      if (r.skills) {
+        try {
+          const parsed = JSON.parse(r.skills);
+          if (Array.isArray(parsed)) {
+            talentSkills = parsed.map(String).map((s) => s.trim()).filter(Boolean);
+          }
+        } catch {
+          talentSkills = r.skills.split(",").map((s) => s.trim()).filter(Boolean);
+        }
       }
+
+      // 2. Fallback to formation tools if no custom skills provided
+      if (talentSkills.length === 0 && r.formationTools) {
+        try {
+          const parsed = JSON.parse(r.formationTools || "[]");
+          if (Array.isArray(parsed)) {
+            talentSkills = parsed.slice(0, 6).map(String);
+          }
+        } catch {
+          talentSkills = [];
+        }
+      }
+
+      if (talentSkills.length === 0) {
+        talentSkills = ["Génie Logiciel", "Pratique Terrain"];
+      }
+
+      const displayStatus =
+        r.professionalStatus ||
+        (r.status === "actif"
+          ? "Disponible immédiatement"
+          : r.status === "termine" || r.status === "alumni"
+          ? "Diplômé / En poste"
+          : "Recherche de stage");
+
       return {
+        id: r.id,
         name: `${r.firstName} ${r.lastName}`,
-        formation: r.formationTitle,
-        skills: tools.length ? tools : ["—"],
-        status: r.status === "actif" ? "Disponible immédiatement" : "Recherche de stage",
+        firstName: r.firstName,
+        lastName: r.lastName,
+        formation: r.customFormation || r.formationTitle || "Formation Numérique",
+        skills: talentSkills,
+        status: displayStatus,
         campus: r.city || "Cotonou, Bénin",
         matricule: r.studentNumber,
         photoUrl: r.avatarUrl || undefined,
         cvUrl: r.cvUrl || undefined,
+        email: r.email,
+        phone: r.phone,
       };
     });
   } catch (error) {
@@ -516,12 +629,17 @@ export async function getCompanyOffers() {
 }
 
 export async function getPartnershipRequests() {
-  await ensureDatabaseSeeded();
-  const rows = await db.select().from(partnershipRequests).orderBy(desc(partnershipRequests.createdAt));
-  return rows.map((r) => ({
-    ...r,
-    createdAt: new Date(r.createdAt).toISOString(),
-  }));
+  try {
+    await ensureDatabaseSeeded();
+    const rows = await db.select().from(partnershipRequests).orderBy(desc(partnershipRequests.createdAt));
+    return rows.map((r) => ({
+      ...r,
+      createdAt: new Date(r.createdAt).toISOString(),
+    }));
+  } catch (error) {
+    console.error("Error in getPartnershipRequests:", error);
+    return [];
+  }
 }
 
 export async function createPaymentRequest(data: {
@@ -547,25 +665,30 @@ export async function createPaymentRequest(data: {
 }
 
 export async function getPaymentRequests() {
-  await ensureDatabaseSeeded();
-  const rows = await db
-    .select({
-      id: paymentRequests.id,
-      studentId: paymentRequests.studentId,
-      amount: paymentRequests.amount,
-      method: paymentRequests.method,
-      phone: paymentRequests.phone,
-      status: paymentRequests.status,
-      reference: paymentRequests.reference,
-      createdAt: paymentRequests.createdAt,
-      studentFirstName: students.firstName,
-      studentLastName: students.lastName,
-      studentNumber: students.studentNumber,
-    })
-    .from(paymentRequests)
-    .leftJoin(students, eq(paymentRequests.studentId, students.id))
-    .orderBy(desc(paymentRequests.createdAt));
-  return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt).toISOString() }));
+  try {
+    await ensureDatabaseSeeded();
+    const rows = await db
+      .select({
+        id: paymentRequests.id,
+        studentId: paymentRequests.studentId,
+        amount: paymentRequests.amount,
+        method: paymentRequests.method,
+        phone: paymentRequests.phone,
+        status: paymentRequests.status,
+        reference: paymentRequests.reference,
+        createdAt: paymentRequests.createdAt,
+        studentFirstName: students.firstName,
+        studentLastName: students.lastName,
+        studentNumber: students.studentNumber,
+      })
+      .from(paymentRequests)
+      .leftJoin(students, eq(paymentRequests.studentId, students.id))
+      .orderBy(desc(paymentRequests.createdAt));
+    return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt).toISOString() }));
+  } catch (error) {
+    console.error("Error in getPaymentRequests:", error);
+    return [];
+  }
 }
 
 export async function getStudentPaymentRequests(studentId: number) {
