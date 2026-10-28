@@ -47,12 +47,12 @@ export function NewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Votre adresse email"
           aria-label="Votre adresse email"
-          className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full rounded-xl border border-white/20 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-slate-300 focus:border-[var(--color-fc-cyan)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-cyan)]/30"
         />
       </div>
       <button
         type="submit"
-        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 shadow-lg shadow-blue-600/25 transition-all shrink-0"
+        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-5 py-3 text-sm font-bold text-[var(--color-fc-deep)] shadow-lg shadow-black/15 transition-all hover:-translate-y-0.5 hover:bg-white"
       >
         <Send className="w-4 h-4" />
         <span>Recevoir la brochure</span>

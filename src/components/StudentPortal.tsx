@@ -286,10 +286,10 @@ setProfileSaveSuccess(true);
   const nextPendingSchedule = data.schedules.find((s) => s.status === "en_attente");
 
   return (
-    <div className="min-h-screen bg-slate-50/60 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="student-portal min-h-screen bg-[var(--color-fc-bg)] py-8">
+      <div className="page-container space-y-6">
         {/* Session bar */}
-        <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-3 text-xs shadow-sm">
           <div className="flex items-center gap-2 text-slate-500">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span className="font-medium">
@@ -307,10 +307,10 @@ setProfileSaveSuccess(true);
         </div>
 
         {/* Student Identity Card Banner */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        <div className="relative overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-100 border-2 border-blue-600 shadow-md shrink-0 relative">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-[var(--color-fc-primary)] bg-slate-100 shadow-md sm:h-20 sm:w-20">
                 <Image
                   src={
                     data.student.avatarUrl ||
@@ -361,7 +361,7 @@ setProfileSaveSuccess(true);
                   setPaymentAmount(nextPendingSchedule?.amount || 50000);
                   setShowPaymentModal(true);
                 }}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 shrink-0"
+                className="flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-primary)] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[var(--color-fc-primary)]/20 transition-all hover:bg-[var(--color-fc-deep)] sm:w-auto"
               >
                 <CreditCard className="w-4 h-4" />
                 <span>Régler une mensualité</span>
@@ -393,7 +393,7 @@ setProfileSaveSuccess(true);
 
             <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
               <div
-                className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 h-full rounded-full transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-[var(--color-fc-deep)] via-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -401,7 +401,7 @@ setProfileSaveSuccess(true);
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-bold border-b border-slate-200">
+        <div className="flex items-center gap-2 overflow-x-auto rounded-2xl border border-[var(--color-fc-gray-light)] bg-white px-2 pb-1 text-xs font-bold shadow-sm scrollbar-none">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
@@ -938,7 +938,7 @@ setProfileSaveSuccess(true);
 
               {/* Document 2: Certificat de scolarité */}
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/8 text-[var(--color-fc-primary)]">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
@@ -1363,11 +1363,11 @@ setProfileSaveSuccess(true);
                       onClick={() => setPaymentMethod("Carte Bancaire")}
                       className={`p-3 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
                         paymentMethod === "Carte Bancaire"
-                          ? "border-violet-500 bg-violet-50 text-slate-900 ring-2 ring-violet-500"
+                          ? "border-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/5 text-slate-900 ring-2 ring-[var(--color-fc-primary)]"
                           : "border-slate-200 bg-white text-slate-600"
                       }`}
                     >
-                      <CreditCard className="w-4 h-4 text-violet-600" />
+                      <CreditCard className="h-4 w-4 text-[var(--color-fc-primary)]" />
                       <span>Carte Visa</span>
                     </button>
                   </div>

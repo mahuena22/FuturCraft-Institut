@@ -151,8 +151,8 @@ export default async function FormationDetailPage(props: {
     return (
         <div className="bg-[var(--color-fc-bg)] min-h-screen">
             {/* 9.1 HERO SECTION */}
-            <section className="relative overflow-hidden bg-[var(--color-fc-deep)] text-white py-16 lg:py-24 border-b border-[var(--color-fc-primary)]/30">
-                <div className="absolute inset-0 opacity-25 relative">
+            <section className="relative isolate overflow-hidden border-b border-white/10 bg-[var(--color-fc-deep)] py-16 text-white lg:py-24">
+                <div className="absolute inset-0 opacity-25">
                     <Image
                         src={formation.imageUrl}
                         alt={formation.title}
@@ -167,59 +167,59 @@ export default async function FormationDetailPage(props: {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="max-w-3xl space-y-6">
+                    <div className="max-w-4xl space-y-7">
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-fc-primary)]/20 text-[var(--color-fc-cyan)] border border-[var(--color-fc-primary)]/30">
+                            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white">
                                 {formation.category}
                             </span>
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-fc-primary)]/20 text-[var(--color-fc-cyan)] border border-[var(--color-fc-primary)]/30">
+                            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white">
                                 🇧🇯 {formation.campus}
                             </span>
                         </div>
 
-                        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                        <h1 className="max-w-4xl font-display text-4xl font-extrabold leading-[1.05] tracking-[-0.045em] sm:text-6xl">
                             {formation.title}
                         </h1>
 
-                        <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
+                        <p className="max-w-3xl text-base leading-8 text-white/75 sm:text-lg">
                             {formation.shortDescription}
                         </p>
 
                         {/* Quick meta bar */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-[var(--color-fc-bg)]/90 backdrop-blur-md border border-[var(--color-fc-gray-light)]/30 text-xs">
+                        <div className="grid grid-cols-2 gap-4 rounded-2xl border border-white/15 bg-[var(--color-fc-deep)]/80 p-5 text-xs backdrop-blur-md sm:grid-cols-4 sm:p-6">
                             <div>
-                                <span className="text-slate-400 block mb-0.5">
+                                <span className="mb-1 block text-white/55">
                                     Durée :
                                 </span>
-                                <span className="font-bold text-white flex items-center gap-1">
-                                    <Clock className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
+                                <span className="flex items-center gap-1.5 font-bold text-white">
+                                    <Clock className="h-3.5 w-3.5 text-[var(--color-fc-cyan)]" />
                                     {formation.duration}
                                 </span>
                             </div>
                             <div>
-                                <span className="text-slate-400 block mb-0.5">
+                                <span className="mb-1 block text-white/55">
                                     Niveau requis :
                                 </span>
-                                <span className="font-bold text-white flex items-center gap-1">
-                                    <GraduationCap className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
+                                <span className="flex items-center gap-1.5 font-bold text-white">
+                                    <GraduationCap className="h-3.5 w-3.5 text-[var(--color-fc-cyan)]" />
                                     {formation.level}
                                 </span>
                             </div>
                             <div>
-                                <span className="text-slate-400 block mb-0.5">
+                                <span className="mb-1 block text-white/55">
                                     Frais de scolarité :
                                 </span>
-                                <span className="font-bold text-[var(--color-fc-primary)] text-sm">
+                                <span className="text-sm font-bold text-[var(--color-fc-cyan)]">
                                     {formation.price.toLocaleString('fr-FR')}{' '}
                                     FCFA
                                 </span>
                             </div>
                             <div>
-                                <span className="text-slate-400 block mb-0.5">
+                                <span className="mb-1 block text-white/55">
                                     Modalité :
                                 </span>
-                                <span className="font-bold text-white flex items-center gap-1">
-                                    <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
+                                <span className="flex items-center gap-1.5 font-bold text-white">
+                                    <MapPin className="h-3.5 w-3.5 text-[var(--color-fc-cyan)]" />
                                     {formation.mode}
                                 </span>
                             </div>
@@ -229,7 +229,7 @@ export default async function FormationDetailPage(props: {
                         <div className="flex flex-wrap items-center gap-4 pt-2">
                             <Link
                                 href={`/inscription?formationId=${formation.id}`}
-                                className="px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-xl shadow-[var(--color-fc-deep)]/30 transition-all flex items-center gap-2 transform active:scale-95"
+                                className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-7 py-3.5 text-sm font-bold text-[var(--color-fc-deep)] shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-white active:scale-95 sm:text-base"
                             >
                                 <span>Je candidate maintenant</span>
                                 <ArrowRight className="w-4 h-4" />
@@ -237,7 +237,7 @@ export default async function FormationDetailPage(props: {
 
                             <a
                                 href="#programme"
-                                className="px-5 py-3.5 rounded-xl font-semibold text-sm text-[var(--color-fc-deep)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-light)]/30 border border-[var(--color-fc-gray-light)]/30 transition-all"
+                                className="rounded-xl border border-white/25 bg-white/5 px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                             >
                                 Consulter le programme détaillé
                             </a>
@@ -247,8 +247,8 @@ export default async function FormationDetailPage(props: {
             </section>
 
             {/* MAIN TWO-COLUMN BODY */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="page-container py-14 sm:py-20">
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
                     {/* Main left content */}
                     <div className="lg:col-span-8 space-y-14">
                         {/* 9.2 PRÉSENTATION */}
@@ -451,7 +451,7 @@ export default async function FormationDetailPage(props: {
                     <div className="lg:col-span-4 space-y-6">
                         <div className="sticky top-28 space-y-6">
                             {/* Enrollment Card */}
-                            <div className="bg-[var(--color-fc-bg)] rounded-2xl border-2 border-[var(--color-fc-primary)]/30 p-6 shadow-xl space-y-6">
+                            <div className="space-y-6 rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-lg shadow-[var(--color-fc-deep)]/5 sm:p-7">
                                 <div>
                                     <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] block mb-1">
                                         Candidature &amp; Inscription

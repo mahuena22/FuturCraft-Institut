@@ -12,6 +12,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { PageIntro } from "@/components/PageIntro";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -35,26 +36,18 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-[var(--color-fc-bg)] min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-3 py-1 rounded-full border border-[var(--color-fc-primary)]/20">
-            Échange Direct & Orientation
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-[var(--color-fc-black)] tracking-tight">
-            Contactez FuturCraft Institut
-          </h1>
-          <p className="text-[var(--color-fc-gray-mid)] text-sm sm:text-base">
-            Nos équipes pédagogiques et administratives sont à votre écoute pour vous guider vers le métier du numérique qui vous correspond.
-          </p>
-        </div>
-
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
+      <PageIntro
+        eyebrow="Échange direct & orientation"
+        title="Parlons de votre prochain projet."
+        description="Nos équipes pédagogiques et administratives sont à votre écoute pour vous guider vers le métier du numérique qui vous correspond."
+      />
+      <div className="page-container py-12 sm:py-16">
         {/* 2 Column Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Left: Contact Details & Campus */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-[var(--color-fc-bg)] p-6 sm:p-8 rounded-3xl border border-[var(--color-fc-gray-light)] space-y-6">
+            <div className="space-y-6 rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-8">
               <h3 className="text-xl font-bold text-[var(--color-fc-black)]">Coordonnées Officielles</h3>
 
               <div className="space-y-4 text-xs">
@@ -115,7 +108,7 @@ export default function ContactPage() {
           </div>
 
           {/* Right: Message Form */}
-          <div className="lg:col-span-7 bg-[var(--color-fc-bg)] p-6 sm:p-10 rounded-3xl border border-[var(--color-fc-gray-light)] shadow-xs space-y-6">
+          <div className="space-y-6 rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-10 lg:col-span-7">
             <div>
               <h3 className="text-2xl font-bold text-[var(--color-fc-black)]">Envoyez-nous un Message</h3>
               <p className="text-xs text-[var(--color-fc-gray-mid)] mt-1">

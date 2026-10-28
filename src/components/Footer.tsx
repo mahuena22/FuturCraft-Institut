@@ -16,31 +16,31 @@ export function Footer() {
   return (
     <footer className="bg-[var(--color-fc-deep)] text-[var(--color-fc-gray-light)] border-t border-[var(--color-fc-primary)]/30">
       {/* Manifesto statement banner */}
-      <div className="border-b border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-primary)]/10 py-10 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="border-b border-white/10 bg-white/[0.035] px-4 py-12 sm:px-6">
+        <div className="mx-auto flex max-w-[84rem] flex-col items-start justify-between gap-7 md:flex-row md:items-center">
           <div className="max-w-2xl">
-            <span className="text-xs uppercase tracking-widest font-bold text-blue-400">
+            <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[var(--color-fc-cyan)]">
               Vision & Engagement
             </span>
-            <p className="text-xl md:text-2xl font-medium text-white italic mt-1 leading-snug">
+            <p className="mt-2 text-xl font-semibold leading-snug text-white md:text-2xl">
               « Nous ne formons pas simplement des étudiants. Nous aidons une génération à construire, créer et transformer son avenir. »
             </p>
-            <span className="text-xs text-slate-400 mt-2 block">
+            <span className="mt-3 block text-xs text-white/55">
               FuturCraft Institut — Bénin & International
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <Link
               href="/inscription"
-              className="px-5 py-3 rounded-xl text-sm font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-primary)] hover:bg-[var(--color-fc-deep)] shadow-lg shadow-[var(--color-fc-primary)]/30 transition-all flex items-center gap-2"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-5 py-3 text-sm font-bold text-[var(--color-fc-deep)] shadow-lg shadow-black/15 transition-all hover:-translate-y-0.5 hover:bg-white"
             >
               <span>Rejoindre la cohorte 2026</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
             <Link
               href="/espace-etudiant"
-              className="px-5 py-3 rounded-xl text-sm font-semibold text-[var(--color-fc-gray-light)] hover:text-[var(--color-fc-bg)] bg-[var(--color-fc-primary)]/10 hover:bg-[var(--color-fc-primary)]/20 border border-[var(--color-fc-primary)]/30 transition-all"
+              className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-center text-sm font-semibold text-white transition-colors hover:border-white/40 hover:bg-white/10"
             >
               Espace Étudiant
             </Link>
@@ -49,10 +49,10 @@ export function Footer() {
       </div>
 
       {/* Main footer grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+      <div className="mx-auto max-w-[84rem] px-4 py-14 sm:px-6">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
           {/* Brand Col */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="space-y-4 lg:col-span-2">
             <div className="flex items-center gap-3">
               <div className="h-9 w-auto rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-primary)]/30 flex items-center justify-center p-1.5">
                 <Image
@@ -64,7 +64,7 @@ export function Footer() {
                 />
               </div>
               <div>
-                <span className="font-extrabold text-2xl tracking-tight text-[var(--color-fc-bg)]">
+                <span className="font-display text-2xl font-extrabold tracking-tight text-white">
                   FuturCraft<span className="text-[var(--color-fc-cyan)]">.</span>
                 </span>
                 <span className="block text-[11px] uppercase tracking-wider text-[var(--color-fc-gray-mid)] font-semibold">
@@ -253,7 +253,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-[var(--color-fc-primary)]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-fc-gray-mid)]">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-center text-xs text-white/55 sm:flex-row sm:text-left">
           <p>© {new Date().getFullYear()} FuturCraft Institut. Tous droits réservés. Enregistré en République du Bénin.</p>
           <div className="flex items-center gap-6">
             <Link href="/institut" className="hover:text-[var(--color-fc-cyan)]">À propos de l&apos;Institut</Link>

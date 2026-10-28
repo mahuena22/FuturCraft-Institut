@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import { PageIntro } from "@/components/PageIntro";
 
 export const revalidate = 3600;
 
@@ -63,24 +64,15 @@ export default function InstitutPage() {
   ];
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Hero Header */}
-      <section className="bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 relative z-10">
-          <span className="text-xs font-bold uppercase tracking-widest text-blue-400 bg-blue-950/80 px-3 py-1 rounded-full border border-blue-800">
-            L&apos;Institut d&apos;Excellence
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight max-w-3xl mx-auto">
-            Bâtir la Prochaine Génération de Talents Numériques Africains
-          </h1>
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            « Nous ne formons pas simplement des étudiants. Nous aidons une génération à construire, créer et transformer son avenir. »
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
+      <PageIntro
+        eyebrow="L'institut d'excellence"
+        title="Bâtir la prochaine génération de talents numériques africains."
+        description="Nous ne formons pas simplement des étudiants. Nous aidons une génération à construire, créer et transformer son avenir."
+      />
 
       {/* 21.1 HISTOIRE, MISSION, VISION */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <section className="page-container space-y-16 py-14 sm:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">

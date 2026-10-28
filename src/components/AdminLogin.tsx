@@ -35,16 +35,16 @@ export function AdminLogin() {
   }
 
   return (
-    <div className="min-h-[80vh] bg-slate-50/60 flex items-center justify-center px-4 relative overflow-hidden py-16">
-      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-[var(--color-fc-bg)] px-4 py-16">
+      <div className="pointer-events-none absolute inset-0 bg-grid opacity-20" />
       <div className="relative w-full max-w-md">
         <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-8 py-8 text-white">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
+          <div className="bg-[var(--color-fc-deep)] px-8 py-8 text-white">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-lg shadow-black/20">
               <ShieldCheck className="w-7 h-7" />
             </div>
             <h1 className="text-2xl font-black tracking-tight">Console d&apos;Administration</h1>
-            <p className="text-sm text-slate-400 mt-1">Espace sécurisé — accès réservé au personnel autorisé.</p>
+            <p className="mt-1 text-sm text-white/65">Espace sécurisé — accès réservé au personnel autorisé.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-5">
@@ -83,7 +83,7 @@ export function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 disabled:opacity-60 shadow-lg shadow-blue-600/25 transition-all"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-primary)] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-[var(--color-fc-primary)]/20 transition-all hover:bg-[var(--color-fc-deep)] disabled:opacity-60"
             >
               {loading ? (
                 <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />

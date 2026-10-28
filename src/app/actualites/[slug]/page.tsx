@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
+import { PageIntro } from "@/components/PageIntro";
 
 export const dynamic = "force-dynamic";
 
@@ -34,19 +35,20 @@ export default async function ArticleDetailPage(props: {
   const paragraphs = article.content.split("\n\n").filter(Boolean);
 
   return (
-    <div className="bg-white min-h-screen py-12">
-      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
+      <PageIntro eyebrow={article.category} title={article.title} description={article.excerpt} />
+      <article className="mx-auto max-w-3xl space-y-8 px-4 py-12 sm:px-6 sm:py-16">
         {/* Back link */}
         <Link
           href="/actualites"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-fc-primary)] transition-colors hover:text-[var(--color-fc-deep)]"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour aux actualités
         </Link>
 
         {/* Cover image */}
-        <div className="aspect-[16/9] relative rounded-2xl overflow-hidden bg-slate-100">
+        <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-[var(--color-fc-gray-light)] shadow-lg">
           <Image
             src={article.coverImage}
             alt={article.title}
@@ -58,10 +60,7 @@ export default async function ArticleDetailPage(props: {
         </div>
 
         {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
-          <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
-            {article.category}
-          </span>
+        <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--color-fc-gray-mid)]">
           <span className="flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5" /> {article.publishedAt}
           </span>
@@ -70,38 +69,33 @@ export default async function ArticleDetailPage(props: {
             <Clock className="w-3.5 h-3.5" /> {article.readTime}
           </span>
           <span>•</span>
-          <span className="font-semibold text-slate-600">{article.author}</span>
+          <span className="font-semibold text-[var(--color-fc-black)]">{article.author}</span>
         </div>
-
-        {/* Title */}
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight leading-tight">
-          {article.title}
-        </h1>
 
         {/* Body */}
         <div className="prose prose-slate max-w-none">
           {paragraphs.map((p, i) => (
-            <p key={i} className="text-base sm:text-lg text-slate-700 leading-relaxed mb-6">
+            <p key={i} className="mb-6 text-base leading-8 text-[var(--color-fc-black)]/80 sm:text-lg">
               {p}
             </p>
           ))}
         </div>
 
         {/* Share */}
-        <div className="flex items-center gap-3 pt-6 border-t border-slate-200">
-          <Share2 className="w-4 h-4 text-slate-400" />
-          <span className="text-sm text-slate-400">Partager cet article</span>
+        <div className="flex items-center gap-3 border-t border-[var(--color-fc-gray-light)] pt-6">
+          <Share2 className="h-4 w-4 text-[var(--color-fc-gray-mid)]" />
+          <span className="text-sm text-[var(--color-fc-gray-mid)]">Partager cet article</span>
         </div>
 
         {/* CTA inscription */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 text-center text-white space-y-4">
+        <div className="space-y-4 rounded-3xl bg-[var(--color-fc-deep)] p-8 text-center text-white">
           <h3 className="text-xl font-bold">Envie de vous former avec nous ?</h3>
-          <p className="text-blue-100 text-sm">
+          <p className="text-sm text-white/75">
             Découvrez nos formations et lancez votre carrière dans la tech.
           </p>
           <Link
             href="/#formations"
-            className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3 font-bold text-[var(--color-fc-deep)] transition-colors hover:bg-white"
           >
             Voir nos formations
             <ArrowLeft className="w-4 h-4 rotate-180" />

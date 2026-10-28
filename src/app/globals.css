@@ -16,7 +16,7 @@
   --color-fc-cyan: #1898BA;
   --color-fc-light: #8BB9CA;
   --color-fc-bg: #FBFCFC;
-  --color-fc-gray-light: #FFFFFF;
+  --color-fc-gray-light: #E8EEF4;
   --color-fc-gray-mid: #969493;
   --color-fc-black: #141213;
 
@@ -67,21 +67,13 @@
   --color-brand-300: var(--color-fc-black-dark);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not(.dark) {
-    color-scheme: light;
-  }
-}
-
 /* ───── Base ───── */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
 }
 
 html {
@@ -104,6 +96,146 @@ h4,
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.025em;
+}
+
+.page-container {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+}
+
+.admin-portal button,
+.student-portal button {
+  transition-duration: 180ms;
+}
+
+.admin-portal input,
+.admin-portal select,
+.admin-portal textarea,
+.student-portal input,
+.student-portal select,
+.student-portal textarea {
+  border-color: #dce5ed;
+  border-radius: 0.75rem;
+}
+
+.admin-portal input:focus,
+.admin-portal select:focus,
+.admin-portal textarea:focus,
+.student-portal input:focus,
+.student-portal select:focus,
+.student-portal textarea:focus {
+  border-color: var(--color-fc-primary);
+  outline: 2px solid rgba(18, 81, 149, 0.14);
+  outline-offset: 0;
+}
+
+.admin-portal table,
+.student-portal table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-portal th,
+.student-portal th {
+  letter-spacing: 0.04em;
+}
+
+.page-intro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 86% 16%, rgba(24, 152, 186, 0.2), transparent 30rem),
+    linear-gradient(118deg, var(--color-fc-deep), #0a3478 68%, #125195);
+  color: #fff;
+}
+
+.page-intro::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  content: "";
+  mask-image: linear-gradient(90deg, transparent, #000 65%);
+  pointer-events: none;
+}
+
+.page-intro-inner {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+  padding-block: clamp(4rem, 8vw, 7rem);
+}
+
+.page-intro-copy {
+  max-width: 52rem;
+}
+
+.page-intro-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #b7e7f0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.page-intro-eyebrow::before {
+  width: 1.7rem;
+  height: 2px;
+  background: var(--color-fc-cyan);
+  content: "";
+}
+
+.page-intro-title {
+  max-width: 19ch;
+  margin-top: 1.2rem;
+  color: #fff;
+  font-size: clamp(2.15rem, 4.8vw, 4.25rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.page-intro-description {
+  max-width: 42rem;
+  margin-top: 1.25rem;
+  color: rgba(232, 238, 244, 0.82);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.8;
+}
+
+.section-heading {
+  max-width: 46rem;
+}
+
+.section-heading h2 {
+  margin-top: 0.75rem;
+  color: var(--color-fc-black);
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.section-heading p {
+  margin-top: 1rem;
+  color: var(--color-fc-gray-mid);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  .page-container,
+  .page-intro-inner {
+    width: min(100% - 2.5rem, 80rem);
+  }
 }
 
 /* ───── Scrollbars ───── */

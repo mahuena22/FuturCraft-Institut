@@ -2,6 +2,7 @@ import { getProjects } from "@/lib/data-service";
 import { ProjectsShowcase } from "@/components/ProjectsShowcase";
 import { Layers } from "lucide-react";
 import Link from "next/link";
+import { PageIntro } from "@/components/PageIntro";
 
 export const revalidate = 3600;
 export const metadata = {
@@ -14,21 +15,13 @@ export default async function ProjetsPage() {
   const projects = await getProjects();
 
   return (
-    <div className="bg-white min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-violet-600 bg-violet-50 px-3 py-1 rounded-full border border-violet-100">
-            Portfolio &amp; Réalisations
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-950 tracking-tight">
-            Galerie des Projets Étudiants
-          </h1>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            À FuturCraft, chaque fin de formation donne lieu à un projet réel déployé en production et soutenu devant un jury d&apos;entreprises partenaires.
-          </p>
-        </div>
-
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
+      <PageIntro
+        eyebrow="Portfolio & réalisations"
+        title="Les idées prennent forme, les projets deviennent réels."
+        description="Chaque parcours donne lieu à une réalisation concrète, développée par les étudiants et présentée à des entreprises partenaires."
+      />
+      <div className="page-container py-14 sm:py-20">
         {/* Live Project Filter & Modal */}
         <ProjectsShowcase projects={projects} />
       </div>

@@ -100,7 +100,7 @@ export default async function HomePage() {
 
     return (
         <div className="overflow-hidden bg-[var(--color-fc-bg)]">
-            <section className="relative isolate min-h-[720px] bg-[var(--color-fc-deep)] text-white">
+            <section className="relative isolate overflow-hidden bg-[var(--color-fc-deep)] text-white">
                 <Image
                     src="/images/hero-bg.jpg"
                     alt="Étudiants en formation numérique à FuturCraft"
@@ -109,22 +109,26 @@ export default async function HomePage() {
                     sizes="100vw"
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                    className="object-cover object-center opacity-55"
+                    className="object-cover object-center opacity-35"
                 />
                 <div className="absolute inset-0 bg-grid-dark opacity-30" />
                 <div className="hero-orb hero-orb-one" />
                 <div className="hero-orb hero-orb-two" />
 
-                <div className="relative mx-auto flex min-h-[720px] max-w-7xl items-center px-4 py-24 sm:px-6 lg:px-8">
-                    <div className="grid w-full items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+                <div className="relative mx-auto flex min-h-[650px] max-w-[84rem] items-center px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
+                    <div className="grid w-full items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
                         <div className="max-w-2xl">
-                            <h1 className="animate-fade-up font-display text-4xl font-black leading-[1.04] tracking-tight sm:text-5xl lg:text-6xl">
+                            <span className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-white/85 backdrop-blur-sm sm:text-xs">
+                                <span className="h-2 w-2 rounded-full bg-[var(--color-fc-cyan)] shadow-[0_0_14px_rgba(24,152,186,0.8)]" />
+                                Institut numérique · Godomey, Bénin
+                            </span>
+                            <h1 className="animate-fade-up mt-6 font-display text-5xl font-extrabold leading-[0.99] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
                                 Ton avenir
                                 <span className="block text-[var(--color-fc-cyan)]">
                                     se construit ici.
                                 </span>
                             </h1>
-                            <p className="animate-fade-up delay-200 mt-6 max-w-xl text-base leading-8 text-[var(--color-fc-light)]/80 sm:text-lg">
+                            <p className="animate-fade-up delay-200 mt-7 max-w-xl text-base leading-8 text-white/75 sm:text-lg">
                                 Forme-toi aux métiers les plus demandés du
                                 numérique avec des projets concrets, des mentors
                                 passionnés et une communauté qui avance avec
@@ -133,54 +137,56 @@ export default async function HomePage() {
                             <div className="animate-fade-up delay-300 mt-9 flex flex-col gap-3 sm:flex-row">
                                 <Link
                                     href="/inscription"
-                                    className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-fc-bg)] px-6 py-3.5 text-sm font-extrabold text-[var(--color-fc-deep)] shadow-xl shadow-[var(--color-fc-primary)]/30 transition-all hover:-translate-y-1 hover:bg-[var(--color-fc-light)]/30"
+                                    className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-extrabold text-[var(--color-fc-deep)] shadow-xl shadow-black/15 transition-all hover:-translate-y-1 hover:bg-white"
                                 >
                                     S&apos;inscrire
                                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                                 </Link>
                                 <Link
                                     href="/formations"
-                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[var(--color-fc-light)]/30 bg-transparent px-6 py-3.5 text-sm font-bold text-white transition-all hover:-translate-y-1 hover:bg-[var(--color-fc-light)]/10"
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-bold text-white transition-all hover:-translate-y-1 hover:bg-white/10"
                                 >
                                     <Play className="h-4 w-4 fill-current text-[var(--color-fc-cyan)]" />
                                     Découvrir les formations
                                 </Link>
                             </div>
-                            <div className="animate-fade-up delay-400 mt-10 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-[var(--color-fc-light)]/70">
+                            <div className="animate-fade-up delay-400 mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-white/70">
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
                                     Projets réels
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
                                     Certifications professionnelles
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
+                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
                                     Accompagnement emploi
                                 </span>
                             </div>
                         </div>
 
-                        <div className="relative hidden min-h-[430px] lg:block">
-                            <div className="absolute right-2 top-4 h-80 w-80 rounded-full bg-[var(--color-fc-primary)]/20 blur-3xl" />
-                            <div className="absolute right-10 top-16 h-[350px] w-[350px] rounded-[3rem] border border-[var(--color-fc-light)]/20 bg-[var(--color-fc-bg)]/10 shadow-2xl shadow-[var(--color-fc-deep)]/50 backdrop-blur-sm hero-card-tilt" />
-                            <div className="absolute right-20 top-28 h-[350px] w-[350px] overflow-hidden rounded-[2.5rem] border border-[var(--color-fc-light)]/20 shadow-2xl shadow-[var(--color-fc-deep)]/50 hero-card-tilt">
+                        <div className="relative hidden min-h-[470px] lg:block">
+                            <div className="absolute right-0 top-12 h-80 w-80 rounded-full bg-[var(--color-fc-cyan)]/15 blur-3xl" />
+                            <div className="absolute right-12 top-6 h-[390px] w-[min(100%,390px)] rounded-[2rem] border border-white/20 bg-white/10 shadow-2xl backdrop-blur-sm" />
+                            <div className="absolute right-0 top-0 h-[390px] w-[min(100%,390px)] overflow-hidden rounded-[2rem] border border-white/20 shadow-2xl shadow-black/30">
                                 <Image
                                     src="/images/hero-bg.jpg"
                                     alt=""
                                     fill
-                                    sizes="350px"
+                                    sizes="(max-width: 1280px) 40vw, 390px"
                                     className="object-cover object-center"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                <div className="absolute bottom-6 left-6 right-6">
-                                    <div className="mb-2 flex items-center gap-2 text-xs font-bold text-[var(--color-fc-light)]">
-                                        <span className="h-2 w-2 rounded-full bg-[var(--color-fc-primary)] shadow-[0_0_12px_rgba(18,81,149,0.5)]" />
-                                        Campus en mouvement
+                                <div className="absolute bottom-0 left-0 right-0 p-7">
+                                    <div className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-white/75">
+                                        <span className="h-2 w-2 rounded-full bg-[var(--color-fc-cyan)]" />
+                                        Apprentissage par la pratique
                                     </div>
-                                    <p className="font-display text-2xl font-bold">
-                                        Apprends. Crée. Innove.
+                                    <p className="font-display text-3xl font-bold leading-tight">
+                                        Apprendre aujourd&apos;hui.
+                                        <br />
+                                        Construire demain.
                                     </p>
                                 </div>
                             </div>

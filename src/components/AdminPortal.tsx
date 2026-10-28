@@ -605,18 +605,18 @@ export function AdminPortal({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="admin-portal min-h-screen bg-[var(--color-fc-bg)] py-8">
+      <div className="page-container space-y-6">
         {/* Top bar with Role Switcher */}
-        <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl bg-[var(--color-fc-deep)] p-4 text-white shadow-lg sm:p-5 md:flex-row">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-fc-primary)] text-white">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <h1 className="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">
                 Console d&apos;Administration FuturCraft
-                <span className="text-xs px-2 py-0.5 rounded bg-violet-500/30 text-violet-300 font-normal border border-violet-400/30">
+                <span className="rounded border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-normal text-[var(--color-fc-cyan)]">
                   v1.2
                 </span>
               </h1>
@@ -633,7 +633,7 @@ export function AdminPortal({
               onClick={() => setCurrentRole("super_admin")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "super_admin"
-                  ? "bg-violet-600 text-white shadow-xs"
+                  ? "bg-[var(--color-fc-primary)] text-white shadow-xs"
                   : "text-slate-300 hover:text-white"
               }`}
             >
@@ -672,12 +672,12 @@ export function AdminPortal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-bold border-b border-slate-200">
+        <div className="flex items-center gap-2 overflow-x-auto rounded-2xl border border-[var(--color-fc-gray-light)] bg-white px-2 pb-1 text-xs font-bold shadow-sm scrollbar-none">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "dashboard"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -689,7 +689,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("validations")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "validations"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -706,7 +706,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("etudiants")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "etudiants"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -718,7 +718,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("paiements")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "paiements"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -730,7 +730,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("formations")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "formations"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -742,7 +742,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("articles")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "articles"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -754,7 +754,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("partenariats")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "partenariats"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -766,7 +766,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("roles")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "roles"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -778,7 +778,7 @@ export function AdminPortal({
             onClick={() => setActiveTab("rappels")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "rappels"
-                ? "border-violet-600 text-violet-600"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
@@ -847,7 +847,7 @@ export function AdminPortal({
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
                   Cursus Ouverts
                 </span>
-                <div className="text-3xl font-black text-violet-600">{stats.formationsCount}</div>
+                <div className="text-3xl font-black text-[var(--color-fc-primary)]">{stats.formationsCount}</div>
                 <span className="text-xs text-slate-500 block pt-1">
                   Tous campus (Godomey, Supermarché O Bénin Avant pk14)
                 </span>
@@ -862,7 +862,7 @@ export function AdminPortal({
                   <h3 className="text-base font-bold text-slate-900">Derniers Encaissements Enregistrés</h3>
                   <button
                     onClick={() => setActiveTab("paiements")}
-                    className="text-xs font-bold text-violet-600 hover:underline"
+                    className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                   >
                     Voir tous les encaissements →
                   </button>
@@ -1671,14 +1671,14 @@ export function AdminPortal({
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                <div className="p-5 rounded-2xl bg-violet-50/60 border border-violet-200 space-y-3">
+                <div className="space-y-3 rounded-2xl border border-[var(--color-fc-primary)]/15 bg-[var(--color-fc-primary)]/5 p-5">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-violet-600 text-white flex items-center justify-center font-bold text-xs">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-fc-primary)] text-xs font-bold text-white">
                       SA
                     </span>
                     <div>
                       <h4 className="font-bold text-slate-900 text-sm">Super Administrateur</h4>
-                      <span className="text-[10px] text-violet-700 font-semibold">Direction Générale</span>
+                      <span className="text-[10px] font-semibold text-[var(--color-fc-primary)]">Direction Générale</span>
                     </div>
                   </div>
                   <ul className="space-y-1.5 text-xs text-slate-700">

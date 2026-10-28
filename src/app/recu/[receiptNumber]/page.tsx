@@ -31,19 +31,19 @@ export default async function ReceiptVerificationPage(props: {
 
   if (!data) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center p-6 bg-slate-50/50">
-        <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 p-8 text-center space-y-4 shadow-xl">
+      <div className="flex min-h-[70vh] items-center justify-center bg-[var(--color-fc-bg)] p-6">
+        <div className="w-full max-w-md space-y-4 rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-8 text-center shadow-xl shadow-[var(--color-fc-deep)]/5">
           <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
             <AlertTriangle className="w-8 h-8" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900">Reçu Introuvable</h1>
-          <p className="text-xs text-slate-500">
+          <h1 className="text-xl font-bold text-[var(--color-fc-black)]">Reçu introuvable</h1>
+          <p className="text-sm leading-relaxed text-[var(--color-fc-gray-mid)]">
             Le reçu avec le numéro <strong>{receiptNumber}</strong> n&apos;existe pas dans notre base de données officielle ou a été invalidé.
           </p>
           <div className="pt-2">
             <Link
               href="/recu"
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white inline-flex items-center gap-1.5"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-fc-primary)] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[var(--color-fc-deep)]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Faire une autre recherche</span>
@@ -57,12 +57,12 @@ export default async function ReceiptVerificationPage(props: {
   const { receipt, payment, student, formation } = data;
 
   return (
-    <div className="min-h-screen bg-slate-50/70 py-12 px-4">
-      <div className="max-w-xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[var(--color-fc-bg)] px-4 py-10 sm:py-14">
+      <div className="mx-auto max-w-2xl space-y-6">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <Link
             href="/recu"
-            className="text-xs font-bold text-slate-500 hover:text-slate-900 flex items-center gap-1"
+            className="flex items-center gap-1 text-xs font-bold text-[var(--color-fc-gray-mid)] transition-colors hover:text-[var(--color-fc-primary)]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Retour à la vérification</span>
@@ -75,26 +75,26 @@ export default async function ReceiptVerificationPage(props: {
         </div>
 
         {/* The Official Certificate Card */}
-        <div className="bg-white rounded-3xl border-2 border-emerald-500/30 p-6 sm:p-10 shadow-2xl space-y-6 relative overflow-hidden">
+        <div className="relative space-y-6 overflow-hidden rounded-3xl border border-emerald-500/25 bg-white p-6 shadow-xl shadow-[var(--color-fc-deep)]/5 sm:p-10">
           {/* Subtle watermark background */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
             <ShieldCheck className="w-96 h-96 text-emerald-900" />
           </div>
 
           {/* Certificate Header */}
-          <div className="border-b border-slate-200 pb-5 flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-4 border-b border-[var(--color-fc-gray-light)] pb-5">
             <div>
               <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-wider">
                 Certification de Paiement Officielle
               </span>
-              <h2 className="text-2xl font-black text-slate-950 mt-1">FuturCraft Institut</h2>
-              <p className="text-[11px] text-slate-500">
+              <h2 className="mt-1 text-2xl font-black text-[var(--color-fc-black)]">FuturCraft Institut</h2>
+              <p className="text-[11px] text-[var(--color-fc-gray-mid)]">
                 Centre de formation aux métiers du numérique • République du Bénin
               </p>
             </div>
 
             <div className="text-right">
-              <span className="font-mono font-black text-base text-blue-600 block">
+              <span className="block font-mono text-base font-black text-[var(--color-fc-primary)]">
                 {receipt.receiptNumber}
               </span>
               <span className="text-[10px] text-slate-400">Émis le : {receipt.issuedAt}</span>
@@ -102,7 +102,7 @@ export default async function ReceiptVerificationPage(props: {
           </div>
 
           {/* Student & Formation info */}
-          <div className="grid grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-1 gap-4 text-xs sm:grid-cols-2">
             <div>
               <span className="text-slate-400 block text-[10px]">Étudiant titulaire :</span>
               <strong className="text-slate-900 text-sm block">
@@ -121,7 +121,7 @@ export default async function ReceiptVerificationPage(props: {
           </div>
 
           {/* Financial summary box */}
-          <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs space-y-2">
+          <div className="space-y-2 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 text-xs">
             <div className="flex justify-between items-center text-sm font-black text-emerald-950 pb-2 border-b border-emerald-200/80">
               <span>MONTANT ENCAISSÉ :</span>
               <span className="text-emerald-700 text-xl">
@@ -147,7 +147,7 @@ export default async function ReceiptVerificationPage(props: {
           </div>
 
           {/* Security details and QR Code */}
-          <div className="pt-2 flex items-center justify-between border-t border-slate-200 gap-4">
+          <div className="flex items-center justify-between gap-4 border-t border-[var(--color-fc-gray-light)] pt-4">
             <div className="space-y-1">
               <span className="text-[10px] text-slate-400 uppercase font-bold block">
                 Code de sécurité numérique :

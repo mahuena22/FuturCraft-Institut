@@ -282,10 +282,10 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
   return (
     <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden max-w-4xl mx-auto">
       {/* Progress Bar & Steps Tabs */}
-      <div className="bg-slate-50/80 border-b border-slate-200 p-4 sm:p-6">
+      <div className="border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-4 sm:p-6">
         <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-3">
           <span>Étape {step} sur 5</span>
-          <span className="text-blue-600">
+          <span className="text-[var(--color-fc-primary)]">
             {step === 1 && "1. Choix du cursus"}
             {step === 2 && "2. Informations personnelles"}
             {step === 3 && "3. Parcours académique"}
@@ -296,18 +296,18 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
         <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
           <div
-            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 h-full transition-all duration-300 rounded-full"
+            className="h-full rounded-full bg-gradient-to-r from-[var(--color-fc-deep)] via-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] transition-all duration-300"
             style={{ width: `${(step / 5) * 100}%` }}
           />
         </div>
 
         {/* Step icons bar */}
         <div className="hidden sm:grid grid-cols-5 gap-2 mt-4 text-[11px] font-semibold text-slate-500 text-center">
-          <div className={step >= 1 ? "text-blue-600 font-bold" : ""}>1. Formation</div>
-          <div className={step >= 2 ? "text-blue-600 font-bold" : ""}>2. Identité</div>
-          <div className={step >= 3 ? "text-blue-600 font-bold" : ""}>3. Diplômes</div>
-          <div className={step >= 4 ? "text-blue-600 font-bold" : ""}>4. Tuteur</div>
-          <div className={step >= 5 ? "text-blue-600 font-bold" : ""}>5. Confirmation</div>
+          <div className={step >= 1 ? "font-bold text-[var(--color-fc-primary)]" : ""}>1. Formation</div>
+          <div className={step >= 2 ? "font-bold text-[var(--color-fc-primary)]" : ""}>2. Identité</div>
+          <div className={step >= 3 ? "font-bold text-[var(--color-fc-primary)]" : ""}>3. Diplômes</div>
+          <div className={step >= 4 ? "font-bold text-[var(--color-fc-primary)]" : ""}>4. Tuteur</div>
+          <div className={step >= 5 ? "font-bold text-[var(--color-fc-primary)]" : ""}>5. Confirmation</div>
         </div>
       </div>
 

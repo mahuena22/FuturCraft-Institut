@@ -11,6 +11,7 @@ import {
     Coffee,
     Code2,
 } from 'lucide-react';
+import { PageIntro } from '@/components/PageIntro';
 
 export const revalidate = 3600;
 export const metadata = {
@@ -50,25 +51,14 @@ export default async function ViePage() {
     ];
 
     return (
-        <div className="bg-white min-h-screen">
-            {/* Hero */}
-            <section className="bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-                    <span className="text-xs font-bold uppercase tracking-widest text-violet-400 bg-violet-950 px-3 py-1 rounded-full border border-violet-800 relative -top-2">
-                        Immersion &amp; Communauté
-                    </span>
-                    <h1 className="text-3xl sm:text-5xl font-black tracking-tight">
-                        La Vie à FuturCraft Institut
-                    </h1>
-                    <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Plus qu&apos;une école, une communauté passionnée.
-                        Découvrez l&apos;ambiance sur nos campus, les hackathons
-                        effervescents et les moments inoubliables.
-                    </p>
-                </div>
-            </section>
+        <div className="min-h-screen bg-[var(--color-fc-bg)]">
+            <PageIntro
+                eyebrow="Immersion & communauté"
+                title="Bien plus qu’une école : une communauté qui construit."
+                description="Découvrez la vie du campus, les ateliers pratiques, les hackathons et les moments partagés qui font grandir chaque talent."
+            />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+            <div className="page-container space-y-16 py-14 sm:py-20">
                 {/* Événements à venir */}
                 <section className="space-y-6">
                     <div className="flex items-center justify-between">
