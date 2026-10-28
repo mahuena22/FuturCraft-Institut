@@ -13,6 +13,7 @@ import { getFormations } from "@/lib/data-service";
 import { Reveal } from "@/components/Reveal";
 import { StatCounter } from "@/components/StatCounter";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { formatTrainingPrice } from "@/lib/format-training-price";
 
 const formatPrice = (price: number) =>
     new Intl.NumberFormat("fr-FR").format(price).replace(/\u202f/g, " ");
@@ -77,21 +78,6 @@ const testimonials = [
         quote:
             "Une expérience immersive et encadrante. À FuturCraft, chaque module débouche sur une réalisation concrète qui renforce confiance et employabilité.",
     },
-];
-
-const trainingPricing = [
-    { title: "Développement Web Fullstack", duration: "2 ans", price: "300.000 FCFA/ans" },
-    { title: "Développement en Intelligence Artificielle", duration: "2 ans", price: "300.000 FCFA/ans" },
-    { title: "Maîtrise des Outils IA", duration: "1 mois", price: "70.000 FCFA" },
-    { title: "Web Design (UI/UX)", duration: "9 mois", price: "250.000 FCFA" },
-    { title: "Graphisme et Sérigraphie", duration: "9 mois", price: "250.000 FCFA" },
-    { title: "Marketing Digital & Growth", duration: "3 mois", price: "150.000 FCFA" },
-    { title: "Maintenance Informatique et Réseau", duration: "6 mois", price: "250.000 FCFA" },
-    { title: "Photographie, Cadrage et Montage Vidéo", duration: "1 an", price: "300.000 FCFA" },
-    { title: "Copywriting & Storytelling Digital", duration: "2 mois", price: "150.000 FCFA" },
-    { title: "E-commerce & Vente en Ligne", duration: "2 mois", price: "150.000 FCFA" },
-    { title: "Pilotage Professionnel de Drone", duration: "1 mois", price: "100.000 FCFA" },
-    { title: "Webmaster & Gestionnaire de Sites", duration: "1 an", price: "300.000 FCFA" },
 ];
 
 const instructors = [
@@ -418,14 +404,16 @@ export default async function HomePage() {
                         <div className="px-5 py-4">Durée</div>
                         <div className="px-5 py-4">Tarif</div>
                     </div>
-                    {trainingPricing.map((training) => (
+                    {formations.filter((formation) => formation.isActive).map((training) => (
                         <div
-                            key={training.title}
+                            key={training.id}
                             className="grid grid-cols-[2.2fr_1fr_1.1fr] border-b border-[var(--color-fc-gray-light)] last:border-b-0 text-sm text-[var(--color-fc-gray-mid)]"
                         >
                             <div className="px-5 py-4 font-semibold">{training.title}</div>
                             <div className="px-5 py-4">{training.duration}</div>
-                            <div className="px-5 py-4 font-bold text-[var(--color-fc-primary)]">{training.price}</div>
+                            <div className="px-5 py-4 font-bold text-[var(--color-fc-primary)]">
+                                {formatTrainingPrice(training.price, training.duration)}
+                            </div>
                         </div>
                     ))}
                 </div>
