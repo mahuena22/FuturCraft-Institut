@@ -15,7 +15,7 @@ import {
   paymentRequests,
 } from "@/db/schema";
 import { ensureDatabaseSeeded } from "@/db/ensure-seed";
-import { eq, desc, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { sendValidationEmail } from "@/lib/email";
 
@@ -311,7 +311,13 @@ export async function getValidatedStudentTalents() {
     })
     .from(students)
     .innerJoin(formations, eq(students.formationId, formations.id))
-    .where(eq(students.profileVisible, true));
+    .where(
+      and(
+        eq(students.profileVisible, true),
+        isNotNull(students.validatedAt),
+        inArray(students.status, ["inscrit", "actif", "termine", "alumni"])
+      )
+    );
 
   return rows.map((r) => {
     let tools: string[] = [];
