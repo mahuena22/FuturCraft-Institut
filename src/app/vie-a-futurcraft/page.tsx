@@ -57,9 +57,6 @@ export default async function ViePage() {
                 </div>
 
                 <div className="relative z-10 mx-auto max-w-7xl space-y-4 px-4 text-center sm:px-6 lg:px-8">
-                    <span className="rounded-full border border-blue-400/30 bg-blue-900/60 px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-300">
-                        Immersion &amp; Communauté
-                    </span>
                     <h1 className="mx-auto max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
                         La Vie à
                         <span className="text-gradient-brand mt-1 block">
