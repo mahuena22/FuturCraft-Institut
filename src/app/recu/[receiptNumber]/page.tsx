@@ -25,9 +25,11 @@ export async function generateMetadata(props: {
 
 export default async function ReceiptVerificationPage(props: {
   params: Promise<{ receiptNumber: string }>;
+  searchParams: Promise<{ code?: string }>;
 }) {
   const { receiptNumber } = await props.params;
-  const data = await getReceiptDetails(receiptNumber);
+  const { code } = await props.searchParams;
+  const data = await getReceiptDetails(receiptNumber, { verificationCode: code });
 
   if (!data) {
     return (

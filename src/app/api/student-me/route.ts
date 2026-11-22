@@ -28,17 +28,28 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const isSafeStudentFileUrl = (url: string) => /^\/uploads\/students\/[a-zA-Z0-9._-]+$/.test(url);
+    const patch: Record<string, unknown> = {};
+    if (body.phone !== undefined) patch.phone = String(body.phone || "").trim();
+    if (body.whatsapp !== undefined) patch.whatsapp = String(body.whatsapp || "").trim();
+    if (body.city !== undefined) patch.city = body.city ? String(body.city).trim() : null;
+    if (body.address !== undefined) patch.address = body.address ? String(body.address).trim() : null;
+    if (body.avatarUrl !== undefined) {
+      const v = body.avatarUrl ? String(body.avatarUrl) : "";
+      if (v && !isSafeStudentFileUrl(v)) return NextResponse.json({ error: "avatarUrl invalide" }, { status: 400 });
+      patch.avatarUrl = v || null;
+    }
+    if (body.cvUrl !== undefined) {
+      const v = body.cvUrl ? String(body.cvUrl) : "";
+      if (v && !isSafeStudentFileUrl(v)) return NextResponse.json({ error: "cvUrl invalide" }, { status: 400 });
+      patch.cvUrl = v || null;
+    }
+    if (Object.keys(patch).length === 0) return NextResponse.json({ error: "Aucune modification" }, { status: 400 });
+
     const [updated] = await db
       .update(students)
-      .set({
-        ...(body.phone && { phone: String(body.phone) }),
-        ...(body.whatsapp && { whatsapp: String(body.whatsapp) }),
-        ...(body.city !== undefined && { city: body.city ? String(body.city) : null }),
-        ...(body.address !== undefined && { address: body.address ? String(body.address) : null }),
-        ...(body.avatarUrl !== undefined && { avatarUrl: body.avatarUrl ? String(body.avatarUrl) : null }),
-        ...(body.cvUrl !== undefined && { cvUrl: body.cvUrl ? String(body.cvUrl) : null }),
-      })
+      .set(patch)
       .where(eq(students.id, studentId))
       .returning();
     return NextResponse.json({ success: true, student: updated });

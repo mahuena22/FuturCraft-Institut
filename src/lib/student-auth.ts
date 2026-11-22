@@ -5,7 +5,11 @@ export const STUDENT_SESSION_COOKIE_NAME = "fc_student_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 function secret(): string {
-  return process.env.SESSION_SECRET || process.env.ADMIN_PASSWORD || "fc-dev-secret";
+  const value = process.env.SESSION_SECRET;
+  if (!value) {
+    throw new Error("SESSION_SECRET is required");
+  }
+  return value;
 }
 
 function sign(value: string): string {

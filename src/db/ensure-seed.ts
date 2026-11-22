@@ -8,15 +8,14 @@ let seedPromise: Promise<void> | null = null;
 export async function ensureDatabaseSeeded() {
   if (!seedPromise) {
     seedPromise = (async () => {
-      try {
-        const rows = await db.select({ c: count() }).from(formations);
-        if (Number(rows[0]?.c ?? 0) === 0) {
-          await seedDatabase();
-        }
-      } catch (err) {
-        console.error("Error checking seed:", err);
+      const rows = await db.select({ c: count() }).from(formations);
+      if (Number(rows[0]?.c ?? 0) === 0) {
+        await seedDatabase();
       }
-    })();
+    })().catch((err) => {
+      seedPromise = null;
+      throw err;
+    });
   }
   await seedPromise;
 }

@@ -801,7 +801,7 @@ setProfileSaveSuccess(true);
                               date: p.paidAt,
                               method: p.paymentMethod,
                               ref: p.transactionRef,
-                              verificationCode: rec?.verificationCode || "FC-SEC-DEFAULT",
+                              verificationCode: rec?.verificationCode || "—",
                             });
                           }}
                           className="px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--color-fc-primary)] bg-white border border-[var(--color-fc-primary)]/20 hover:bg-[var(--color-fc-surface)] transition-colors flex items-center gap-1"

@@ -340,120 +340,52 @@ export async function getValidatedStudentTalents() {
   });
 }
 
-export async function recordPayment(data: {
-  studentId: number;
-  scheduleId?: number;
-  amount: number;
-  paymentMethod: string;
-  recordedBy?: string;
-  notes?: string;
-  transactionRef?: string;
-}) {
+function formatPaymentDate(date: Date) { return new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date); }
+function nextReceiptRef(id: number, prefix: "REC" | "TRX") { return `${prefix}-2026-${String(id).padStart(5, "0")}`; }
+export async function recordPayment(data: { studentId: number; scheduleId?: number; amount: number; paymentMethod: string; recordedBy?: string; notes?: string; transactionRef?: string; }) {
   await ensureDatabaseSeeded();
-
-  const [student] = await db.select().from(students).where(eq(students.id, data.studentId));
-  if (!student) throw new Error("Étudiant introuvable");
-
-  const countPayments = await db.select({ maxId: sql<number>`coalesce(max(${payments.id}), 0)` }).from(payments);
-  const recIndex = String(countPayments[0].maxId + 1).padStart(5, "0");
-  const receiptNumber = `REC-2026-${recIndex}`;
-  const verificationCode = `FC-SEC-${randomBytes(4).toString("hex").toUpperCase()}-${Date.now().toString().slice(-4)}`;
-  const trxRef = data.transactionRef || `TRX-${data.paymentMethod.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-6)}`;
-  const nowStr = new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date());
-
-  const [paymentRecord] = await db
-    .insert(payments)
-    .values({
-      receiptNumber,
-      studentId: data.studentId,
-      scheduleId: data.scheduleId || null,
-      amount: data.amount,
-      paymentMethod: data.paymentMethod,
-      transactionRef: trxRef,
-      status: "valide",
-      notes: data.notes || `Paiement pour ${student.firstName} ${student.lastName}`,
-      recordedBy: data.recordedBy || "Portail en ligne (MTN/Moov)",
-      paidAt: nowStr,
-    })
-    .returning();
-
-  // If schedule is linked, update it
-  if (data.scheduleId) {
-    await db
-      .update(paymentSchedules)
-      .set({
-        status: "paye",
-        paidAt: nowStr,
-        transactionRef: trxRef,
-      })
-      .where(eq(paymentSchedules.id, data.scheduleId));
-  }
-
-  // Create receipt
-  const [receiptRecord] = await db
-    .insert(receipts)
-    .values({
-      receiptNumber,
-      paymentId: paymentRecord.id,
-      studentId: student.id,
-      verificationCode,
-      qrData: `https://futurcraft.bj/recu/${receiptNumber}?code=${verificationCode}&matricule=${student.studentNumber}`,
-      issuedAt: nowStr,
-    })
-    .returning();
-
-  // Update student amounts and status if needed
-  const newPaid = student.paidAmount + data.amount;
-  const newRemaining = Math.max(0, student.totalAmount - newPaid);
-  const newStatus = student.status === "preinscrit" || student.status === "inscrit" ? "actif" : student.status;
-
-  await db
-    .update(students)
-    .set({
-      paidAmount: newPaid,
-      remainingAmount: newRemaining,
-      status: newStatus,
-    })
-    .where(eq(students.id, student.id));
-
-  // Add notification
-  await db.insert(notifications).values({
-    studentId: student.id,
-    title: "Nouveau reçu de paiement généré",
-    message: `Votre versement de ${data.amount.toLocaleString("fr-FR")} FCFA a été validé. Reçu N° ${receiptNumber} disponible.`,
-    type: "payment",
+  if (!Number.isInteger(data.amount) || data.amount <= 0) throw new Error("Montant invalide");
+  return await db.transaction(async (tx) => {
+    const [student] = await tx.select().from(students).where(eq(students.id, data.studentId)).for("update");
+    if (!student) throw new Error("Étudiant introuvable");
+    let schedule: typeof paymentSchedules.$inferSelect | null = null;
+    if (data.scheduleId) {
+      const [s] = await tx.select().from(paymentSchedules).where(eq(paymentSchedules.id, data.scheduleId)).for("update");
+      if (!s || s.studentId !== student.id) throw new Error("Échéance introuvable pour cet étudiant");
+      if (s.status === "paye") throw new Error("Cette échéance est déjà payée");
+      if (data.amount > s.amount) throw new Error("Le montant dépasse l'échéance sélectionnée");
+      schedule = s;
+    }
+    if (data.amount > student.remainingAmount) throw new Error("Le montant dépasse le solde restant");
+    const [paymentInsert] = await tx.insert(payments).values({ receiptNumber: `TMP-REC-${randomBytes(8).toString("hex").toUpperCase()}`, studentId: student.id, scheduleId: schedule?.id || null, amount: data.amount, paymentMethod: data.paymentMethod, transactionRef: data.transactionRef || `TMP-TRX-${randomBytes(8).toString("hex").toUpperCase()}`, status: "valide", notes: data.notes || `Paiement pour ${student.firstName} ${student.lastName}`, recordedBy: data.recordedBy || "Portail en ligne (MTN/Moov)", paidAt: formatPaymentDate(new Date()) }).returning();
+    const receiptNumber = nextReceiptRef(paymentInsert.id, "REC");
+    const trxRef = data.transactionRef || nextReceiptRef(paymentInsert.id, "TRX");
+    const verificationCode = `FC-SEC-${randomBytes(4).toString("hex").toUpperCase()}-${String(paymentInsert.id).padStart(4, "0")}`;
+    const [paymentRecord] = await tx.update(payments).set({ receiptNumber, transactionRef: trxRef }).where(eq(payments.id, paymentInsert.id)).returning();
+    if (schedule) await tx.update(paymentSchedules).set({ status: "paye", paidAt: paymentRecord.paidAt, transactionRef: trxRef }).where(eq(paymentSchedules.id, schedule.id));
+    const [receiptRecord] = await tx.insert(receipts).values({ receiptNumber, paymentId: paymentRecord.id, studentId: student.id, verificationCode, qrData: `https://futurcraft.bj/recu/${receiptNumber}?code=${verificationCode}`, issuedAt: paymentRecord.paidAt }).returning();
+    const newPaid = student.paidAmount + data.amount;
+    const newRemaining = Math.max(0, student.totalAmount - newPaid);
+    const newStatus = student.status === "preinscrit" || student.status === "inscrit" ? "actif" : student.status;
+    await tx.update(students).set({ paidAmount: newPaid, remainingAmount: newRemaining, status: newStatus }).where(eq(students.id, student.id));
+    await tx.insert(notifications).values({ studentId: student.id, title: "Nouveau reçu de paiement généré", message: `Votre versement de ${data.amount.toLocaleString("fr-FR")} FCFA a été validé. Reçu N° ${receiptNumber} disponible.`, type: "payment" });
+    return { payment: paymentRecord, receipt: receiptRecord };
   });
-
-  return {
-    payment: paymentRecord,
-    receipt: receiptRecord,
-  };
 }
 
-export async function getReceiptDetails(receiptNumber: string) {
+export async function getReceiptDetails(receiptNumber: string, options?: { verificationCode?: string; studentId?: number; includeSensitive?: boolean }) {
   await ensureDatabaseSeeded();
   const receiptRows = await db.select().from(receipts).where(eq(receipts.receiptNumber, receiptNumber));
   if (!receiptRows.length) return null;
   const receipt = receiptRows[0];
-
+  if (options?.verificationCode && options.verificationCode !== receipt.verificationCode) return null;
+  if (options?.studentId && options.studentId !== receipt.studentId) return null;
   const [payment] = await db.select().from(payments).where(eq(payments.id, receipt.paymentId));
   const [student] = await db.select().from(students).where(eq(students.id, receipt.studentId));
-  const [formation] = student
-    ? await db.select().from(formations).where(eq(formations.id, student.formationId))
-    : [null];
-
-  return {
-    receipt,
-    payment,
-    student,
-    formation,
-  };
+  const [formation] = student ? await db.select().from(formations).where(eq(formations.id, student.formationId)) : [null];
+  if (!student) return null;
+  const safeStudent = options?.includeSensitive ? student : { id: student.id, studentNumber: student.studentNumber, firstName: student.firstName, lastName: student.lastName };
+  return { receipt, payment, student: safeStudent, formation };
 }
 
 export async function getAdminStats() {
