@@ -41,15 +41,15 @@ export async function sendEmail(opts: {
 function layout(title: string, body: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
-  <body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
-    <div style="max-width:560px;margin:24px auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
-      <div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:20px 28px;">
+  <body style="margin:0;padding:0;background:#f4f7fb;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+    <div style="max-width:560px;margin:24px auto;background:#ffffff;border:1px solid #dbe4ef;border-radius:16px;overflow:hidden;">
+      <div style="background:#051269;padding:20px 28px;">
         <div style="color:#ffffff;font-size:18px;font-weight:800;letter-spacing:0.5px;">FuturCraft Institut</div>
       </div>
       <div style="padding:28px;">
-        <h1 style="margin:0 0 12px;font-size:20px;color:#0f172a;">${title}</h1>
+        <h1 style="margin:0 0 12px;font-size:20px;color:#06122f;">${title}</h1>
         <div style="color:#334155;font-size:14px;line-height:1.7;">${body}</div>
-        <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px;">
+        <div style="margin-top:24px;padding-top:16px;border-top:1px solid #dbe4ef;color:#64748b;font-size:12px;">
           FuturCraft Institut — Cotonou, Bénin · formations numériques et d'avenir.
         </div>
       </div>
@@ -59,7 +59,7 @@ function layout(title: string, body: string): string {
 }
 
 function field(name: string, value: string): string {
-  return `<tr><td style="padding:6px 10px;width:40%;font-weight:700;color:#0f172a;vertical-align:top;">${name}</td><td style="padding:6px 10px;color:#475569;">${value}</td></tr>`;
+  return `<tr><td style="padding:6px 10px;width:40%;font-weight:700;color:#06122f;vertical-align:top;">${name}</td><td style="padding:6px 10px;color:#475569;">${value}</td></tr>`;
 }
 
 export async function sendInscriptionEmails(params: {
@@ -78,16 +78,16 @@ export async function sendInscriptionEmails(params: {
     "Votre préinscription est enregistrée ✅",
     `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
      <p>Votre préinscription à la formation <strong>${params.formationTitle}</strong> est bien reçue.</p>
-     <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("N° matricule", params.studentNumber)}${field("Formation", params.formationTitle)}${field("Frais totaux", money)}${field("Contact", params.phone)}</table>
-     <p style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 16px;"><strong>⏳ Validation en attente :</strong> votre dossier sera vérifié par l'administration (${getAdminName()}). Vous recevrez une notification dès que votre compte sera activé.</p>
-     <p>Une fois validé, connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#4f46e5;font-weight:700;">espace étudiant</a> avec votre matricule et votre téléphone pour régler vos frais en ligne (MTN MoMo / Moov Money) ou au guichet.</p>`
+     <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #dbe4ef;border-radius:12px;">${field("N° matricule", params.studentNumber)}${field("Formation", params.formationTitle)}${field("Frais totaux", money)}${field("Contact", params.phone)}</table>
+     <p style="background:#f4f7fb;border:1px solid #cfe0f0;border-radius:12px;padding:12px 16px;"><strong>⏳ Validation en attente :</strong> votre dossier sera vérifié par l'administration (${getAdminName()}). Vous recevrez une notification dès que votre compte sera activé.</p>
+     <p>Une fois validé, connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#125195;font-weight:700;">espace étudiant</a> avec votre matricule et votre téléphone pour régler vos frais en ligne (MTN MoMo / Moov Money) ou au guichet.</p>`
   );
 
   // Alerte interne à l'équipe
   const teamHtml = layout(
     "Nouvelle préinscription reçue — à valider",
     `<p>Une nouvelle préinscription vient d'être enregistrée et attend votre validation :</p>
-     <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("Matricule", params.studentNumber)}${field("Étudiant", `${params.firstName} ${params.lastName}`)}${field("Formation", params.formationTitle)}${field("Total à percevoir", money)}${field("Téléphone", params.phone)}${field("Email", params.email)}</table>
+     <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #dbe4ef;border-radius:12px;">${field("Matricule", params.studentNumber)}${field("Étudiant", `${params.firstName} ${params.lastName}`)}${field("Formation", params.formationTitle)}${field("Total à percevoir", money)}${field("Téléphone", params.phone)}${field("Email", params.email)}</table>
      <p>Connectez-vous à la console d'administration pour valider ou rejeter ce dossier. Le compte ne sera actif et visible sur la page Entreprises qu'après validation.</p>`
   );
 
@@ -116,14 +116,14 @@ export async function sendValidationEmail(params: {
     isValidated
       ? `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
          <p>Félicitations ! Votre dossier de candidature a été <strong>validé</strong> par l'administration (${getAdminName()}).</p>
-         <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("N° matricule", params.studentNumber)}${params.formationTitle ? field("Formation", params.formationTitle) : ""}</table>
-         <p style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:12px 16px;"><strong>✅ Compte actif :</strong> votre profil est désormais visible par les recruteurs sur notre <a href="https://futurcraft.bj/entreprises" style="color:#4f46e5;font-weight:700;">page Entreprises</a>.</p>
+         <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #dbe4ef;border-radius:12px;">${field("N° matricule", params.studentNumber)}${params.formationTitle ? field("Formation", params.formationTitle) : ""}</table>
+         <p style="background:#f0f7ff;border:1px solid #cfe0f0;border-radius:12px;padding:12px 16px;"><strong>✅ Compte actif :</strong> votre profil est désormais visible par les recruteurs sur notre <a href="https://futurcraft.bj/entreprises" style="color:#125195;font-weight:700;">page Entreprises</a>.</p>
          ${params.note ? `<p><em>Note de l'administration : ${params.note.replace(/[\n]/g, "<br/>")}</em></p>` : ""}
-         <p>Connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#4f46e5;font-weight:700;">espace étudiant</a> pour finaliser vos frais d'inscription, déposer votre photo de profil et votre CV.</p>`
+         <p>Connectez-vous à votre <a href="https://futurcraft.bj/espace-etudiant" style="color:#125195;font-weight:700;">espace étudiant</a> pour finaliser vos frais d'inscription, déposer votre photo de profil et votre CV.</p>`
       : `<p>Bonjour <strong>${params.firstName} ${params.lastName}</strong>,</p>
          <p>Après examen de votre dossier (matricule ${params.studentNumber}), l'administration de FuturCraft Institut n'a pas retenu votre candidature à ce stade.</p>
-         ${params.note ? `<p style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px 16px;"><strong>Motif :</strong> ${params.note.replace(/[\n]/g, "<br/>")}</p>` : ""}
-         <p>Vous pouvez déposer une nouvelle demande, ou nous contacter pour toute question : <a href="mailto:contact@futurcraft.bj" style="color:#4f46e5;font-weight:700;">contact@futurcraft.bj</a>.</p>`
+         ${params.note ? `<p style="background:#fff5f5;border:1px solid #f1caca;border-radius:12px;padding:12px 16px;"><strong>Motif :</strong> ${params.note.replace(/[\n]/g, "<br/>")}</p>` : ""}
+         <p>Vous pouvez déposer une nouvelle demande, ou nous contacter pour toute question : <a href="mailto:contact@futurcraft.bj" style="color:#125195;font-weight:700;">contact@futurcraft.bj</a>.</p>`
   );
   if (params.email) {
     void sendEmail({
@@ -145,7 +145,7 @@ export async function sendAdminDocumentUploadEmail(params: {
   const html = layout(
     "Nouveau document étudiant",
     `<p>💼 <strong>${params.firstName} ${params.lastName}</strong> (matricule ${params.studentNumber}) vient de déposer sa <strong>${kindLabel}</strong> dans son espace étudiant.</p>
-     <p><a href="https://futurcraft.bj${params.url}" style="color:#4f46e5;font-weight:700;">Consulter le document →</a></p>
+     <p><a href="https://futurcraft.bj${params.url}" style="color:#125195;font-weight:700;">Consulter le document →</a></p>
      <p><em>Sa fiche est désormais complète et plus attractive pour les recruteurs sur la page Entreprises.</em></p>`
   );
   void sendEmail({
@@ -166,7 +166,7 @@ export async function sendPartnershipEmail(params: {
   const html = layout(
     "Nouvelle demande de partenariat",
     `<p>Une entreprise souhaite collaborer avec FuturCraft :</p>
-     <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e2e8f0;border-radius:12px;">${field("Entreprise", params.companyName)}${field("Contact", params.contactName)}${field("Email", params.email)}${field("Téléphone", params.phone)}${field("Type", params.partnershipType)}</table>
+     <table style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #dbe4ef;border-radius:12px;">${field("Entreprise", params.companyName)}${field("Contact", params.contactName)}${field("Email", params.email)}${field("Téléphone", params.phone)}${field("Type", params.partnershipType)}</table>
      ${params.message ? `<p><em>Message : ${params.message.replace(/\n/g, "<br/>")}</em></p>` : ""}`
   );
   void sendEmail({ to: INTERNAL_EMAIL, subject: `[FuturCraft] Partenariat — ${params.companyName}`, html }).catch((e) =>

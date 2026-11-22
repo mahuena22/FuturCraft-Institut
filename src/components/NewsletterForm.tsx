@@ -25,7 +25,7 @@ export function NewsletterForm() {
         <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-bold text-emerald-300">Merci !</p>
-          <p className="text-xs text-slate-300 mt-0.5">
+          <p className="text-xs text-white/70 mt-0.5">
             La brochure des formations vous sera envoyée à <strong>{email}</strong>. Un conseiller peut aussi vous rappeler.
           </p>
         </div>
@@ -40,14 +40,14 @@ export function NewsletterForm() {
       noValidate
     >
       <div className="relative flex-1">
-        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Votre adresse email"
           aria-label="Votre adresse email"
-          className="w-full rounded-xl border border-white/20 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-slate-300 focus:border-[var(--color-fc-cyan)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-cyan)]/30"
+          className="w-full rounded-xl border border-white/20 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:border-[var(--color-fc-cyan)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-cyan)]/30"
         />
       </div>
       <button

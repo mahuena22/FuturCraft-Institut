@@ -4,11 +4,11 @@ import { Layers } from "lucide-react";
 import Link from "next/link";
 import { PageIntro } from "@/components/PageIntro";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Galerie des Projets Étudiants | FuturCraft Institut Bénin",
   description:
-    "Découvrez les projets technologiques réels développés par les étudiants de FuturCraft : GEN3RVTO RH, AgroConnect, drones et IA.",
+    "Découvrez les projets réalisés par les étudiants de FuturCraft Institut et validés par l'administration.",
 };
 
 export default async function ProjetsPage() {

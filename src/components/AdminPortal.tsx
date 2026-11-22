@@ -25,6 +25,7 @@ import {
   LogOut,
   Handshake,
   FileText,
+  FolderGit2,
   Pencil,
   Trash2,
   DollarSign,
@@ -60,6 +61,8 @@ interface StudentItem {
   paidAmount: number;
   remainingAmount: number;
   formationId: number;
+  profileVisible: boolean;
+  validatedAt: Date | null;
 }
 
 interface PaymentItem {
@@ -133,6 +136,24 @@ interface ArticleItem {
   publishedAt: string;
 }
 
+interface StudentProjectItem {
+  id: number;
+  studentId: number | null;
+  studentNumber: string | null;
+  studentName: string | null;
+  slug: string;
+  title: string;
+  tagline: string;
+  description: string;
+  coverImage: string;
+  formationTitle: string;
+  technologies: string;
+  teamMembers: string;
+  projectUrl: string | null;
+  githubUrl: string | null;
+  isFeatured: boolean | null;
+}
+
 interface AdmissionItem {
   id: number;
   studentNumber: string;
@@ -156,6 +177,7 @@ export function AdminPortal({
   formationsList,
   initialPartnerships,
   initialArticles,
+  initialProjects,
 }: {
   initialStats: AdminStats;
   initialStudents: StudentItem[];
@@ -163,6 +185,7 @@ export function AdminPortal({
   formationsList: FormationItem[];
   initialPartnerships: PartnershipItem[];
   initialArticles?: ArticleItem[];
+  initialProjects: StudentProjectItem[];
 }) {
   const [stats, setStats] = useState<AdminStats>(initialStats);
   const [students, setStudents] = useState<StudentItem[]>(initialStudents);
@@ -170,11 +193,12 @@ export function AdminPortal({
   const [partnerships, setPartnerships] = useState<PartnershipItem[]>(initialPartnerships);
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequestItem[]>([]);
   const [articles, setArticles] = useState<ArticleItem[]>(initialArticles || []);
+  const [projects, setProjects] = useState<StudentProjectItem[]>(initialProjects);
   const [formations, setFormations] = useState<FormationItem[]>(formationsList);
   const [admissions, setAdmissions] = useState<AdmissionItem[]>([]);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "validations" | "etudiants" | "paiements" | "formations" | "articles" | "roles" | "partenariats" | "rappels">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "validations" | "etudiants" | "paiements" | "formations" | "articles" | "projects" | "roles" | "partenariats" | "rappels">("dashboard");
 
   const router = useRouter();
 
@@ -303,6 +327,24 @@ export function AdminPortal({
     category: "",
     publishedAt: "",
   });
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [projectForm, setProjectForm] = useState({
+    studentId: "",
+    title: "",
+    tagline: "",
+    description: "",
+    coverImage: "",
+    technologies: "",
+    projectUrl: "",
+    githubUrl: "",
+  });
+  const [isSavingProject, setIsSavingProject] = useState(false);
+  const validatedStudents = students.filter(
+    (student) =>
+      student.profileVisible &&
+      student.validatedAt &&
+      ["inscrit", "actif", "termine", "alumni"].includes(student.status)
+  );
 
   // Filter students
   const filteredStudents = students.filter((s) => {
@@ -502,6 +544,49 @@ export function AdminPortal({
     }
   };
 
+  const handleSaveProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProject(true);
+    try {
+      const res = await fetch("/api/admin/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(projectForm),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur lors de l’enregistrement du projet");
+      setProjects((current) => [data.project, ...current]);
+      setProjectModalOpen(false);
+      setProjectForm({
+        studentId: "",
+        title: "",
+        tagline: "",
+        description: "",
+        coverImage: "",
+        technologies: "",
+        projectUrl: "",
+        githubUrl: "",
+      });
+      alert("Projet ajouté. Il est visible sur le site car l’étudiant est validé.");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Erreur lors de l’enregistrement");
+    } finally {
+      setIsSavingProject(false);
+    }
+  };
+
+  const handleDeleteProject = async (project: StudentProjectItem) => {
+    if (!window.confirm(`Supprimer le projet « ${project.title} » ?`)) return;
+    try {
+      const res = await fetch(`/api/admin/projects/${project.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur lors de la suppression");
+      setProjects((current) => current.filter((item) => item.id !== project.id));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Erreur lors de la suppression");
+    }
+  };
+
   // Submit manual payment
   const handleRecordPayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -620,21 +705,21 @@ export function AdminPortal({
                   v1.2
                 </span>
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Supervision des inscriptions, encaissements, cursus et délivrance des reçus
               </p>
             </div>
           </div>
 
           {/* Role selector dropdown */}
-          <div className="flex items-center gap-2 bg-slate-800 p-1.5 rounded-xl border border-slate-700 text-xs">
-            <span className="text-slate-400 font-semibold px-2">Rôle actif :</span>
+          <div className="flex items-center gap-2 bg-white/10 p-1.5 rounded-xl border border-white/15 text-xs">
+            <span className="text-[var(--color-fc-gray-mid)] font-semibold px-2">Rôle actif :</span>
             <button
               onClick={() => setCurrentRole("super_admin")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "super_admin"
-                  ? "bg-[var(--color-fc-primary)] text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-[var(--color-fc-primary)] text-white "
+                  : "text-white/60 hover:text-white"
               }`}
             >
               Super Admin
@@ -643,8 +728,8 @@ export function AdminPortal({
               onClick={() => setCurrentRole("financier")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "financier"
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-emerald-600 text-white "
+                  : "text-white/60 hover:text-white"
               }`}
             >
               Caissier / Financier
@@ -653,8 +738,8 @@ export function AdminPortal({
               onClick={() => setCurrentRole("agent")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "agent"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-[var(--color-fc-deep)] text-white "
+                  : "text-white/60 hover:text-white"
               }`}
             >
               Agent Administratif
@@ -664,7 +749,7 @@ export function AdminPortal({
           <button
             onClick={handleLogout}
             title="Se déconnecter"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 hover:text-white hover:bg-red-600/20 border border-slate-700 hover:border-red-500/40 transition-all"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 hover:text-white hover:bg-red-600/20 border border-white/15 hover:border-red-500/40 transition-all"
           >
             <LogOut className="w-4 h-4" />
             Déconnexion
@@ -678,7 +763,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "dashboard"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -690,13 +775,13 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "validations"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Validations</span>
             {pendingValidations > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-[var(--color-fc-surface)]0 text-white text-[10px] font-black">
                 {pendingValidations}
               </span>
             )}
@@ -707,7 +792,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "etudiants"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Users className="w-4 h-4" />
@@ -719,7 +804,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "paiements"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <CreditCard className="w-4 h-4" />
@@ -731,7 +816,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "formations"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -743,7 +828,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "articles"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -751,11 +836,23 @@ export function AdminPortal({
           </button>
 
           <button
+            onClick={() => setActiveTab("projects")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "projects"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
+            }`}
+          >
+            <FolderGit2 className="w-4 h-4" />
+            <span>Projets étudiants ({projects.length})</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("partenariats")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "partenariats"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Handshake className="w-4 h-4" />
@@ -767,7 +864,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "roles"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -779,7 +876,7 @@ export function AdminPortal({
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "rappels"
                 ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <AlertTriangle className="w-4 h-4" />
@@ -792,63 +889,63 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* KPI Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Dossiers en attente
                 </span>
-                <div className="text-3xl font-black text-amber-600">{pendingValidations}</div>
+                <div className="text-3xl font-black text-[var(--color-fc-primary)]">{pendingValidations}</div>
                 <div className="flex items-center gap-2 text-xs pt-1">
                   <button
                     onClick={() => setActiveTab("validations")}
-                    className="text-blue-600 font-bold hover:underline"
+                    className="text-[var(--color-fc-primary)] font-bold hover:underline"
                   >
                     Valider les comptes →
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Total Étudiants
                 </span>
-                <div className="text-3xl font-black text-slate-900">{stats.totalStudents}</div>
+                <div className="text-3xl font-black text-[var(--color-fc-black)]">{stats.totalStudents}</div>
                 <div className="flex items-center gap-2 text-xs pt-1">
                   <span className="text-emerald-600 font-bold">{stats.activeStudents} actifs</span>
-                  <span className="text-slate-300">•</span>
-                  <span className="text-blue-600 font-semibold">{stats.newInscriptions} préinscrits</span>
+                  <span className="text-white/60">•</span>
+                  <span className="text-[var(--color-fc-primary)] font-semibold">{stats.newInscriptions} préinscrits</span>
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Montant Encaissé (FCFA)
                 </span>
                 <div className="text-3xl font-black text-emerald-600">
                   {stats.totalCollectedAmount.toLocaleString("fr-FR")}
                 </div>
-                <span className="text-xs text-slate-500 block pt-1">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
                   Taux de recouvrement : <strong>{stats.recoveryRate}%</strong>
                 </span>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Reste à Percevoir
                 </span>
                 <div className="text-3xl font-black text-rose-600">
                   {stats.totalRemainingAmount.toLocaleString("fr-FR")}
                 </div>
-                <span className="text-xs text-slate-500 block pt-1">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
                   Sur <strong>{stats.totalExpectedAmount.toLocaleString("fr-FR")} FCFA</strong> prévus
                 </span>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Cursus Ouverts
                 </span>
                 <div className="text-3xl font-black text-[var(--color-fc-primary)]">{stats.formationsCount}</div>
-                <span className="text-xs text-slate-500 block pt-1">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
                   Tous campus (Godomey, Supermarché O Bénin Avant pk14)
                 </span>
               </div>
@@ -857,9 +954,9 @@ export function AdminPortal({
             {/* Quick Actions & Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Recent Payments Table */}
-              <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="lg:col-span-8 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900">Derniers Encaissements Enregistrés</h3>
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Derniers Encaissements Enregistrés</h3>
                   <button
                     onClick={() => setActiveTab("paiements")}
                     className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
@@ -870,7 +967,7 @@ export function AdminPortal({
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="border-b border-slate-200 text-slate-500 text-[11px] font-bold">
+                    <thead className="border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] text-[11px] font-bold">
                       <tr>
                         <th className="py-2">Reçu N°</th>
                         <th className="py-2">Étudiant</th>
@@ -880,25 +977,25 @@ export function AdminPortal({
                         <th className="py-2">Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                       {payments.slice(0, 5).map((p) => (
-                        <tr key={p.id} className="hover:bg-slate-50">
-                          <td className="py-2.5 font-mono font-bold text-blue-600">
+                        <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]">
+                          <td className="py-2.5 font-mono font-bold text-[var(--color-fc-primary)]">
                             <Link href={`/recu/${p.receiptNumber}`} target="_blank" className="hover:underline">
                               {p.receiptNumber}
                             </Link>
                           </td>
-                          <td className="py-2.5 font-semibold text-slate-900">
+                          <td className="py-2.5 font-semibold text-[var(--color-fc-black)]">
                             {p.studentFirstName} {p.studentLastName}
                           </td>
-                          <td className="py-2.5 text-slate-600 truncate max-w-[150px]">
+                          <td className="py-2.5 text-[var(--color-fc-gray-mid)] truncate max-w-[150px]">
                             {p.formationTitle || "Formation"}
                           </td>
                           <td className="py-2.5 font-bold text-emerald-600">
                             {p.amount.toLocaleString("fr-FR")} FCFA
                           </td>
-                          <td className="py-2.5 text-slate-500">{p.paymentMethod}</td>
-                          <td className="py-2.5 text-slate-400">{p.paidAt}</td>
+                          <td className="py-2.5 text-[var(--color-fc-gray-mid)]">{p.paymentMethod}</td>
+                          <td className="py-2.5 text-[var(--color-fc-gray-mid)]">{p.paidAt}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -907,8 +1004,8 @@ export function AdminPortal({
               </div>
 
               {/* Action shortcuts */}
-              <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-                <h3 className="text-base font-bold text-slate-900">Opérations Rapides</h3>
+              <div className="lg:col-span-4 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
+                <h3 className="text-base font-bold text-[var(--color-fc-black)]">Opérations Rapides</h3>
                 <div className="space-y-2.5">
                   <button
                     onClick={() => setShowManualPaymentModal(true)}
@@ -923,10 +1020,10 @@ export function AdminPortal({
 
                   <button
                     onClick={() => setShowNewStudentModal(true)}
-                    className="w-full p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 text-xs font-bold flex items-center justify-between transition-colors"
+                    className="w-full p-3 rounded-xl bg-[var(--color-fc-surface)] hover:bg-blue-100 border border-[var(--color-fc-primary)]/20 text-blue-800 text-xs font-bold flex items-center justify-between transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Users className="w-4 h-4 text-[var(--color-fc-primary)]" />
                       Inscrire un étudiant au guichet
                     </span>
                     <Plus className="w-4 h-4" />
@@ -934,13 +1031,13 @@ export function AdminPortal({
 
                   <Link
                     href="/recu"
-                    className="w-full p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold flex items-center justify-between transition-colors"
+                    className="w-full p-3 rounded-xl bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] text-[var(--color-fc-black)] text-xs font-bold flex items-center justify-between transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      <QrCode className="w-4 h-4 text-slate-600" />
+                      <QrCode className="w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                       Vérifier l&apos;authenticité d&apos;un reçu
                     </span>
-                    <ArrowUpRight className="w-4 h-4 text-slate-400" />
+                    <ArrowUpRight className="w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                   </Link>
                 </div>
               </div>
@@ -953,14 +1050,14 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Validation des Comptes Étudiants</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Validation des Comptes Étudiants</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Chaque nouvel étudiant doit être validé avant de pouvoir se connecter et apparaître sur la page Entreprises.
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                  pendingValidations > 0 ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                  pendingValidations > 0 ? "bg-[var(--color-fc-surface)] text-[var(--color-fc-black)]" : "bg-emerald-100 text-emerald-800"
                 }`}>
                   {pendingValidations > 0 ? `${pendingValidations} dossiers en attente` : "Aucun dossier en attente"}
                 </span>
@@ -969,16 +1066,16 @@ export function AdminPortal({
 
             {/* Pending validations */}
             {pendingValidations > 0 && (
-              <div className="bg-white rounded-2xl border border-amber-200 overflow-hidden shadow-xs">
-                <div className="bg-amber-50 px-5 py-3 border-b border-amber-200 flex items-center justify-between">
-                  <span className="text-sm font-bold text-amber-800 flex items-center gap-2">
+              <div className="bg-white rounded-2xl border border-[var(--color-fc-primary)]/20 overflow-hidden ">
+                <div className="bg-[var(--color-fc-surface)] px-5 py-3 border-b border-[var(--color-fc-primary)]/20 flex items-center justify-between">
+                  <span className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     Dossiers en attente de validation
                   </span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="py-3 px-4">Matricule</th>
                         <th className="py-3 px-4">Étudiant</th>
@@ -988,20 +1085,20 @@ export function AdminPortal({
                         <th className="py-3 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                       {admissions.filter((a) => a.status === "preinscrit").map((a) => (
-                        <tr key={a.id} className="hover:bg-amber-50/40 transition-colors">
-                          <td className="py-3 px-4 font-mono font-bold text-blue-600">{a.studentNumber}</td>
+                        <tr key={a.id} className="hover:bg-[var(--color-fc-surface)] transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">{a.studentNumber}</td>
                           <td className="py-3 px-4">
-                            <strong className="text-slate-900 block">{a.firstName} {a.lastName}</strong>
-                            <span className="text-[10px] text-slate-400">{a.city || "Cotonou"}</span>
+                            <strong className="text-[var(--color-fc-black)] block">{a.firstName} {a.lastName}</strong>
+                            <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.city || "Cotonou"}</span>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
                             <div>{a.phone}</div>
-                            <div className="text-[10px] text-slate-400">{a.email}</div>
+                            <div className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.email}</div>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">{a.formationTitle || "—"}</td>
-                          <td className="py-3 px-4 text-slate-500 text-[10px]">
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "—"}</td>
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] text-[10px]">
                             {a.createdAt ? new Date(a.createdAt).toLocaleDateString("fr-FR") : "—"}
                           </td>
                           <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
@@ -1027,21 +1124,21 @@ export function AdminPortal({
             )}
 
             {/* Recent reviews (validated / rejected) */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-              <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
-                <span className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
+              <div className="px-5 py-3 border-b border-[var(--color-fc-gray-light)] flex items-center justify-between">
+                <span className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   Dossiers traités récemment
                 </span>
               </div>
               {admissions.filter((a) => a.status !== "preinscrit").length === 0 ? (
-                <div className="p-8 text-center text-sm text-slate-400">
+                <div className="p-8 text-center text-sm text-[var(--color-fc-gray-mid)]">
                   Aucun dossier traité pour le moment.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="py-3 px-4">Matricule</th>
                         <th className="py-3 px-4">Étudiant</th>
@@ -1050,18 +1147,18 @@ export function AdminPortal({
                         <th className="py-3 px-4">Note</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                       {admissions
                         .filter((a) => a.status !== "preinscrit")
                         .slice(0, 20)
                         .map((a) => (
-                          <tr key={a.id} className="hover:bg-slate-50/70 transition-colors">
-                            <td className="py-3 px-4 font-mono font-bold text-blue-600">{a.studentNumber}</td>
+                          <tr key={a.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                            <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">{a.studentNumber}</td>
                             <td className="py-3 px-4">
-                              <strong className="text-slate-900 block">{a.firstName} {a.lastName}</strong>
-                              <span className="text-[10px] text-slate-400">{a.email}</span>
+                              <strong className="text-[var(--color-fc-black)] block">{a.firstName} {a.lastName}</strong>
+                              <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.email}</span>
                             </td>
-                            <td className="py-3 px-4 text-slate-600">{a.formationTitle || "—"}</td>
+                            <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "—"}</td>
                             <td className="py-3 px-4">
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -1069,7 +1166,7 @@ export function AdminPortal({
                                     ? "bg-emerald-100 text-emerald-800"
                                     : a.status === "rejete"
                                     ? "bg-rose-100 text-rose-700"
-                                    : "bg-slate-100 text-slate-600"
+                                    : "bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)]"
                                 }`}
                               >
                                 {a.status === "inscrit" && "Validé (inscrit)"}
@@ -1079,7 +1176,7 @@ export function AdminPortal({
                                 {!["inscrit", "actif", "termine", "rejete"].includes(a.status) && a.status}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-slate-500 italic max-w-[220px]">
+                            <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] italic max-w-[220px]">
                               {a.validationNote || "—"}
                             </td>
                           </tr>
@@ -1098,15 +1195,15 @@ export function AdminPortal({
             {/* Header + Add Student button */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Répertoire des Candidats &amp; Étudiants</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Répertoire des Candidats &amp; Étudiants</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Recherchez par nom, matricule, téléphone et gérez les statuts d&apos;admission.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowNewStudentModal(true)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Inscrire un nouvel étudiant</span>
@@ -1114,15 +1211,15 @@ export function AdminPortal({
             </div>
 
             {/* 30. RECHERCHE & FILTRES RAPIDES */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
+            <div className="bg-white p-4 rounded-2xl border border-[var(--color-fc-gray-light)]  grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
               <div className="sm:col-span-6 relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[var(--color-fc-gray-mid)] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Rechercher par nom, matricule FC-..., email, téléphone..."
                   value={searchStudent}
                   onChange={(e) => setSearchStudent(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)]/50 text-xs"
                 />
               </div>
 
@@ -1130,7 +1227,7 @@ export function AdminPortal({
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs text-[var(--color-fc-black)]"
                 >
                   <option value="all">Tous les statuts</option>
                   <option value="preinscrit">En attente de validation</option>
@@ -1145,7 +1242,7 @@ export function AdminPortal({
                 <select
                   value={formationFilter}
                   onChange={(e) => setFormationFilter(e.target.value)}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs text-[var(--color-fc-black)]"
                 >
                   <option value="all">Toutes les formations</option>
                   {formations.map((f) => (
@@ -1158,10 +1255,10 @@ export function AdminPortal({
             </div>
 
             {/* Students Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Matricule</th>
                       <th className="py-3 px-4">Étudiant</th>
@@ -1171,21 +1268,21 @@ export function AdminPortal({
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {filteredStudents.map((st) => (
-                      <tr key={st.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-blue-600">
+                      <tr key={st.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">
                           {st.studentNumber}
                         </td>
                         <td className="py-3 px-4">
-                          <strong className="text-slate-900 block">
+                          <strong className="text-[var(--color-fc-black)] block">
                             {st.firstName} {st.lastName}
                           </strong>
-                          <span className="text-[10px] text-slate-400">{st.city || "Cotonou"}</span>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{st.city || "Cotonou"}</span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
                           <div>{st.phone}</div>
-                          <div className="text-[10px] text-slate-400">{st.email}</div>
+                          <div className="text-[10px] text-[var(--color-fc-gray-mid)]">{st.email}</div>
                         </td>
                         <td className="py-3 px-4">
                           <span
@@ -1195,10 +1292,10 @@ export function AdminPortal({
                                 : st.status === "inscrit" || st.status === "termine" || st.status === "alumni"
                                 ? "bg-emerald-100 text-emerald-700"
                                 : st.status === "preinscrit"
-                                ? "bg-amber-100 text-amber-800"
+                                ? "bg-[var(--color-fc-surface)] text-[var(--color-fc-black)]"
                                 : st.status === "rejete"
                                 ? "bg-rose-100 text-rose-700"
-                                : "bg-slate-100 text-slate-600"
+                                : "bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)]"
                             }`}
                           >
                             {st.status === "preinscrit" && "En attente de validation"}
@@ -1206,7 +1303,7 @@ export function AdminPortal({
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <div className="font-bold text-slate-900">
+                          <div className="font-bold text-[var(--color-fc-black)]">
                             {st.paidAmount.toLocaleString("fr-FR")} / {st.totalAmount.toLocaleString("fr-FR")} FCFA
                           </div>
                           <div className="text-[10px] text-rose-600">
@@ -1219,7 +1316,7 @@ export function AdminPortal({
                               setSelectedStudentForStatus(st);
                               setNewStatusValue(st.status);
                             }}
-                            className="text-xs font-bold text-blue-600 hover:underline"
+                            className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                           >
                             Changer statut
                           </button>
@@ -1238,15 +1335,15 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Registre Comptable &amp; Encaissements</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Registre Comptable &amp; Encaissements</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Enregistrez les versements en espèces à la caisse ou validez les paiements Mobile Money.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowManualPaymentModal(true)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700  flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Enregistrer un versement (Caisse / MoMo)</span>
@@ -1259,11 +1356,11 @@ export function AdminPortal({
               return (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-600" />
+                    <h3 className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-[var(--color-fc-primary)]" />
                       Demandes de paiement en ligne
                       {pending.length > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[11px] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] text-[11px] font-bold">
                           {pending.length} en attente
                         </span>
                       )}
@@ -1271,14 +1368,14 @@ export function AdminPortal({
                   </div>
 
                   {paymentRequests.length === 0 ? (
-                    <div className="p-6 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
+                    <div className="p-6 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] text-center text-xs text-[var(--color-fc-gray-mid)]">
                       Aucune demande de paiement en ligne pour le moment.
                     </div>
                   ) : (
-                    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                    <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
                       <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs">
-                          <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                          <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                             <tr>
                               <th className="py-3 px-4">Référence</th>
                               <th className="py-3 px-4">Étudiant</th>
@@ -1290,26 +1387,26 @@ export function AdminPortal({
                               <th className="py-3 px-4 text-right">Action</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-150">
+                          <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                             {paymentRequests.map((r) => (
-                              <tr key={r.id} className="hover:bg-slate-50/70 transition-colors">
-                                <td className="py-3 px-4 font-mono font-bold text-blue-600">{r.reference}</td>
-                                <td className="py-3 px-4 font-semibold text-slate-900">
+                              <tr key={r.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                                <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">{r.reference}</td>
+                                <td className="py-3 px-4 font-semibold text-[var(--color-fc-black)]">
                                   {r.studentFirstName} {r.studentLastName} ({r.studentNumber})
                                 </td>
                                 <td className="py-3 px-4 font-extrabold text-emerald-600">
                                   {r.amount.toLocaleString("fr-FR")} FCFA
                                 </td>
                                 <td className="py-3 px-4">
-                                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-[11px]">
+                                  <span className="px-2 py-0.5 rounded bg-[var(--color-fc-bg)] text-[var(--color-fc-black)] font-medium text-[11px]">
                                     {r.method}
                                   </span>
                                 </td>
-                                <td className="py-3 px-4 font-mono text-slate-600">{r.phone}</td>
-                                <td className="py-3 px-4 text-slate-400">{new Date(r.createdAt).toLocaleString("fr-FR")}</td>
+                                <td className="py-3 px-4 font-mono text-[var(--color-fc-gray-mid)]">{r.phone}</td>
+                                <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{new Date(r.createdAt).toLocaleString("fr-FR")}</td>
                                 <td className="py-3 px-4">
                                   {r.status === "en_attente" ? (
-                                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold text-[11px]">
+                                    <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold text-[11px]">
                                       En attente
                                     </span>
                                   ) : r.status === "valide" ? (
@@ -1342,7 +1439,7 @@ export function AdminPortal({
                                       </button>
                                     </div>
                                   ) : (
-                                    <span className="text-[11px] text-slate-400">Traité</span>
+                                    <span className="text-[11px] text-[var(--color-fc-gray-mid)]">Traité</span>
                                   )}
                                 </td>
                               </tr>
@@ -1357,10 +1454,10 @@ export function AdminPortal({
             })()}
 
             {/* Payments Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">N° Reçu</th>
                       <th className="py-3 px-4">Étudiant</th>
@@ -1372,31 +1469,31 @@ export function AdminPortal({
                       <th className="py-3 px-4 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {payments.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-blue-600">
+                      <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">
                           {p.receiptNumber}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-slate-900">
+                        <td className="py-3 px-4 font-semibold text-[var(--color-fc-black)]">
                           {p.studentFirstName} {p.studentLastName} ({p.studentNumber})
                         </td>
-                        <td className="py-3 px-4 text-slate-600">{p.formationTitle}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{p.formationTitle}</td>
                         <td className="py-3 px-4 font-extrabold text-emerald-600 text-sm">
                           {p.amount.toLocaleString("fr-FR")} FCFA
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-[11px]">
+                          <span className="px-2 py-0.5 rounded bg-[var(--color-fc-bg)] text-[var(--color-fc-black)] font-medium text-[11px]">
                             {p.paymentMethod}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-500 text-[11px]">{p.recordedBy}</td>
-                        <td className="py-3 px-4 text-slate-400">{p.paidAt}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] text-[11px]">{p.recordedBy}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{p.paidAt}</td>
                         <td className="py-3 px-4 text-right">
                           <Link
                             href={`/recu/${p.receiptNumber}`}
                             target="_blank"
-                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                           >
                             <Printer className="w-3.5 h-3.5" />
                             <span>Voir reçu</span>
@@ -1415,8 +1512,8 @@ export function AdminPortal({
         {activeTab === "formations" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Gestion des Formations &amp; Tarifs</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Gestion des Formations &amp; Tarifs</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Consultez les 12 cursus officiels, leurs prix en FCFA et les frais d&apos;inscription.
               </p>
             </div>
@@ -1425,19 +1522,19 @@ export function AdminPortal({
               {formations.map((f) => (
                 <div
                   key={f.id}
-                  className={`bg-white p-5 rounded-2xl border shadow-xs space-y-3 ${
+                  className={`bg-white p-5 rounded-2xl border  space-y-3 ${
                     f.isActive === null || f.isActive === undefined || f.isActive === true
-                      ? "border-slate-200"
+                      ? "border-[var(--color-fc-gray-light)]"
                       : "border-rose-200 bg-rose-50/40"
                   }`}
                 >
                   <div className="flex items-start justify-between">
-                    <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase font-bold text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] px-2 py-0.5 rounded">
                       {f.category}
                     </span>
                     <span className="flex items-center gap-2">
                       {f.isPopular ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-100 text-violet-800">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)]">
                           Populaire
                         </span>
                       ) : null}
@@ -1453,29 +1550,29 @@ export function AdminPortal({
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 leading-snug">{f.title}</h3>
-                  <div className="text-xs text-slate-500">⏱️ {f.duration} — {f.mode || "Présentiel & Hybride"}</div>
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)] leading-snug">{f.title}</h3>
+                  <div className="text-xs text-[var(--color-fc-gray-mid)]">⏱️ {f.duration} — {f.mode || "Présentiel & Hybride"}</div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div className="pt-2 border-t border-[var(--color-fc-gray-light)] flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Frais totaux :</span>
-                      <strong className="text-sm font-black text-slate-900">
+                      <span className="text-[10px] text-[var(--color-fc-gray-mid)] block">Frais totaux :</span>
+                      <strong className="text-sm font-black text-[var(--color-fc-black)]">
                         {f.price.toLocaleString("fr-FR")} FCFA
                       </strong>
-                      <span className="text-[10px] text-slate-400 block">
+                      <span className="text-[10px] text-[var(--color-fc-gray-mid)] block">
                         + {f.registrationFee.toLocaleString("fr-FR")} FCFA dossier
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/formation/${f.slug}`}
-                        className="text-xs font-bold text-blue-600 hover:underline"
+                        className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                       >
                         Voir page →
                       </Link>
                       <button
                         onClick={() => openFormationEditor(f)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] px-2 py-1 rounded-lg transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                         Modifier
@@ -1493,24 +1590,24 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Blog &amp; Actualités</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Blog &amp; Actualités</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Rédigez, modifiez ou supprimez les articles publiés sur la page Actualités.
                 </p>
               </div>
               <button
                 onClick={() => openArticleEditor(null)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Nouvel article</span>
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Titre</th>
                       <th className="py-3 px-4">Catégorie</th>
@@ -1520,42 +1617,42 @@ export function AdminPortal({
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {articles.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-slate-400">
+                        <td colSpan={6} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
                           Aucun article publié pour le moment.
                         </td>
                       </tr>
                     )}
                     {articles.map((a) => (
-                      <tr key={a.id} className="hover:bg-slate-50/70 transition-colors align-top">
+                      <tr key={a.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors align-top">
                         <td className="py-3 px-4 max-w-[320px]">
-                          <strong className="text-slate-900 block truncate">{a.title}</strong>
-                          <span className="text-[10px] text-slate-400 font-mono truncate block">
+                          <strong className="text-[var(--color-fc-black)] block truncate">{a.title}</strong>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)] font-mono truncate block">
                             /actualites/{a.slug}
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold text-[10px]">
                             {a.category}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">{a.author}</td>
-                        <td className="py-3 px-4 text-slate-500">{a.readTime}</td>
-                        <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{a.publishedAt}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.author}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.readTime}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] whitespace-nowrap">{a.publishedAt}</td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               href={`/actualites/${a.slug}`}
                               target="_blank"
-                              className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                             >
                               Voir
                             </Link>
                             <button
                               onClick={() => openArticleEditor(a)}
-                              className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition-colors"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] px-2 py-1 rounded-lg transition-colors"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                               Modifier
@@ -1578,20 +1675,106 @@ export function AdminPortal({
           </div>
         )}
 
+        {/* TAB PROJETS ÉTUDIANTS */}
+        {activeTab === "projects" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Projets des étudiants validés</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
+                  Seuls les étudiants confirmés par l’administration peuvent être associés à un projet publié.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setProjectForm((current) => ({
+                    ...current,
+                    studentId: String(validatedStudents[0]?.id || ""),
+                  }));
+                  setProjectModalOpen(true);
+                }}
+                disabled={validatedStudents.length === 0}
+                className="flex items-center gap-2 self-start rounded-xl bg-[var(--color-fc-deep)] px-5 py-2.5 text-xs font-bold text-white  hover:bg-[var(--color-fc-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Nouveau projet</span>
+              </button>
+            </div>
+
+            {validatedStudents.length === 0 && (
+              <p className="rounded-xl border border-[var(--color-fc-primary)]/20 bg-[var(--color-fc-surface)] p-4 text-xs text-[var(--color-fc-black)]">
+                Validez d’abord un dossier étudiant pour pouvoir lui associer un projet.
+              </p>
+            )}
+
+            <div className="overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white ">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] text-[11px] font-bold uppercase tracking-wider text-[var(--color-fc-gray-mid)]">
+                    <tr>
+                      <th className="px-4 py-3">Projet</th>
+                      <th className="px-4 py-3">Étudiant</th>
+                      <th className="px-4 py-3">Formation</th>
+                      <th className="px-4 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
+                    {projects.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
+                          Aucun projet publié pour le moment.
+                        </td>
+                      </tr>
+                    )}
+                    {projects.map((project) => (
+                      <tr key={project.id} className="align-top hover:bg-[var(--color-fc-bg)]/70">
+                        <td className="max-w-[320px] px-4 py-3">
+                          <strong className="block truncate text-[var(--color-fc-black)]">{project.title}</strong>
+                          <span className="block truncate text-[10px] text-[var(--color-fc-gray-mid)]">{project.tagline}</span>
+                        </td>
+                        <td className="px-4 py-3 text-[var(--color-fc-black)]">
+                          {project.studentName || "Étudiant supprimé"}
+                          {project.studentNumber && (
+                            <span className="mt-1 block font-mono text-[10px] text-[var(--color-fc-gray-mid)]">
+                              {project.studentNumber}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-[var(--color-fc-gray-mid)]">{project.formationTitle}</td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProject(project)}
+                            className="inline-flex items-center gap-1 rounded-lg bg-rose-50 px-2 py-1 text-xs font-bold text-rose-600 hover:bg-rose-100"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Supprimer
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* TAB PARTENARIATS */}
         {activeTab === "partenariats" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Demandes de Partenariat Entreprises</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Demandes de Partenariat Entreprises</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Propositions de partenariat reçues depuis l&apos;espace entreprises : stages, recrutement, coaching, certification.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Entreprise</th>
                       <th className="py-3 px-4">Contact</th>
@@ -1601,34 +1784,34 @@ export function AdminPortal({
                       <th className="py-3 px-4">Statut</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {partnerships.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-slate-400">
+                        <td colSpan={6} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
                           Aucune demande de partenariat pour le moment.
                         </td>
                       </tr>
                     )}
                     {partnerships.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50/70 transition-colors align-top">
+                      <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors align-top">
                         <td className="py-3 px-4">
-                          <strong className="text-slate-900 block">{p.companyName}</strong>
-                          <span className="text-[10px] text-slate-400">N° {p.id}</span>
+                          <strong className="text-[var(--color-fc-black)] block">{p.companyName}</strong>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)]">N° {p.id}</span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
-                          <div className="font-semibold text-slate-900">{p.contactName}</div>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
+                          <div className="font-semibold text-[var(--color-fc-black)]">{p.contactName}</div>
                           <div className="text-[11px]">{p.email}</div>
                           <div className="text-[11px]">{p.phone}</div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold text-[10px]">
                             {p.partnershipType}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600 max-w-[260px]">
-                          {p.message || <span className="text-slate-300">—</span>}
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] max-w-[260px]">
+                          {p.message || <span className="text-white/60">—</span>}
                         </td>
-                        <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] whitespace-nowrap">
                           {new Date(p.createdAt).toLocaleDateString("fr-FR", {
                             day: "2-digit",
                             month: "short",
@@ -1641,9 +1824,9 @@ export function AdminPortal({
                             onChange={(e) => handlePartnerStatusChange(p.id, e.target.value)}
                             className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${
                               p.status === "nouveau"
-                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                ? "bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] border-[var(--color-fc-primary)]/20"
                                 : p.status === "contacte"
-                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                ? "bg-[var(--color-fc-surface)] text-blue-700 border-[var(--color-fc-primary)]/20"
                                 : "bg-emerald-50 text-emerald-700 border-emerald-200"
                             }`}
                           >
@@ -1664,9 +1847,9 @@ export function AdminPortal({
         {/* 28. TAB ROLES ET ACCÈS */}
         {activeTab === "roles" && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-              <h2 className="text-xl font-bold text-slate-900">Matrice des Rôles et Autorisations</h2>
-              <p className="text-xs text-slate-500">
+            <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-4">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Matrice des Rôles et Autorisations</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Chaque profil administratif dispose de droits spécifiques pour garantir la sécurité et la traçabilité des opérations.
               </p>
 
@@ -1677,11 +1860,11 @@ export function AdminPortal({
                       SA
                     </span>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Super Administrateur</h4>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Super Administrateur</h4>
                       <span className="text-[10px] font-semibold text-[var(--color-fc-primary)]">Direction Générale</span>
                     </div>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
                     <li>✓ Accès total à la plateforme</li>
                     <li>✓ Gestion financière et audits</li>
                     <li>✓ Modification des formations et tarifs</li>
@@ -1695,11 +1878,11 @@ export function AdminPortal({
                       CF
                     </span>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Caissier / Financier</h4>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Caissier / Financier</h4>
                       <span className="text-[10px] text-emerald-700 font-semibold">Service Comptabilité</span>
                     </div>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
                     <li>✓ Enregistrement des paiements physiques</li>
                     <li>✓ Génération immédiate des reçus certifiés</li>
                     <li>✓ Suivi des retards d&apos;échéances</li>
@@ -1707,17 +1890,17 @@ export function AdminPortal({
                   </ul>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-blue-50/60 border border-blue-200 space-y-3">
+                <div className="p-5 rounded-2xl bg-[var(--color-fc-surface)]/60 border border-[var(--color-fc-primary)]/20 space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                    <span className="w-8 h-8 rounded-lg bg-[var(--color-fc-deep)] text-white flex items-center justify-center font-bold text-xs">
                       AG
                     </span>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Agent Administratif</h4>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Agent Administratif</h4>
                       <span className="text-[10px] text-blue-700 font-semibold">Service Scolarité</span>
                     </div>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
                     <li>✓ Enregistrement des candidats physiques</li>
                     <li>✓ Édition des attestations de scolarité</li>
                     <li>✓ Mise à jour des coordonnées des étudiants</li>
@@ -1732,16 +1915,16 @@ export function AdminPortal({
 
       {/* MODAL: ENREGISTRER UN PAIEMENT PHYSIQUE (CAISSE) */}
       {showManualPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-md w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
                 <span>Encaisser un versement étudiant</span>
               </h3>
               <button
                 onClick={() => setShowManualPaymentModal(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -1749,11 +1932,11 @@ export function AdminPortal({
 
             <form onSubmit={handleRecordPayment} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Étudiant concerné *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Étudiant concerné *</label>
                 <select
                   value={manualPayStudentId}
                   onChange={(e) => setManualPayStudentId(Number(e.target.value))}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                 >
                   {students.map((st) => (
                     <option key={st.id} value={st.id}>
@@ -1764,21 +1947,21 @@ export function AdminPortal({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Montant encaissé (FCFA) *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Montant encaissé (FCFA) *</label>
                 <input
                   type="number"
                   value={manualPayAmount}
                   onChange={(e) => setManualPayAmount(Number(e.target.value))}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-sm"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] font-bold text-sm"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Mode de versement *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Mode de versement *</label>
                 <select
                   value={manualPayMethod}
                   onChange={(e) => setManualPayMethod(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                 >
                   <option value="Caisse / Espèces">Caisse / Espèces (Guichet)</option>
                   <option value="MTN Mobile Money">MTN Mobile Money (Direct marchand)</option>
@@ -1788,12 +1971,12 @@ export function AdminPortal({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Notes / Réf reçu physique</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Notes / Réf reçu physique</label>
                 <input
                   type="text"
                   value={manualPayNotes}
                   onChange={(e) => setManualPayNotes(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)]"
                 />
               </div>
 
@@ -1813,16 +1996,16 @@ export function AdminPortal({
 
       {/* MODAL: NOUVEL ÉTUDIANT MANUEL */}
       {showNewStudentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-lg w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <Users className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 <span>Inscrire un étudiant au guichet physique</span>
               </h3>
               <button
                 onClick={() => setShowNewStudentModal(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -1831,7 +2014,7 @@ export function AdminPortal({
             <form onSubmit={handleCreateStudent} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Nom *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nom *</label>
                   <input
                     type="text"
                     required
@@ -1839,11 +2022,11 @@ export function AdminPortal({
                     onChange={(e) =>
                       setNewStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Prénom *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Prénom *</label>
                   <input
                     type="text"
                     required
@@ -1851,14 +2034,14 @@ export function AdminPortal({
                     onChange={(e) =>
                       setNewStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Téléphone *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Téléphone *</label>
                   <input
                     type="text"
                     required
@@ -1867,11 +2050,11 @@ export function AdminPortal({
                     onChange={(e) =>
                       setNewStudentForm((prev) => ({ ...prev, phone: e.target.value }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Email *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Email *</label>
                   <input
                     type="email"
                     required
@@ -1879,19 +2062,19 @@ export function AdminPortal({
                     onChange={(e) =>
                       setNewStudentForm((prev) => ({ ...prev, email: e.target.value }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Formation choisie *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Formation choisie *</label>
                 <select
                   value={newStudentForm.formationId}
                   onChange={(e) =>
                     setNewStudentForm((prev) => ({ ...prev, formationId: Number(e.target.value) }))
                   }
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                 >
                   {formations.map((f) => (
                     <option key={f.id} value={f.id}>
@@ -1905,7 +2088,7 @@ export function AdminPortal({
                 <button
                   type="submit"
                   disabled={isCreatingStudent}
-                  className="w-full py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all disabled:opacity-50"
+                  className="w-full py-3 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-md transition-all disabled:opacity-50"
                 >
                   {isCreatingStudent ? "Création en cours..." : "Créer le dossier et générer le matricule FC-2025-..."}
                 </button>
@@ -1917,18 +2100,18 @@ export function AdminPortal({
 
       {/* MODAL: CHANGER LE STATUT D'UN ÉTUDIANT */}
       {selectedStudentForStatus && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
-            <h3 className="text-base font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-sm w-full p-6  space-y-4 animate-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-[var(--color-fc-black)]">
               Modifier le statut de {selectedStudentForStatus.firstName} {selectedStudentForStatus.lastName}
             </h3>
 
             <div className="space-y-2 text-xs">
-              <label className="block font-semibold text-slate-600">Nouveau statut :</label>
+              <label className="block font-semibold text-[var(--color-fc-gray-mid)]">Nouveau statut :</label>
               <select
                 value={newStatusValue}
                 onChange={(e) => setNewStatusValue(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-medium"
+                className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white font-medium"
               >
                 <option value="preinscrit">Préinscrit (en attente de validation)</option>
                 <option value="rejete">Rejeté</option>
@@ -1942,13 +2125,13 @@ export function AdminPortal({
             <div className="pt-2 flex gap-2">
               <button
                 onClick={handleUpdateStatus}
-                className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700"
+                className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]"
               >
                 Mettre à jour
               </button>
               <button
                 onClick={() => setSelectedStudentForStatus(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
               >
                 Annuler
               </button>
@@ -1958,8 +2141,8 @@ export function AdminPortal({
       )}
 
       {validationTarget && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-sm w-full p-6  space-y-4 animate-in zoom-in-95 duration-200">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto ${
               validationAction === "validate" ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
             }`}>
@@ -1969,19 +2152,19 @@ export function AdminPortal({
                 <AlertTriangle className="w-6 h-6" />
               )}
             </div>
-            <h3 className="text-base font-bold text-slate-900 text-center">
+            <h3 className="text-base font-bold text-[var(--color-fc-black)] text-center">
               {validationAction === "validate"
                 ? `Valider ${validationTarget.firstName} ${validationTarget.lastName} ?`
                 : `Rejeter le dossier de ${validationTarget.firstName} ${validationTarget.lastName} ?`}
             </h3>
-            <p className="text-xs text-slate-500 text-center leading-relaxed">
+            <p className="text-xs text-[var(--color-fc-gray-mid)] text-center leading-relaxed">
               {validationAction === "validate"
                 ? "Le compte sera activé, une notification sera envoyée à l'étudiant et son profil apparaîtra sur la page Entreprises."
                 : "Le compte restera fermé et l'étudiant sera notifié de la décision."}
             </p>
 
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-slate-600">
+              <label className="block text-xs font-semibold text-[var(--color-fc-gray-mid)]">
                 Note pour l&apos;étudiant {validationAction === "validate" ? "(optionnel)" : ""}
               </label>
               <textarea
@@ -1989,7 +2172,7 @@ export function AdminPortal({
                 onChange={(e) => setValidationNote(e.target.value)}
                 rows={3}
                 placeholder={validationAction === "reject" ? "Précisez la raison du rejet (ex : dossier incomplet)..." : "Ajoutez un message de bienvenue..."}
-                className="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs"
+                className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs"
               />
             </div>
 
@@ -2005,7 +2188,7 @@ export function AdminPortal({
               </button>
               <button
                 onClick={() => setValidationTarget(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
               >
                 Annuler
               </button>
@@ -2016,16 +2199,16 @@ export function AdminPortal({
 
       {/* MODAL: MODIFIER UNE FORMATION */}
       {editingFormation && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-lg w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 <span>Modifier « {editingFormation.title} »</span>
               </h3>
               <button
                 onClick={() => setEditingFormation(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -2034,42 +2217,42 @@ export function AdminPortal({
             <form onSubmit={handleSaveFormation} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Titre *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Titre *</label>
                   <input
                     type="text"
                     required
                     value={formationForm.title}
                     onChange={(e) => setFormationForm((p) => ({ ...p, title: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Durée *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Durée *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ex : 9 mois"
                     value={formationForm.duration}
                     onChange={(e) => setFormationForm((p) => ({ ...p, duration: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Prix total (FCFA) *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Prix total (FCFA) *</label>
                   <input
                     type="number"
                     required
                     min={0}
                     value={formationForm.price}
                     onChange={(e) => setFormationForm((p) => ({ ...p, price: Number(e.target.value) }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Frais dossier (FCFA) *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Frais dossier (FCFA) *</label>
                   <input
                     type="number"
                     required
@@ -2078,14 +2261,14 @@ export function AdminPortal({
                     onChange={(e) =>
                       setFormationForm((p) => ({ ...p, registrationFee: Number(e.target.value) }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Nb mensualités</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nb mensualités</label>
                   <input
                     type="number"
                     min={1}
@@ -2093,15 +2276,15 @@ export function AdminPortal({
                     onChange={(e) =>
                       setFormationForm((p) => ({ ...p, installmentsCount: Number(e.target.value) }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Mode</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Mode</label>
                   <select
                     value={formationForm.mode}
                     onChange={(e) => setFormationForm((p) => ({ ...p, mode: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-white"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                   >
                     <option value="Présentiel & Hybride">Présentiel & Hybride</option>
                     <option value="En ligne">En ligne</option>
@@ -2111,31 +2294,31 @@ export function AdminPortal({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Campus</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Campus</label>
                 <input
                   type="text"
                   value={formationForm.campus}
                   onChange={(e) => setFormationForm((p) => ({ ...p, campus: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                 />
               </div>
 
               <div className="flex items-center gap-6 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[var(--color-fc-black)]">
                   <input
                     type="checkbox"
                     checked={formationForm.isActive}
                     onChange={(e) => setFormationForm((p) => ({ ...p, isActive: e.target.checked }))}
-                    className="w-4 h-4 rounded border-slate-300"
+                    className="w-4 h-4 rounded border-[var(--color-fc-gray-light)]"
                   />
                   Active
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[var(--color-fc-black)]">
                   <input
                     type="checkbox"
                     checked={formationForm.isPopular}
                     onChange={(e) => setFormationForm((p) => ({ ...p, isPopular: e.target.checked }))}
-                    className="w-4 h-4 rounded border-slate-300"
+                    className="w-4 h-4 rounded border-[var(--color-fc-gray-light)]"
                   />
                   Populaire
                 </label>
@@ -2145,14 +2328,145 @@ export function AdminPortal({
                 <button
                   type="submit"
                   disabled={isSavingFormation}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] disabled:opacity-50 transition-all"
                 >
                   {isSavingFormation ? "Enregistrement…" : "Enregistrer les modifications"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingFormation(null)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: NOUVEAU PROJET ÉTUDIANT */}
+      {projectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-fc-deep)]/60 p-4 backdrop-blur-xs">
+          <div className="max-h-[90vh] w-full max-w-2xl space-y-5 overflow-y-auto rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6  sm:p-8">
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-base font-bold text-[var(--color-fc-black)]">
+                <FolderGit2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
+                Nouveau projet étudiant
+              </h3>
+              <button
+                type="button"
+                onClick={() => setProjectModalOpen(false)}
+                className="font-bold text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)]"
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProject} className="space-y-3 text-xs">
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Étudiant confirmé *
+                <select
+                  required
+                  value={projectForm.studentId}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, studentId: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                >
+                  {validatedStudents.map((student) => (
+                    <option key={student.id} value={student.id}>
+                      {student.firstName} {student.lastName} — {student.studentNumber}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Titre du projet *
+                <input
+                  required
+                  value={projectForm.title}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, title: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Résumé *
+                <input
+                  required
+                  value={projectForm.tagline}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, tagline: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Description *
+                <textarea
+                  required
+                  rows={4}
+                  value={projectForm.description}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, description: e.target.value }))}
+                  className="mt-1 w-full resize-y rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Image (URL HTTPS ou chemin /images/) *
+                <input
+                  required
+                  value={projectForm.coverImage}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, coverImage: e.target.value }))}
+                  placeholder="https://… ou /images/…"
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2 font-mono"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Technologies (séparées par des virgules) *
+                <input
+                  required
+                  value={projectForm.technologies}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, technologies: e.target.value }))}
+                  placeholder="React, TypeScript, PostgreSQL"
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block font-bold text-[var(--color-fc-black)]">
+                  Lien du projet
+                  <input
+                    type="url"
+                    value={projectForm.projectUrl}
+                    onChange={(e) => setProjectForm((current) => ({ ...current, projectUrl: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                  />
+                </label>
+                <label className="block font-bold text-[var(--color-fc-black)]">
+                  Lien GitHub
+                  <input
+                    type="url"
+                    value={projectForm.githubUrl}
+                    onChange={(e) => setProjectForm((current) => ({ ...current, githubUrl: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                  />
+                </label>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="submit"
+                  disabled={isSavingProject || validatedStudents.length === 0}
+                  className="flex-1 rounded-xl bg-[var(--color-fc-deep)] py-2.5 text-xs font-bold text-white transition-all hover:bg-[var(--color-fc-primary)] disabled:opacity-50"
+                >
+                  {isSavingProject ? "Enregistrement…" : "Publier le projet"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectModalOpen(false)}
+                  className="rounded-xl bg-[var(--color-fc-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--color-fc-gray-mid)] hover:bg-[var(--color-fc-gray-light)]"
                 >
                   Annuler
                 </button>
@@ -2164,16 +2478,16 @@ export function AdminPortal({
 
       {/* MODAL: CRÉER / MODIFIER UN ARTICLE */}
       {articleModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-2xl w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 <span>{editingArticle ? "Modifier l'article" : "Nouvel article de blog"}</span>
               </h3>
               <button
                 onClick={() => setArticleModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -2182,89 +2496,89 @@ export function AdminPortal({
             <form onSubmit={handleSaveArticle} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block font-bold text-slate-700 mb-1">Titre *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Titre *</label>
                   <input
                     type="text"
                     required
                     value={articleForm.title}
                     onChange={(e) => setArticleForm((p) => ({ ...p, title: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Slug (URL)</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Slug (URL)</label>
                   <input
                     type="text"
                     placeholder="auto-généré depuis le titre si vide"
                     value={articleForm.slug}
                     onChange={(e) => setArticleForm((p) => ({ ...p, slug: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200 font-mono"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Catégorie *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Catégorie *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ex : Événements"
                     value={articleForm.category}
                     onChange={(e) => setArticleForm((p) => ({ ...p, category: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">Extrait court *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Extrait court *</label>
                 <textarea
                   required
                   rows={2}
                   value={articleForm.excerpt}
                   onChange={(e) => setArticleForm((p) => ({ ...p, excerpt: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200 resize-none"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] resize-none"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">Contenu complet (HTML/markdown libre) *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Contenu complet (HTML/markdown libre) *</label>
                 <textarea
                   required
                   rows={6}
                   value={articleForm.content}
                   onChange={(e) => setArticleForm((p) => ({ ...p, content: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200 resize-y font-mono text-[11px]"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] resize-y font-mono text-[11px]"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">URL image de couverture *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">URL image de couverture *</label>
                 <input
                   type="url"
                   required
                   placeholder="https://images.pexels.com/..."
                   value={articleForm.coverImage}
                   onChange={(e) => setArticleForm((p) => ({ ...p, coverImage: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200 font-mono text-[11px]"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] font-mono text-[11px]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Auteur</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Auteur</label>
                   <input
                     type="text"
                     value={articleForm.author}
                     onChange={(e) => setArticleForm((p) => ({ ...p, author: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Temps de lecture</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Temps de lecture</label>
                   <input
                     type="text"
                     value={articleForm.readTime}
                     onChange={(e) => setArticleForm((p) => ({ ...p, readTime: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
@@ -2272,14 +2586,14 @@ export function AdminPortal({
               <div className="pt-2 flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] transition-all"
                 >
                   {editingArticle ? "Enregistrer les modifications" : "Publier l'article"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setArticleModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
                 >
                   Annuler
                 </button>

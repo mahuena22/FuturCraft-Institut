@@ -2,30 +2,34 @@ import Image from "next/image";
 import Link from "next/link";
 import {
     ArrowRight,
-    CheckCircle2,
+    ArrowUpRight,
+    BookOpen,
+    Briefcase,
     GraduationCap,
     MapPin,
-    Play,
-    Rocket,
+
+    Quote,
+    Sparkles,
+    Target,
     Users,
 } from "lucide-react";
 import { getFormations } from "@/lib/data-service";
 import { Reveal } from "@/components/Reveal";
 import { StatCounter } from "@/components/StatCounter";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { SectionHeading } from "@/components/SectionHeading";
 import { formatTrainingPrice } from "@/lib/format-training-price";
 
 const formatPrice = (price: number) =>
     new Intl.NumberFormat("fr-FR").format(price).replace(/\u202f/g, " ");
 
 const partnerCompanies = [
-    "FuturCraft Institut et Programme Futur",
-    "Startups tech béninoises",
-    "Agences de développement web/mobile",
+    "Entreprises de Cotonou",
+    "Startups tech locales",
+    "Agences web et mobile",
     "Cabinets marketing digital",
-    "Imprimeries / ateliers de sérigraphie",
-    "Sociétés de maintenance informatique à Cotonou",
-    "Sociétés de maintenance informatique à Abomey-Calavi",
+    "Ateliers de sérigraphie",
+    "Sociétés de maintenance informatique",
 ];
 
 const testimonials = [
@@ -34,73 +38,76 @@ const testimonials = [
         role: "Prompt Engineer",
         avatar: "/images/carmel.jpg",
         quote:
-            "Grâce à FuturCraft Institut, j'ai ma sœur qui a pu acquérir des compétences concrètes et trouver un emploi rapidement. Les formateurs sont passionnés et toujours à l'écoute.",
+            "J'ai commencé sans rien connaître au code. Aujourd'hui je bosse sur des prompts et des workflows IA pour une boîte à Cotonou. Le plus dur, c'était les premières semaines, mais les mentors ne lâchent pas.",
     },
     {
         name: "Président DJANGOUN",
-        role: "Entrepreneur digital / Étudiant",
+        role: "Entrepreneur digital",
         avatar: "/images/president.jpg",
         quote:
-            "FuturCraft offre un cadre dynamique, une pédagogie axée sur la pratique et un accompagnement qui fait vraiment la différence dans le parcours des apprenants.",
+            "Ce qui m'a plu, c'est qu'on ne fait pas que de la théorie. On monte des projets, on se plante, on recommence. C'est ça qui prépare au vrai travail.",
     },
     {
-        name: "Onesim Graça Ema-Ayé ",
+        name: "Onesim Graça Ema-Ayé",
         role: "Développeur web",
         avatar: "/images/wiliam.jpg",
         quote:
-            "Les projets concrets m'ont permis de progresser rapidement et de prendre confiance. J'ai appris à travailler comme dans une véritable équipe produit.",
+            "Au début je pensais que le web c'était juste du HTML. J'ai découvert les APIs, les bases de données, le déploiement. Le stage de fin de formation m'a permis de décrocher un CDD.",
     },
     {
         name: "Pacome ASSOGBA",
-        role: "Photographie, Cadrage et Montage Vidéo",
+        role: "Photographie et montage vidéo",
         avatar: "/images/houessinon.jpg",
         quote:
-            "Une formation accessible et exigeante, portée par des intervenants toujours disponibles. Chaque cours nous rapproche un peu plus du monde professionnel.",
+            "Les cours se font souvent le soir et le samedi, donc j'ai pu continuer à travailler en journée. Les formateurs sont disponibles sur WhatsApp, ça aide vraiment.",
     },
     {
         name: "Ange AKONDE",
         role: "Développeur web Full-stack",
         avatar: "/images/nicodem.jpg",
         quote:
-            "J'ai trouvé à FuturCraft une communauté motivée et les outils nécessaires pour transformer mes idées en compétences et résultats concrets.",
+            "Le projet de fin de cohorte, c'était un vrai site pour un client réel. Stressant, mais c'est ce qui m'a donné confiance pour les entretiens.",
     },
     {
         name: "Cédric Magloire AKOFODJI",
         role: "Consultant numérique",
         avatar: "/images/cedric.jpg",
         quote:
-            "La force de l'institut est son approche par la pratique. On apprend, on teste et on construit avec des objectifs professionnels clairs dès le premier mois.",
+            "Je ne suis pas devenu expert en 6 mois, mais j'ai acquis des bases solides et un réseau. Les contacts avec les entreprises partenaires ont été utiles pour la suite.",
     },
     {
         name: "Léa AHOUANSE",
         role: "Étudiante",
         avatar: "/images/Lea-Ahouanse.jpg",
         quote:
-            "Une expérience immersive et encadrante. À FuturCraft, chaque module débouche sur une réalisation concrète qui renforce confiance et employabilité.",
+            "Les cours sont exigeants et il faut être régulier. Ce n'est pas une promenade, mais on en sort avec quelque chose de concret dans les mains.",
     },
 ];
 
 const instructors = [
     {
         name: "Prosper SOSSOU",
-        role: "Intervenant Référent en Développement Web & Technologies Fullstack",
+        role: "Développement Web",
     },
     {
         name: "Herman HOUNKPE",
-        role: "Intervenant Spécialiste en Marketing Digital & Stratégie d'Acquisition",
+        role: "Marketing Digital",
     },
     {
         name: "Gauthier DOSSOU",
-        role: "Intervenant en Design Graphique, Direction Artistique & Communication",
+        role: "Design Graphique",
     },
 ];
 
 export default async function HomePage() {
     const formations = await getFormations();
+    const featured = formations.filter((f) => f.isActive).slice(0, 3);
+    const activeFormations = formations.filter((f) => f.isActive);
 
     return (
         <div className="overflow-hidden bg-[var(--color-fc-bg)]">
-            <section className="relative isolate overflow-hidden bg-[var(--color-fc-deep)] text-white">
+            {/* ── HERO ── */}
+            <section className="relative isolate overflow-hidden bg-[#06122f] text-white">
                 <Image
                     src="/images/hero-bg.jpg"
                     alt="Étudiants en formation numérique à FuturCraft"
@@ -109,144 +116,100 @@ export default async function HomePage() {
                     sizes="100vw"
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                    className="object-cover object-center opacity-35"
+                    className="object-cover object-center opacity-25"
                 />
-                <div className="absolute inset-0 bg-grid-dark opacity-30" />
-                <div className="hero-orb hero-orb-one" />
-                <div className="hero-orb hero-orb-two" />
+                <div className="absolute inset-0 bg-[#06122f]/80" />
 
-                <div className="relative mx-auto flex min-h-[650px] max-w-[84rem] items-center px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
-                    <div className="grid w-full items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-                        <div className="max-w-2xl">
-                            <span className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-white/85 backdrop-blur-sm sm:text-xs">
-                                <span className="h-2 w-2 rounded-full bg-[var(--color-fc-cyan)] shadow-[0_0_14px_rgba(24,152,186,0.8)]" />
-                                Institut numérique · Godomey, Bénin
+                <div className="relative mx-auto grid min-h-[88vh] max-w-[84rem] items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-10 lg:py-28">
+                    <div>
+                        <h1 className="animate-fade-up font-display text-5xl font-extrabold leading-[0.95] tracking-[-0.06em] sm:text-6xl lg:text-[5.25rem]">
+                            Apprends un métier.
+                            <span className="mt-1 block text-[var(--color-fc-cyan)]">
+                                Construis ta place.
                             </span>
-                            <h1 className="animate-fade-up mt-6 font-display text-5xl font-extrabold leading-[0.99] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-                                Ton avenir
-                                <span className="block text-[var(--color-fc-cyan)]">
-                                    se construit ici.
-                                </span>
-                            </h1>
-                            <p className="animate-fade-up delay-200 mt-7 max-w-xl text-base leading-8 text-white/75 sm:text-lg">
-                                Forme-toi aux métiers les plus demandés du
-                                numérique avec des projets concrets, des mentors
-                                passionnés et une communauté qui avance avec
-                                toi.
-                            </p>
-                            <div className="animate-fade-up delay-300 mt-9 flex flex-col gap-3 sm:flex-row">
-                                <Link
-                                    href="/inscription"
-                                    className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-extrabold text-[var(--color-fc-deep)] shadow-xl shadow-black/15 transition-all hover:-translate-y-1 hover:bg-white"
-                                >
-                                    S&apos;inscrire
-                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                </Link>
-                                <Link
-                                    href="/formations"
-                                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-bold text-white transition-all hover:-translate-y-1 hover:bg-white/10"
-                                >
-                                    <Play className="h-4 w-4 fill-current text-[var(--color-fc-cyan)]" />
-                                    Découvrir les formations
-                                </Link>
+                        </h1>
+                        <p className="animate-fade-up delay-200 mt-8 max-w-xl text-base leading-8 text-white/72 sm:text-lg">
+                            Des formations pratiques en développement, IA, design, audiovisuel et métiers du digital. On apprend en faisant, avec des projets réels et un accompagnement de proximité.
+                        </p>
+                        <div className="animate-fade-up delay-300 mt-10 flex flex-col gap-3 sm:flex-row">
+                            <Link
+                                href="/inscription"
+                                className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-fc-cyan)] px-7 py-4 text-sm font-extrabold text-[#06122f] shadow-[0_20px_40px_-12px_rgba(20,163,199,0.45)] transition-all hover:-translate-y-0.5 hover:bg-white"
+                            >
+                                Candidater maintenant
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </Link>
+                            <Link
+                                href="/formations"
+                                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/[0.04] px-7 py-4 text-sm font-bold text-white backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/10"
+                            >
+                                Explorer les formations
+                                <ArrowUpRight className="h-4 w-4 text-[var(--color-fc-cyan)]" />
+                            </Link>
+                        </div>
+                        <div className="animate-fade-up delay-400 mt-12 flex flex-wrap gap-x-8 gap-y-4 border-t border-white/10 pt-8 text-sm text-white/65">
+                            <div className="flex items-center gap-3">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/8 text-[var(--color-fc-cyan)]"><BookOpen className="h-4 w-4" /></span>
+                                <span><strong className="block text-white">12 formations</strong>métiers du numérique</span>
                             </div>
-                            <div className="animate-fade-up delay-400 mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-white/70">
-                                <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
-                                    Projets réels
-                                </span>
-                                <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
-                                    Certifications professionnelles
-                                </span>
-                                <span className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[var(--color-fc-cyan)]" />
-                                    Accompagnement emploi
-                                </span>
+                            <div className="flex items-center gap-3">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/8 text-[var(--color-fc-cyan)]"><Target className="h-4 w-4" /></span>
+                                <span><strong className="block text-white">Pratique d&apos;abord</strong>projets & ateliers</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="relative hidden min-h-[470px] lg:block">
-                            <div className="absolute right-0 top-12 h-80 w-80 rounded-full bg-[var(--color-fc-cyan)]/15 blur-3xl" />
-                            <div className="absolute right-12 top-6 h-[390px] w-[min(100%,390px)] rounded-[2rem] border border-white/20 bg-white/10 shadow-2xl backdrop-blur-sm" />
-                            <div className="absolute right-0 top-0 h-[390px] w-[min(100%,390px)] overflow-hidden rounded-[2rem] border border-white/20 shadow-2xl shadow-black/30">
-                                <Image
-                                    src="/images/hero-bg.jpg"
-                                    alt=""
-                                    fill
-                                    sizes="(max-width: 1280px) 40vw, 390px"
-                                    className="object-cover object-center"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                <div className="absolute bottom-0 left-0 right-0 p-7">
-                                    <div className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-white/75">
-                                        <span className="h-2 w-2 rounded-full bg-[var(--color-fc-cyan)]" />
-                                        Apprentissage par la pratique
+                    <div className="relative hidden lg:block">
+                        <div className="absolute -inset-4 rounded-[2.5rem] border border-white/10" />
+                        <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/5 shadow-2xl shadow-black/30">
+                            <Image
+                                src="/images/hero-bg.jpg"
+                                alt="Atelier FuturCraft"
+                                width={900}
+                                height={1100}
+                                className="h-[520px] w-full object-cover"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-[#06122f]/35" />
+                            <div className="absolute bottom-0 left-0 right-0 p-6">
+                                <div className="rounded-2xl border border-white/15 bg-[#06122f]/80 p-5 backdrop-blur-md">
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">Prochaine étape</p>
+                                    <p className="mt-2 font-display text-xl font-bold">Rejoins une cohorte et travaille sur un vrai projet.</p>
+                                    <div className="mt-4 flex items-center gap-3 text-xs text-white/70">
+                                        <span className="rounded-full bg-white/10 px-3 py-1">Godomey</span>
+                                        <span className="rounded-full bg-white/10 px-3 py-1">Mentorat</span>
+                                        <span className="rounded-full bg-white/10 px-3 py-1">Portfolio</span>
                                     </div>
-                                    <p className="font-display text-3xl font-bold leading-tight">
-                                        Apprendre aujourd&apos;hui.
-                                        <br />
-                                        Construire demain.
-                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[var(--color-fc-bg)] to-transparent" />
             </section>
 
-            <section className="relative z-10 mx-auto -mt-2 max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="grid overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-white shadow-xl shadow-[var(--color-fc-deep)]/10 sm:grid-cols-3">
-                    {([
-                        {
-                            variant: "count" as const,
-                            target: 12,
-                            prefix: "",
-                            suffix: "+",
-                            label: "formations professionnalisantes",
-                            icon: GraduationCap,
-                        },
-                        {
-                            variant: "count" as const,
-                            target: 500,
-                            prefix: "",
-                            suffix: "+",
-                            label: "talents accompagnés",
-                            icon: Users,
-                        },
-                        {
-                            variant: "address" as const,
-                            icon: MapPin,
-                            label: "Godomey, Supermarché O Bénin Avant pk14",
-                        },
-                    ] as Array<
-                        | { variant: "count"; target: number; prefix?: string; suffix?: string; label: string; icon: typeof MapPin }
-                        | { variant: "address"; label: string; icon: typeof MapPin }
-                    >).map((item) => {
-                        const { icon: Icon, label } = item;
+            {/* ── PROOF BAR ── */}
+            <section className="relative z-10 mx-auto -mt-8 max-w-[84rem] px-4 sm:px-6 lg:px-10">
+                <div className="grid gap-px overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-gray-light)] shadow-[0_20px_60px_-20px_rgba(7,22,61,0.15)] sm:grid-cols-2 lg:grid-cols-4">
+                    {[
+                        { icon: GraduationCap, value: 12, suffix: "", label: "Formations pratiques", detail: "du web à l'IA" },
+                        { icon: Users, value: 500, suffix: "+", label: "Apprenants accompagnés", detail: "tous profils" },
+                        { icon: Briefcase, value: 20, suffix: "+", label: "Partenaires & entreprises", detail: "réseau local" },
+                        { icon: MapPin, value: null, suffix: "", label: "Campus à Godomey", detail: "Abomey-Calavi, Bénin" },
+                    ].map((item) => {
+                        const Icon = item.icon;
                         return (
-                            <div
-                                key={label}
-                                className="flex items-center gap-4 border-b border-[var(--color-fc-gray-light)]/50 p-6 last:border-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
-                                <div className="rounded-2xl bg-[var(--color-fc-primary)]/10 p-3 text-[var(--color-fc-primary)]">
-                                    <Icon className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    {item.variant === "address" ? (
-                                        <p className="font-display text-lg font-black leading-tight text-[var(--color-fc-black)]">
-                                            {label}
+                            <div key={item.label} className="bg-white p-6 sm:p-7">
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                                        <Icon className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">
+                                            {item.value !== null ? <StatCounter target={item.value} suffix={item.suffix} activeAt /> : "BJ"}
                                         </p>
-                                    ) : (
-                                        <>
-                                            <p className="font-display text-2xl font-black text-[var(--color-fc-black)]">
-                                                <StatCounter target={item.target} prefix={item.prefix} suffix={item.suffix} activeAt />
-                                            </p>
-                                            <p className="text-xs font-medium text-[var(--color-fc-gray-mid)]">
-                                                {label}
-                                            </p>
-                                        </>
-                                    )}
+                                        <p className="mt-0.5 text-sm font-semibold text-[var(--color-fc-black)]">{item.label}</p>
+                                        <p className="text-xs text-[var(--color-fc-gray-mid)]">{item.detail}</p>
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -254,70 +217,65 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-                    <div>
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
-                            Choisis ton terrain de jeu
-                        </p>
-                        <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
-                            Des compétences qui ouvrent des portes
-                        </h2>
-                        <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--color-fc-gray-mid)]">
-                            Un apprentissage pratique pour passer de l&apos;idée
-                            à l&apos;impact, accompagné par des experts du
-                            terrain.
-                        </p>
-                    </div>
+            {/* ── FORMATIONS ── */}
+            <section className="mx-auto max-w-[84rem] px-4 py-24 sm:px-6 lg:px-10 lg:py-28">
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                    <SectionHeading
+                        eyebrow="Formations"
+                        title={<>Des compétences qui comptent <span className="text-[var(--color-fc-primary)]">sur le terrain.</span></>}
+                        description="Choisis un parcours pratique, construis un portfolio et prépare-toi aux opportunités du numérique."
+                        align="left"
+                    />
                     <Link
                         href="/formations"
-                        className="group inline-flex items-center gap-2 text-sm font-extrabold text-[var(--color-fc-primary)] hover:text-[var(--color-fc-deep)]"
+                        className="group inline-flex shrink-0 items-center gap-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white px-5 py-3 text-sm font-bold text-[var(--color-fc-black)] transition-all hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]"
                     >
-                        Voir tout le catalogue
+                        Toutes les formations
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 </div>
-                <div className="mt-10 grid gap-5 md:grid-cols-3">
-                    {formations.slice(0, 3).map((formation, index) => (
+
+                <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {featured.map((formation, index) => (
                         <Reveal key={formation.id} delay={(index % 3) * 90} className="h-full">
                             <Link
                                 href={`/formation/${formation.slug}`}
-                                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-fc-primary)] hover:shadow-xl"
+                                className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-fc-primary)]/25 hover:shadow-[0_24px_60px_-20px_rgba(7,22,61,0.18)]"
                             >
-                                <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)]/30">
+                                <div className="relative aspect-[4/3] overflow-hidden bg-[var(--color-fc-gray-light)]/30">
                                     <Image
                                         src={formation.imageUrl}
                                         alt={formation.title}
                                         fill
-                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                                     />
-                                    <span className="absolute left-4 top-4 rounded-lg bg-[var(--color-fc-bg)]/95 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[var(--color-fc-primary)] shadow-sm">
-                                        {formation.category}
-                                    </span>
-                                    <span className="absolute bottom-4 right-4 rounded-lg bg-[var(--color-fc-deep)]/75 px-2.5 py-1 text-[11px] font-bold text-[var(--color-fc-bg)] backdrop-blur">
-                                        {formation.duration}
-                                    </span>
-                                </div>
-                                <div className="flex flex-1 flex-col p-5">
-                                    <div className="mb-2 flex items-start justify-between gap-3">
-                                        <h3 className="font-display text-lg font-bold leading-snug text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)]">
-                                            {formation.title}
-                                        </h3>
-                                        <span className="text-xs font-black text-[var(--color-fc-primary)]">
-                                            {index + 1}
+                                    <div className="absolute inset-0 bg-[#07163d]/20" />
+                                    <div className="absolute left-4 top-4 flex gap-2">
+                                        <span className="rounded-full bg-white/95 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--color-fc-primary)] shadow-sm backdrop-blur">
+                                            {formation.category}
                                         </span>
                                     </div>
-                                    <p className="line-clamp-2 text-xs leading-6 text-[var(--color-fc-gray-mid)]">
+                                </div>
+                                <div className="flex flex-1 flex-col p-6">
+                                    <div className="flex items-center gap-3 text-xs font-semibold text-[var(--color-fc-gray-mid)]">
+                                        <span>{formation.duration}</span>
+                                        <span className="h-1 w-1 rounded-full bg-[var(--color-fc-gray-light)]" />
+                                        <span>{formation.level || "Tous niveaux"}</span>
+                                    </div>
+                                    <h3 className="mt-3 font-display text-xl font-bold leading-snug tracking-tight text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)]">
+                                        {formation.title}
+                                    </h3>
+                                    <p className="mt-3 line-clamp-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
                                         {formation.shortDescription}
                                     </p>
-                                    <div className="mt-auto flex items-center justify-between border-t border-[var(--color-fc-gray-light)]/50 pt-4">
-                                        <span className="text-xs font-bold text-[var(--color-fc-gray-mid)]">
-                                            Dès {formatPrice(formation.price)} FCFA
-                                        </span>
-                                        <span className="inline-flex items-center text-xs font-extrabold text-[var(--color-fc-primary)]">
-                                            Découvrir{" "}
-                                            <ArrowRight className="ml-1 inline h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                                    <div className="mt-auto flex items-center justify-between pt-6">
+                                        <div>
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-fc-gray-mid)]">À partir de</p>
+                                            <p className="font-display text-lg font-extrabold text-[var(--color-fc-black)]">{formatPrice(formation.price)} <span className="text-sm font-bold text-[var(--color-fc-gray-mid)]">FCFA</span></p>
+                                        </div>
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-fc-gray-light)] text-[var(--color-fc-primary)] transition-all group-hover:border-[var(--color-fc-primary)] group-hover:bg-[var(--color-fc-primary)] group-hover:text-white">
+                                            <ArrowUpRight className="h-4 w-4" />
                                         </span>
                                     </div>
                                 </div>
@@ -327,64 +285,94 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
-                        Partenariats & réseau
-                    </p>
-                    <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
-                        Plus de 20+ entreprises partenaires
-                    </h2>
-                    <p className="mx-auto mt-4 max-w-3xl text-sm leading-7 text-[var(--color-fc-gray-mid)]">
-                        Le centre affiche des collaborations solides pour les stages,
-                        projets encadrés et recrutements de ses apprenants.
-                    </p>
-                </div>
-                <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    {partnerCompanies.map((company, index) => (
-                        <Reveal key={company} delay={(index % 4) * 70} className="h-full">
-                            <div className="h-full rounded-2xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-5 text-center text-sm font-semibold text-[var(--color-fc-gray-mid)] shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-fc-primary)] hover:shadow-lg">
-                                {company}
+            {/* ── WHY / METHOD ── */}
+            <section className="border-y border-[var(--color-fc-gray-light)] bg-white">
+                <div className="mx-auto grid max-w-[84rem] gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-10 lg:py-28 lg:gap-16">
+                    <div>
+                        <SectionHeading
+                            eyebrow="Notre approche"
+                            title={<>Pas juste des cours. <span className="text-[var(--color-fc-primary)]">Une vraie pratique.</span></>}
+                            description="On forme des personnes capables de produire, de s'adapter et de travailler en équipe. Chaque parcours est pensé pour te rapprocher du monde professionnel."
+                            align="left"
+                        />
+                        <div className="mt-10 space-y-5">
+                            {[
+                                { icon: Target, title: "Projets concrets", text: "Tu travailles sur des cas réels, pas seulement des exercices théoriques." },
+                                { icon: Users, title: "Mentors accessibles", text: "Des formateurs qui suivent ta progression et te challengent." },
+                                { icon: Sparkles, title: "Portfolio & confiance", text: "Tu sors avec des réalisations à montrer et des réflexes professionnels." },
+                            ].map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <div key={item.title} className="flex gap-4 rounded-2xl border border-transparent p-4 transition-colors hover:border-[var(--color-fc-gray-light)] hover:bg-[var(--color-fc-bg)]">
+                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                                            <Icon className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-display text-lg font-bold text-[var(--color-fc-black)]">{item.title}</h3>
+                                            <p className="mt-1 text-sm leading-7 text-[var(--color-fc-gray-mid)]">{item.text}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                    <div className="relative">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="rounded-[1.75rem] bg-[var(--color-fc-deep)] p-7 text-white sm:col-span-2">
+                                <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">Le parcours FuturCraft</p>
+                                <div className="mt-6 grid gap-6 sm:grid-cols-3">
+                                    {[
+                                        { n: "01", t: "Apprendre", d: "Les bases solides, avec la bonne méthode." },
+                                        { n: "02", t: "Pratiquer", d: "Des projets, des retours, des itérations." },
+                                        { n: "03", t: "Lancer", d: "Portfolio, stage, emploi ou projet perso." },
+                                    ].map((s) => (
+                                        <div key={s.n}>
+                                            <span className="font-display text-3xl font-black text-[var(--color-fc-cyan)]">{s.n}</span>
+                                            <h4 className="mt-2 font-display text-lg font-bold">{s.t}</h4>
+                                            <p className="mt-1 text-sm leading-6 text-white/65">{s.d}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </Reveal>
-                    ))}
-                </div>
-                <div className="mt-6 rounded-2xl border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-primary)]/8 p-5 text-center text-sm text-[var(--color-fc-gray-mid)]">
-                    <span className="font-bold text-[var(--color-fc-primary)]">FuturCraft Institut et Programme Futur  </span> font partie des programmes phares de notre écosystème de formation et d&apos;engagement numérique.
+                            <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-7">
+                                <p className="font-display text-4xl font-extrabold tracking-tight text-[var(--color-fc-primary)]">80%</p>
+                                <p className="mt-2 text-sm font-semibold text-[var(--color-fc-black)]">de pratique</p>
+                                <p className="mt-1 text-sm leading-6 text-[var(--color-fc-gray-mid)]">Ateliers, exercices, projets et mises en situation.</p>
+                            </div>
+                            <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-7">
+                                <p className="font-display text-4xl font-extrabold tracking-tight text-[var(--color-fc-primary)]">1:1</p>
+                                <p className="mt-2 text-sm font-semibold text-[var(--color-fc-black)]">suivi mentor</p>
+                                <p className="mt-1 text-sm leading-6 text-[var(--color-fc-gray-mid)]">Un accompagnement humain, pas un parcours impersonnel.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <section className="bg-[var(--color-fc-gray-light)]/30 py-24">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="text-center">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
-                            Témoignages
-                        </p>
-                        <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
-                            Des parcours qui inspirent, des réussites qui témoignent.
-                        </h2>
-                    </div>
-                    <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        {testimonials.map((item, index) => (
+            {/* ── TESTIMONIALS ── */}
+            <section className="bg-[var(--color-fc-bg)] py-24 lg:py-28">
+                <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
+                    <SectionHeading
+                        eyebrow="Témoignages"
+                        title={<>Ils ont appris. <span className="text-[var(--color-fc-primary)]">Ils construisent.</span></>}
+                        description="Des retours honnêtes d'apprenants qui ont suivi les formations FuturCraft."
+                    />
+                    <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {testimonials.slice(0, 6).map((item, index) => (
                             <Reveal key={item.name} delay={(index % 3) * 90} className="h-full">
-                                <article className="flex h-full flex-col rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                                    <p className="text-sm leading-7 text-[var(--color-fc-gray-mid)] italic">
-                                        &ldquo;{item.quote}&rdquo;
+                                <article className="group flex h-full flex-col rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_-20px_rgba(7,22,61,0.12)]">
+                                    <Quote className="h-8 w-8 text-[var(--color-fc-cyan)]/30" />
+                                    <p className="mt-4 flex-1 text-[15px] leading-7 text-[var(--color-fc-gray-mid)]">
+                                        {item.quote}
                                     </p>
-                                    <div className="mt-6 flex items-center gap-3 border-t border-[var(--color-fc-gray-light)]/50 pt-4">
+                                    <div className="mt-6 flex items-center gap-3 border-t border-[var(--color-fc-gray-light)] pt-5">
                                         {item.avatar && (
-                                            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-[var(--color-fc-primary)]/20">
-                                                <Image
-                                                    src={item.avatar}
-                                                    alt={item.name}
-                                                    fill
-                                                    sizes="44px"
-                                                    className="object-cover"
-                                                />
+                                            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-[var(--color-fc-gray-light)]">
+                                                <Image src={item.avatar} alt={item.name} fill sizes="48px" className="object-cover" />
                                             </div>
                                         )}
                                         <div>
-                                            <p className="font-bold text-[var(--color-fc-black)]">{item.name}</p>
+                                            <p className="font-display font-bold text-[var(--color-fc-black)]">{item.name}</p>
                                             <p className="text-xs text-[var(--color-fc-gray-mid)]">{item.role}</p>
                                         </div>
                                     </div>
@@ -395,95 +383,110 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
-                        Tarifs & durée
-                    </p>
-                    <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
-                        Formations et prix à l&apos;heure actuelle
-                    </h2>
-                </div>
-                <div className="mt-10 overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] shadow-sm">
-                    <div className="grid grid-cols-[2.2fr_1fr_1.1fr] border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-gray-light)]/30 text-left text-xs font-black uppercase tracking-[0.16em] text-[var(--color-fc-gray-mid)]">
-                        <div className="px-5 py-4">Formation</div>
-                        <div className="px-5 py-4">Durée</div>
-                        <div className="px-5 py-4">Tarif</div>
+            {/* ── PRICING OVERVIEW ── */}
+            <section className="border-y border-[var(--color-fc-gray-light)] bg-white py-24 lg:py-28">
+                <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
+                    <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+                        <div>
+                            <SectionHeading
+                                eyebrow="Tarifs"
+                                title={<>Un investissement clair, <span className="text-[var(--color-fc-primary)]">sans surprise.</span></>}
+                                description="Des tarifs accessibles avec des possibilités de paiement échelonné. Contacte-nous pour trouver la formule adaptée à ta situation."
+                                align="left"
+                            />
+                            <div className="mt-8 space-y-4">
+                                <div className="flex items-start gap-3 text-sm text-[var(--color-fc-gray-mid)]">
+                                    <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-fc-cyan)]/15 text-[var(--color-fc-primary)]"><ArrowRight className="h-3 w-3" /></span>
+                                    Paiement échelonné possible
+                                </div>
+                                <div className="flex items-start gap-3 text-sm text-[var(--color-fc-gray-mid)]">
+                                    <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-fc-cyan)]/15 text-[var(--color-fc-primary)]"><ArrowRight className="h-3 w-3" /></span>
+                                    Frais d&apos;inscription : 25 000 FCFA
+                                </div>
+                                <div className="flex items-start gap-3 text-sm text-[var(--color-fc-gray-mid)]">
+                                    <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-fc-cyan)]/15 text-[var(--color-fc-primary)]"><ArrowRight className="h-3 w-3" /></span>
+                                    Accompagnement jusqu&apos;à la fin du parcours
+                                </div>
+                            </div>
+                            <Link href="/admissions" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[var(--color-fc-primary)] hover:text-[var(--color-fc-deep)]">
+                                Voir les modalités d&apos;admission <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
+                        <div className="overflow-hidden rounded-[1.75rem] border border-[var(--color-fc-gray-light)]">
+                            <div className="grid grid-cols-[1fr_auto_auto] gap-4 bg-[var(--color-fc-bg)] px-5 py-4 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--color-fc-gray-mid)] sm:px-6">
+                                <div>Formation</div>
+                                <div className="hidden sm:block">Durée</div>
+                                <div className="text-right">Tarif</div>
+                            </div>
+                            <div className="divide-y divide-[var(--color-fc-gray-light)]">
+                                {activeFormations.slice(0, 8).map((training) => (
+                                    <Link
+                                        key={training.id}
+                                        href={`/formation/${training.slug}`}
+                                        className="grid grid-cols-[1fr_auto_auto] items-center gap-4 px-5 py-4 transition-colors hover:bg-[var(--color-fc-bg)] sm:px-6"
+                                    >
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-semibold text-[var(--color-fc-black)]">{training.title}</p>
+                                            <p className="mt-0.5 text-xs text-[var(--color-fc-gray-mid)] sm:hidden">{training.duration}</p>
+                                        </div>
+                                        <div className="hidden text-sm text-[var(--color-fc-gray-mid)] sm:block">{training.duration}</div>
+                                        <div className="text-right font-display text-sm font-bold text-[var(--color-fc-primary)] whitespace-nowrap">
+                                            {formatTrainingPrice(training.price, training.duration)}
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                            {activeFormations.length > 8 && (
+                                <div className="border-t border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-5 py-4 sm:px-6">
+                                    <Link href="/formations" className="text-sm font-bold text-[var(--color-fc-primary)] hover:underline">
+                                        Voir les {activeFormations.length} formations →
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    {formations.filter((formation) => formation.isActive).map((training) => (
-                        <div
-                            key={training.id}
-                            className="grid grid-cols-[2.2fr_1fr_1.1fr] border-b border-[var(--color-fc-gray-light)] last:border-b-0 text-sm text-[var(--color-fc-gray-mid)]"
-                        >
-                            <div className="px-5 py-4 font-semibold">{training.title}</div>
-                            <div className="px-5 py-4">{training.duration}</div>
-                            <div className="px-5 py-4 font-bold text-[var(--color-fc-primary)]">
-                                {formatTrainingPrice(training.price, training.duration)}
+                </div>
+            </section>
+
+            {/* ── CTA ── */}
+            <section className="px-4 py-24 sm:px-6 lg:px-10 lg:py-28">
+                <div className="relative mx-auto max-w-[84rem] overflow-hidden rounded-[2.5rem] bg-[var(--color-fc-deep)] px-6 py-16 sm:px-12 lg:px-16 lg:py-20">
+                    <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+                        <div className="max-w-2xl">
+                            <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.22em] text-[var(--color-fc-cyan)]">
+                                Prêt à commencer ?
+                            </p>
+                            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl lg:leading-[1.1]">
+                                Ta prochaine compétence commence ici.
+                            </h2>
+                            <p className="mt-5 max-w-xl text-base leading-8 text-white/68">
+                                Rejoins une cohorte, apprends avec des mentors, et construis un projet dont tu seras fier. Les places sont limitées.
+                            </p>
+                            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                                <Link
+                                    href="/inscription"
+                                    className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-fc-cyan)] px-7 py-4 text-sm font-extrabold text-[#06122f] transition-all hover:-translate-y-0.5 hover:bg-white"
+                                >
+                                    S&apos;inscrire maintenant
+                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                                <Link
+                                    href="/contact"
+                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-7 py-4 text-sm font-bold text-white transition-all hover:bg-white/10"
+                                >
+                                    Parler à un conseiller
+                                </Link>
                             </div>
                         </div>
-                    ))}
-                </div>
-            </section>
-
-            <section className="mb-24 mt-24 rounded-[2rem] bg-[var(--color-fc-deep)] px-2 py-24 text-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="text-center">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
-                            Équipe pédagogique
-                        </p>
-                        <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-white sm:text-4xl">
-                            Des intervenants experts et engagés
-                        </h2>
-                    </div>
-                    <div className="mt-10 grid gap-6 md:grid-cols-3">
-                        {instructors.map((instructor, index) => (
-                            <Reveal key={instructor.name} delay={(index % 3) * 90} className="h-full">
-                                <div className="h-full rounded-3xl border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-deep)]/80 p-6 text-center shadow-lg shadow-[var(--color-fc-black)]/20 transition-all hover:-translate-y-1 hover:border-[var(--color-fc-cyan)]/50">
-                                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] text-xl font-black text-[var(--color-fc-bg)]">
-                                        {instructor.name
-                                            .split(" ")
-                                            .map((part) => part[0])
-                                            .slice(0, 2)
-                                            .join("")}
-                                    </div>
-                                    <h3 className="text-lg font-bold text-white">{instructor.name}</h3>
-                                    <p className="mt-3 text-sm leading-6 text-[var(--color-fc-light)]">{instructor.role}</p>
+                        <div className="hidden lg:block">
+                            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">Contact rapide</p>
+                                <a href="tel:+22943327832" className="mt-3 block font-display text-2xl font-bold text-white hover:text-[var(--color-fc-cyan)]">+229 43 32 78 32</a>
+                                <p className="mt-2 text-sm text-white/55">Godomey, Abomey-Calavi</p>
+                                <div className="mt-5 border-t border-white/10 pt-5">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-fc-cyan)]">Recevoir la brochure</p>
+                                    <div className="mt-3"><NewsletterForm /></div>
                                 </div>
-                            </Reveal>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            <section className="mx-4 mb-24  overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] sm:mx-6 lg:mx-auto lg:max-w-7xl">
-                <div className="relative px-6 py-14 sm:px-12 lg:px-16">
-                    <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-[var(--color-fc-primary)]/30 blur-3xl" />
-                    <Rocket className="absolute right-12 top-12 h-24 w-24 rotate-12 text-[var(--color-fc-cyan)]/10" />
-                    <div className="relative max-w-2xl">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
-                            Prêt à passer à l&apos;action ?
-                        </p>
-                        <h2 className="mt-4 font-display text-3xl font-black text-white sm:text-4xl">
-                            Ta prochaine version commence aujourd&apos;hui.
-                        </h2>
-                        <p className="mt-4 text-sm leading-7 text-[var(--color-fc-light)]/70">
-                            Les prochaines cohortes se remplissent vite. Réserve
-                            ta place et construis un avenir dont tu seras fier.
-                        </p>
-                        <Link
-                            href="/inscription"
-                            className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-primary)] px-5 py-3 text-sm font-extrabold text-[var(--color-fc-bg)] shadow-lg shadow-[var(--color-fc-primary)]/25 transition-all hover:bg-[var(--color-fc-deep)]"
-                        >
-                            Rejoindre FuturCraft{" "}
-                            <ArrowRight className="h-4 w-4" />
-                        </Link>
-
-                        <div className="mt-10 border-t border-white/10 pt-6">
-                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
-                                Ou recevoir la brochure
-                            </p>
-                            <div className="mt-3">
-                                <NewsletterForm />
                             </div>
                         </div>
                     </div>

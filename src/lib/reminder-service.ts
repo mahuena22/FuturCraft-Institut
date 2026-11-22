@@ -95,7 +95,7 @@ async function sendReminderEmail(
           <div style="background: #051269; color: white; padding: 20px; text-align: center;">
             <h1 style="margin: 0;">FuturCraft Institut</h1>
           </div>
-          <div style="padding: 20px; background: #f8faff;">
+          <div style="padding: 20px; background: #f4f7fb;">
             <p>Bonjour <strong>${firstName}</strong>,</p>
             <p>Nous vous rappelons que votre paiement est en retard :</p>
             
@@ -103,7 +103,7 @@ async function sendReminderEmail(
               <p style="margin: 5px 0;"><strong>Échéance :</strong> ${schedule.title}</p>
               <p style="margin: 5px 0;"><strong>Montant :</strong> ${schedule.amount.toLocaleString("fr-FR")} FCFA</p>
               <p style="margin: 5px 0;"><strong>Date d'échéance :</strong> ${new Date(schedule.dueDate).toLocaleDateString("fr-FR")}</p>
-              <p style="margin: 5px 0; color: #dc2626;"><strong>Retard :</strong> ${schedule.daysOverdue} jour(s)</p>
+              <p style="margin: 5px 0; color: #b91c1c;"><strong>Retard :</strong> ${schedule.daysOverdue} jour(s)</p>
               <p style="margin: 5px 0;"><strong>Formation :</strong> ${schedule.formationTitle}</p>
             </div>
 
@@ -114,7 +114,7 @@ async function sendReminderEmail(
               <li>Caisse de l'institut (Godomey)</li>
             </ul>
 
-            <p style="font-size: 12px; color: #666; margin-top: 30px;">
+            <p style="font-size: 12px; color: #475569; margin-top: 30px;">
               Si vous avez déjà effectué ce paiement, merci d'ignorer ce message.
               Contactez-nous au +229 43 32 78 32 pour toute question.
             </p>

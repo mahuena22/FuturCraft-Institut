@@ -74,3 +74,7 @@ Configurer les variables d'environnement nécessaires (`DATABASE_URL` et
 `ADMIN_PASSWORD` au minimum) dans l'environnement de déploiement. Les rappels
 automatiques sont planifiés par `vercel.json`. Les fichiers d'environnement
 locaux ne doivent pas être committés.
+
+Les projets affichés dans la galerie doivent être ajoutés depuis l’onglet
+« Projets étudiants » du tableau de bord administrateur et associés à un
+étudiant validé. Les projets d’exemple ne sont pas ajoutés automatiquement.

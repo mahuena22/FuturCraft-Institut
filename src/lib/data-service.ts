@@ -487,7 +487,115 @@ export async function getAdminStats() {
 
 export async function getProjects() {
   await ensureDatabaseSeeded();
-  return await db.select().from(studentProjects).orderBy(desc(studentProjects.isFeatured));
+  const rows = await db
+    .select({ project: studentProjects })
+    .from(studentProjects)
+    .innerJoin(students, eq(studentProjects.studentId, students.id))
+    .where(
+      and(
+        eq(students.profileVisible, true),
+        isNotNull(students.validatedAt),
+        inArray(students.status, ["inscrit", "actif", "termine", "alumni"])
+      )
+    )
+    .orderBy(desc(studentProjects.isFeatured));
+  return rows.map(({ project }) => project);
+}
+
+export async function getAdminStudentProjects() {
+  await ensureDatabaseSeeded();
+  return await db
+    .select({
+      id: studentProjects.id,
+      studentId: studentProjects.studentId,
+      studentNumber: students.studentNumber,
+      studentName: sql<string>`concat(${students.firstName}, ' ', ${students.lastName})`,
+      slug: studentProjects.slug,
+      title: studentProjects.title,
+      tagline: studentProjects.tagline,
+      description: studentProjects.description,
+      coverImage: studentProjects.coverImage,
+      formationTitle: studentProjects.formationTitle,
+      technologies: studentProjects.technologies,
+      teamMembers: studentProjects.teamMembers,
+      projectUrl: studentProjects.projectUrl,
+      githubUrl: studentProjects.githubUrl,
+      isFeatured: studentProjects.isFeatured,
+    })
+    .from(studentProjects)
+    .leftJoin(students, eq(studentProjects.studentId, students.id))
+    .orderBy(desc(studentProjects.createdAt));
+}
+
+export async function createStudentProject(data: {
+  studentId: number;
+  title: string;
+  tagline: string;
+  description: string;
+  coverImage: string;
+  technologies: string[];
+  projectUrl?: string;
+  githubUrl?: string;
+}) {
+  await ensureDatabaseSeeded();
+  const [student] = await db
+    .select({
+      id: students.id,
+      studentNumber: students.studentNumber,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      status: students.status,
+      profileVisible: students.profileVisible,
+      validatedAt: students.validatedAt,
+      formationTitle: formations.title,
+    })
+    .from(students)
+    .innerJoin(formations, eq(students.formationId, formations.id))
+    .where(eq(students.id, data.studentId));
+
+  if (
+    !student ||
+    !student.profileVisible ||
+    !student.validatedAt ||
+    !["inscrit", "actif", "termine", "alumni"].includes(student.status)
+  ) {
+    throw new Error("Seuls les étudiants validés peuvent avoir un projet publié");
+  }
+
+  const [project] = await db
+    .insert(studentProjects)
+    .values({
+      studentId: student.id,
+      slug: `${slugify(data.title, "projet")}-${randomBytes(3).toString("hex")}`,
+      title: data.title,
+      tagline: data.tagline,
+      description: data.description,
+      coverImage: data.coverImage,
+      formationTitle: student.formationTitle,
+      technologies: JSON.stringify(data.technologies),
+      teamMembers: JSON.stringify([
+        { name: `${student.firstName} ${student.lastName}`, role: "Étudiant" },
+      ]),
+      projectUrl: data.projectUrl || null,
+      githubUrl: data.githubUrl || null,
+      isFeatured: true,
+    })
+    .returning();
+
+  return {
+    ...project,
+    studentNumber: student.studentNumber,
+    studentName: `${student.firstName} ${student.lastName}`,
+  };
+}
+
+export async function deleteStudentProject(id: number) {
+  await ensureDatabaseSeeded();
+  const [project] = await db
+    .delete(studentProjects)
+    .where(eq(studentProjects.id, id))
+    .returning({ id: studentProjects.id });
+  return project || null;
 }
 
 export async function getEvents() {
@@ -627,7 +735,7 @@ export async function updateFormation(
   return row || null;
 }
 
-function slugify(value: string): string {
+function slugify(value: string, fallbackPrefix = "article"): string {
   const normalized = value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -636,7 +744,7 @@ function slugify(value: string): string {
     .trim()
     .replace(/[\s]+/g, "-")
     .replace(/-+/g, "-");
-  return normalized || `article-${randomBytes(3).toString("hex")}`;
+  return normalized || `${fallbackPrefix}-${randomBytes(3).toString("hex")}`;
 }
 
 export async function createBlogArticle(data: {

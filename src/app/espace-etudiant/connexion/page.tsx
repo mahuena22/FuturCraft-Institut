@@ -42,10 +42,10 @@ export default function StudentLoginPage() {
 
   return (
     <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-[var(--color-fc-bg)] px-4 py-16">
-      <div className="pointer-events-none absolute inset-0 bg-grid opacity-20" />
+      <div className="pointer-events-none absolute inset-0 opacity-0" />
       <div className="relative w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+        <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] shadow-xl overflow-hidden">
           <div className="bg-[var(--color-fc-deep)] px-8 py-8 text-white">
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-lg shadow-black/20">
               <GraduationCap className="w-7 h-7" />
@@ -63,7 +63,7 @@ export default function StudentLoginPage() {
                 Matricule étudiant
               </label>
               <div className="relative">
-                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                 <input
                   id="studentNumber"
                   type="text"
@@ -71,7 +71,7 @@ export default function StudentLoginPage() {
                   value={studentNumber}
                   onChange={(e) => setStudentNumber(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] py-3 pl-10 pr-4 text-sm font-mono font-bold transition-all placeholder:font-normal placeholder:text-slate-400 focus:border-[var(--color-fc-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-primary)]/15"
+                  className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] py-3 pl-10 pr-4 text-sm font-mono font-bold transition-all placeholder:font-normal placeholder:text-[var(--color-fc-gray-mid)] focus:border-[var(--color-fc-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-primary)]/15"
                 />
               </div>
             </div>
@@ -82,7 +82,7 @@ export default function StudentLoginPage() {
                 Numéro de téléphone / WhatsApp
               </label>
               <div className="relative">
-                <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                 <input
                   id="phone"
                   type="tel"
@@ -90,7 +90,7 @@ export default function StudentLoginPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] py-3 pl-10 pr-4 text-sm transition-all placeholder:text-slate-400 focus:border-[var(--color-fc-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-primary)]/15"
+                  className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] py-3 pl-10 pr-4 text-sm transition-all placeholder:text-[var(--color-fc-gray-mid)] focus:border-[var(--color-fc-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-fc-primary)]/15"
                 />
               </div>
             </div>

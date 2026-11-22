@@ -80,40 +80,28 @@ export function Header() {
             : "bg-[var(--color-fc-bg)]/95 backdrop-blur-md border-b border-[var(--color-fc-gray-light)]/50"
         }`}
       >
-        {/* Top accent bar */}
-        <div className="h-1 bg-gradient-to-r from-[var(--color-fc-deep)] via-[var(--color-fc-primary)] to-[var(--color-fc-cyan)]" />
+        <div className="h-[2px] bg-[var(--color-fc-cyan)]" />
 
-        <div className="hidden border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-deep)] text-white md:block">
-          <div className="mx-auto flex h-9 max-w-[84rem] items-center justify-between px-6 text-[11px] font-medium tracking-wide">
-            <p className="text-white/75">Institut de formation aux métiers du numérique · Godomey, Bénin</p>
-            <a href="tel:+22943327832" className="inline-flex items-center gap-2 text-white/85 transition-colors hover:text-[var(--color-fc-cyan)]">
-              <Phone className="h-3.5 w-3.5 text-[var(--color-fc-cyan)]" />
-              +229 43 32 78 32
-            </a>
-          </div>
-        </div>
-
-        <div className="mx-auto max-w-[84rem] px-4 sm:px-6">
-          <div className="flex h-[76px] items-center justify-between gap-5">
+        <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
+          <div className="flex h-[72px] items-center justify-between gap-6">
 
             {/* ── Brand ── */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
-              <div className="relative flex h-10 w-auto items-center justify-center overflow-hidden rounded-xl border border-[var(--color-fc-gray-light)] bg-white px-2.5">
+            <Link href="/" className="group flex shrink-0 items-center gap-3">
+              <div className="relative flex h-10 items-center justify-center rounded-xl bg-white px-2">
                 <Image
                   src="/images/Logo-crop.png"
                   alt="Logo FuturCraft Institut"
                   width={507}
                   height={340}
-                  className="h-8 w-auto object-contain"
+                  className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="font-display text-[1.1rem] font-extrabold tracking-tight text-[var(--color-fc-black)] leading-none">
-                  FuturCraft
-                  <span className="text-[var(--color-fc-primary)]">.</span>
+              <div className="hidden sm:flex flex-col">
+                <span className="font-display text-[1.15rem] font-extrabold leading-none tracking-tight text-[var(--color-fc-black)]">
+                  FuturCraft<span className="text-[var(--color-fc-cyan)]">.</span>
                 </span>
-                <span className="text-[9px] font-semibold tracking-[0.15em] uppercase text-[var(--color-fc-gray-mid)] mt-0.5">
-                  Institut Numérique
+                <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-fc-gray-mid)]">
+                  Institut
                 </span>
               </div>
             </Link>
@@ -135,7 +123,7 @@ export function Header() {
                       <button
                         aria-expanded={formationsOpen}
                         aria-haspopup="true"
-                        aria-controls="formations-menu"
+                        aria-controls="formations-panel"
                         type="button"
                         onClick={() => setFormationsOpen((open) => !open)}
                         className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-semibold transition-all duration-200 ${
@@ -152,15 +140,16 @@ export function Header() {
 
                       {/* Mega dropdown */}
                       <div
+                        id="formations-panel"
                         className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 transition-all duration-200 ${
                           formationsOpen
                             ? "opacity-100 translate-y-0 pointer-events-auto"
                             : "opacity-0 -translate-y-2 pointer-events-none"
                         }`}
                       >
-                        <div className="bg-white rounded-2xl shadow-2xl shadow-slate-900/12 border border-slate-200/80 overflow-hidden">
+                        <div className="bg-white rounded-2xl shadow-2xl shadow-[var(--color-fc-deep)]/10 border border-[var(--color-fc-gray-light)] overflow-hidden">
                           <div className="px-4 pt-4 pb-2">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-fc-gray-mid)]">
                               Nos formations
                             </p>
                           </div>
@@ -212,21 +201,19 @@ return (
             </nav>
 
 {/* ── Desktop Actions ── */}
-            <div className="hidden sm:flex items-center gap-2.5">
+            <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/espace-etudiant"
-                className="flex items-center gap-2 rounded-xl border border-[var(--color-fc-gray-light)] px-3 py-2 text-[13px] font-semibold text-[var(--color-fc-gray-mid)] transition-all duration-200 hover:border-[var(--color-fc-primary)]/25 hover:bg-[var(--color-fc-primary)]/5 hover:text-[var(--color-fc-primary)]"
+                className="rounded-xl px-4 py-2.5 text-[13px] font-semibold text-[var(--color-fc-gray-mid)] transition-colors hover:text-[var(--color-fc-primary)]"
               >
-                <UserCheck className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 Mon Espace
               </Link>
-
               <Link
                 href="/inscription"
-                className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-primary)] px-4 py-2.5 text-[13px] font-bold text-white shadow-sm shadow-[var(--color-fc-primary)]/20 transition-all hover:-translate-y-0.5 hover:bg-[var(--color-fc-deep)]"
+                className="group inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-5 py-2.5 text-[13px] font-bold text-white transition-all hover:bg-[var(--color-fc-primary)] hover:shadow-lg hover:shadow-[var(--color-fc-primary)]/20"
               >
-                S&apos;inscrire
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 duration-200" />
+                Candidater
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
 

@@ -45,8 +45,10 @@ export default async function FormationsPage() {
 
         <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {highlights.map(({ icon: Icon, label, sub }) => (
-            <div key={label} className="rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-4 shadow-sm sm:p-5">
-              <Icon className="mb-4 h-5 w-5 text-[var(--color-fc-primary)]" />
+            <div key={label} className="rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-5">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                <Icon className="h-5 w-5" />
+              </div>
               <p className="font-display text-sm font-bold text-[var(--color-fc-black)] sm:text-base">{label}</p>
               <p className="mt-1 text-xs text-[var(--color-fc-gray-mid)]">{sub}</p>
             </div>
@@ -58,44 +60,26 @@ export default async function FormationsPage() {
           <FormationsExplorerWrapper formations={formations} />
         </Suspense>
 
-        {/* Bottom Banner — Full width */}
-        <div className="relative overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] p-px shadow-xl shadow-[var(--color-fc-deep)]/10">
-          {/* Inner content */}
-          <div className="relative rounded-[calc(1.5rem-1px)] bg-[var(--color-fc-deep)] px-8 py-12 sm:px-12 lg:px-16">
-            <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none rounded-[calc(1.5rem-1px)]" />
-            <div className="absolute right-8 top-8 w-48 h-48 rounded-full bg-[var(--color-fc-primary)]/10 blur-3xl pointer-events-none" />
-
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="space-y-3 max-w-xl text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-fc-primary)]/20 border border-[var(--color-fc-primary)]/30 text-[var(--color-fc-deep)] text-xs font-bold">
-                  <Sparkles className="w-3 h-3 text-[var(--color-fc-deep)]" />
-                  Orientation personnalisée gratuite
-                </div>
-                <h3 className="font-display text-2xl sm:text-3xl font-black text-white">
-                  Besoin d&apos;aide pour choisir ?
-                </h3>
-                <p className="text-sm text-[var(--color-fc-light)]/60 leading-7">
-                  Nos conseillers pédagogiques vous aident à identifier la formation
-                  la plus adaptée à votre profil et vos ambitions professionnelles.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 shrink-0">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[var(--color-fc-bg)] text-[var(--color-fc-deep)] text-sm font-extrabold hover:bg-[var(--color-fc-light)]/30 transition-all hover:-translate-y-0.5 shadow-lg"
-                >
-                  <Phone className="w-4 h-4" />
-                  Prendre rendez-vous
-                </Link>
-                <Link
-                  href="/inscription"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[var(--color-fc-primary)] hover:bg-[var(--color-fc-deep)] text-[var(--color-fc-bg)] text-sm font-bold transition-all shadow-md"
-                >
-                  Candidater directement
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+        <div className="mt-16 overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] px-8 py-12 sm:px-12 lg:px-16">
+          <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+            <div className="max-w-xl">
+              <p className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
+                <Sparkles className="h-3.5 w-3.5" /> Orientation personnalisée
+              </p>
+              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                Besoin d&apos;aide pour choisir ?
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-white/65">
+                Nos conseillers t&apos;aident à identifier la formation adaptée à ton profil, ton rythme et tes objectifs.
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[var(--color-fc-deep)] transition-colors hover:bg-[var(--color-fc-bg)]">
+                <Phone className="h-4 w-4" /> Parler à un conseiller
+              </Link>
+              <Link href="/inscription" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-bold text-[#06122f] transition-colors hover:bg-white">
+                Candidater <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>

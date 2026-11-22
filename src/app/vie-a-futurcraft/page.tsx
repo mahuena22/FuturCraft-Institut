@@ -54,7 +54,7 @@ export default async function ViePage() {
         <div className="min-h-screen bg-[var(--color-fc-bg)]">
             <PageIntro
                 eyebrow="Immersion & communauté"
-                title="Bien plus qu’une école : une communauté qui construit."
+                title="La vie sur le campus."
                 description="Découvrez la vie du campus, les ateliers pratiques, les hackathons et les moments partagés qui font grandir chaque talent."
             />
 
@@ -63,10 +63,10 @@ export default async function ViePage() {
                 <section className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                                 Agenda Officiel
                             </span>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 mt-1">
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
                                 Événements &amp; Hackathons à Venir
                             </h2>
                         </div>
@@ -76,9 +76,9 @@ export default async function ViePage() {
                         {events.map((ev) => (
                             <div
                                 key={ev.id}
-                                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-blue-300 transition-all flex flex-col"
+                                className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden shadow-xs hover:shadow-xl hover:border-[var(--color-fc-primary)]/40 transition-all flex flex-col"
                             >
-                                <div className="relative aspect-[16/10] bg-slate-100">
+                                <div className="relative aspect-[16/10] bg-[var(--color-fc-gray-light)]">
                                     <Image
                                         src={ev.imageUrl}
                                         alt={ev.title}
@@ -87,7 +87,7 @@ export default async function ViePage() {
                                         className="object-cover"
                                     />
                                     <div className="absolute top-3 left-3">
-                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-600 text-white">
+                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[var(--color-fc-deep)] text-white">
                                             {ev.category}
                                         </span>
                                     </div>
@@ -95,26 +95,26 @@ export default async function ViePage() {
 
                                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-3 text-xs text-slate-500">
-                                            <span className="flex items-center gap-1 font-semibold text-blue-600">
+                                        <div className="flex items-center gap-3 text-xs text-[var(--color-fc-gray-mid)]">
+                                            <span className="flex items-center gap-1 font-semibold text-[var(--color-fc-primary)]">
                                                 <CalendarDays className="w-3.5 h-3.5" />{' '}
                                                 {ev.date}
                                             </span>
                                         </div>
-                                        <h3 className="font-bold text-slate-900 text-base leading-snug">
+                                        <h3 className="font-bold text-[var(--color-fc-black)] text-base leading-snug">
                                             {ev.title}
                                         </h3>
-                                        <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                                        <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed line-clamp-3">
                                             {ev.description}
                                         </p>
                                     </div>
 
-                                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                                    <div className="pt-3 border-t border-[var(--color-fc-gray-light)] flex items-center justify-between text-xs text-[var(--color-fc-gray-mid)]">
                                         <span className="flex items-center gap-1 text-[11px]">
-                                            <MapPin className="w-3.5 h-3.5 text-slate-400" />{' '}
+                                            <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-gray-mid)]" />{' '}
                                             {ev.location}
                                         </span>
-                                        <span className="font-bold text-slate-800">
+                                        <span className="font-bold text-[var(--color-fc-black)]">
                                             {ev.attendeesCount} inscrits
                                         </span>
                                     </div>
@@ -125,12 +125,12 @@ export default async function ViePage() {
                 </section>
 
                 {/* Moments de vie grid */}
-                <section className="space-y-6 pt-6 border-t border-slate-200">
+                <section className="space-y-6 pt-6 border-t border-[var(--color-fc-gray-light)]">
                     <div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2.5 py-1 rounded">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                             Magazine Campus
                         </span>
-                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 mt-1">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
                             Les Temps Forts de nos Promotions
                         </h2>
                     </div>
@@ -139,9 +139,9 @@ export default async function ViePage() {
                         {lifeMoments.map((m, i) => (
                             <div
                                 key={i}
-                                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all group"
+                                className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden shadow-xs hover:shadow-lg transition-all group"
                             >
-                                <div className="aspect-[16/10] overflow-hidden bg-slate-100 relative">
+                                <div className="aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)] relative">
                                     <Image
                                         src={m.image}
                                         alt={m.title}
@@ -150,16 +150,16 @@ export default async function ViePage() {
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute top-3 left-3">
-                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-white/95 text-slate-900 backdrop-blur-xs shadow-xs">
+                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-white/95 text-[var(--color-fc-black)] backdrop-blur-xs shadow-xs">
                                             {m.tag}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="p-6 space-y-2">
-                                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                    <h3 className="text-lg font-bold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)] transition-colors">
                                         {m.title}
                                     </h3>
-                                    <p className="text-xs text-slate-600 leading-relaxed">
+                                    <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed">
                                         {m.desc}
                                     </p>
                                 </div>
@@ -168,23 +168,14 @@ export default async function ViePage() {
                     </div>
                 </section>
 
-                {/* CTA */}
-                <section className="p-8 sm:p-12 rounded-3xl bg-blue-50/70 border border-blue-100 text-center space-y-4">
-                    <h3 className="text-2xl font-black text-slate-950">
-                        Envie de vivre l&apos;expérience FuturCraft ?
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
-                        Participez à la prochaine journée portes ouvertes ou
-                        postulez directement en ligne pour rejoindre la
-                        prochaine cohorte.
+                <section className="rounded-[2rem] bg-[var(--color-fc-deep)] px-8 py-12 text-center text-white sm:px-12">
+                    <h3 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">Envie de vivre l&apos;expérience FuturCraft ?</h3>
+                    <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/65">
+                        Participe à une journée portes ouvertes ou candidate directement pour rejoindre la prochaine cohorte.
                     </p>
-                    <div className="pt-2">
-                        <Link
-                            href="/inscription"
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all"
-                        >
-                            <span>Rejoindre la promotion 2026</span>
-                            <ArrowRight className="w-4 h-4" />
+                    <div className="mt-8">
+                        <Link href="/inscription" className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-bold text-[#06122f] transition-colors hover:bg-white">
+                            Rejoindre la promotion 2026 <ArrowRight className="h-4 w-4" />
                         </Link>
                     </div>
                 </section>

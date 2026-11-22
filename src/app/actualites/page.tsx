@@ -28,7 +28,7 @@ export default async function ActualitesPage() {
               key={art.id}
               className="group flex flex-col overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-white shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-fc-primary)]/30 hover:shadow-xl"
             >
-              <div className="aspect-[16/10] overflow-hidden bg-slate-100 relative">
+              <div className="aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)]/30 relative">
                 <Image
                   src={art.coverImage}
                   alt={art.title}
@@ -66,11 +66,8 @@ export default async function ActualitesPage() {
 
                 <div className="flex items-center justify-between border-t border-[var(--color-fc-gray-light)] pt-4 text-xs text-[var(--color-fc-gray-mid)]">
                   <span className="text-[11px] font-semibold text-[var(--color-fc-black)]">{art.author}</span>
-                  <Link
-                    href={`/actualites/${art.slug}`}
-                    className="flex items-center gap-1 font-bold text-[var(--color-fc-primary)] transition-transform group-hover:translate-x-0.5"
-                  >
-                    Lire l&apos;article →
+                  <Link href={`/actualites/${art.slug}`} className="inline-flex items-center gap-1 font-bold text-[var(--color-fc-primary)]">
+                    Lire l&apos;article <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>

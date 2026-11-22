@@ -290,16 +290,16 @@ setProfileSaveSuccess(true);
       <div className="page-container space-y-6">
         {/* Session bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-3 text-xs shadow-sm">
-          <div className="flex items-center gap-2 text-slate-500">
+          <div className="flex items-center gap-2 text-[var(--color-fc-gray-mid)]">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span className="font-medium">
-              Session authentifiée — <span className="font-bold text-slate-700">{data.student.firstName} {data.student.lastName}</span>
+              Session authentifiée — <span className="font-bold text-[var(--color-fc-black)]">{data.student.firstName} {data.student.lastName}</span>
             </span>
           </div>
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--color-fc-gray-mid)] hover:text-rose-600 hover:bg-rose-50 border border-[var(--color-fc-gray-light)] hover:border-rose-200 transition-all"
           >
             <LogOut className="w-3.5 h-3.5" />
             Se déconnecter
@@ -310,7 +310,7 @@ setProfileSaveSuccess(true);
         <div className="relative overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-[var(--color-fc-primary)] bg-slate-100 shadow-md sm:h-20 sm:w-20">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-[var(--color-fc-primary)] bg-[var(--color-fc-bg)]  sm:h-20 sm:w-20">
                 <Image
                   src={
                     data.student.avatarUrl ||
@@ -325,7 +325,7 @@ setProfileSaveSuccess(true);
 
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+                  <h1 className="text-2xl sm:text-3xl font-black text-[var(--color-fc-black)]">
                     Bonjour {data.student.firstName} 👋
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -337,12 +337,12 @@ setProfileSaveSuccess(true);
                   </span>
                 </div>
 
-                <p className="text-sm font-semibold text-blue-600 mt-0.5">
+                <p className="text-sm font-semibold text-[var(--color-fc-primary)] mt-0.5">
                   {data.formation?.title || "Formation en cours"}
                 </p>
 
-                <div className="flex items-center gap-4 text-xs text-slate-500 mt-1 flex-wrap">
-                  <span className="font-mono font-bold text-slate-700">
+                <div className="flex items-center gap-4 text-xs text-[var(--color-fc-gray-mid)] mt-1 flex-wrap">
+                  <span className="font-mono font-bold text-[var(--color-fc-black)]">
                     Matricule : {data.student.studentNumber}
                   </span>
                   <span>•</span>
@@ -361,7 +361,7 @@ setProfileSaveSuccess(true);
                   setPaymentAmount(nextPendingSchedule?.amount || 50000);
                   setShowPaymentModal(true);
                 }}
-                className="flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-primary)] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[var(--color-fc-primary)]/20 transition-all hover:bg-[var(--color-fc-deep)] sm:w-auto"
+                className="flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-primary)] px-5 py-3 text-sm font-bold text-white  shadow-[var(--color-fc-primary)]/20 transition-all hover:bg-[var(--color-fc-deep)] sm:w-auto"
               >
                 <CreditCard className="w-4 h-4" />
                 <span>Régler une mensualité</span>
@@ -370,30 +370,30 @@ setProfileSaveSuccess(true);
           </div>
 
           {/* Financial Progress Bar (spec: Payé : 240 000 FCFA — Reste : 60 000 FCFA (80%)) */}
-          <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
+          <div className="mt-8 pt-6 border-t border-[var(--color-fc-gray-light)] space-y-3">
             <div className="flex items-center justify-between text-xs sm:text-sm font-bold flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-slate-500">Progression des frais :</span>
-                <span className="text-slate-900 font-extrabold">{progressPercent}%</span>
+                <span className="text-[var(--color-fc-gray-mid)]">Progression des frais :</span>
+                <span className="text-[var(--color-fc-black)] font-extrabold">{progressPercent}%</span>
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <span>
                   Payé : <strong className="text-emerald-600">{paid.toLocaleString("fr-FR")} FCFA</strong>
                 </span>
-                <span className="text-slate-300">|</span>
+                <span className="text-[var(--color-fc-gray-mid)]/60">|</span>
                 <span>
                   Reste à payer : <strong className="text-rose-600">{remaining.toLocaleString("fr-FR")} FCFA</strong>
                 </span>
-                <span className="text-slate-300">|</span>
-                <span className="text-slate-500">
+                <span className="text-[var(--color-fc-gray-mid)]/60">|</span>
+                <span className="text-[var(--color-fc-gray-mid)]">
                   Total : {total.toLocaleString("fr-FR")} FCFA
                 </span>
               </div>
             </div>
 
-            <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+            <div className="w-full bg-[var(--color-fc-bg)] h-3 rounded-full overflow-hidden p-0.5 border border-[var(--color-fc-gray-light)]/60">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[var(--color-fc-deep)] via-[var(--color-fc-primary)] to-[var(--color-fc-cyan)] transition-all duration-500"
+                className="h-full rounded-full bg-[var(--color-fc-primary)] transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -406,8 +406,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("dashboard")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "dashboard"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <User className="w-4 h-4" />
@@ -418,8 +418,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("paiements")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "paiements"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <CreditCard className="w-4 h-4" />
@@ -430,8 +430,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("recus")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "recus"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -442,8 +442,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("documents")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "documents"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -454,8 +454,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("formation")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "formation"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <BookOpen className="w-4 h-4" />
@@ -466,8 +466,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("notifications")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 relative ${
               activeTab === "notifications"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Bell className="w-4 h-4" />
@@ -483,8 +483,8 @@ setProfileSaveSuccess(true);
             onClick={() => setActiveTab("profil")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "profil"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-blue-600 text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Edit3 className="w-4 h-4" />
@@ -497,38 +497,38 @@ setProfileSaveSuccess(true);
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* 3 Overview Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-2">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Montant Déjà Réglé
                 </span>
                 <div className="text-2xl sm:text-3xl font-black text-emerald-600">
-                  {paid.toLocaleString("fr-FR")} <span className="text-xs font-bold text-slate-500">FCFA</span>
+                  {paid.toLocaleString("fr-FR")} <span className="text-xs font-bold text-[var(--color-fc-gray-mid)]">FCFA</span>
                 </div>
-                <span className="text-xs text-slate-500 block">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block">
                   {data.payments.length} versement(s) validé(s)
                 </span>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-2">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Reste à Percevoir
                 </span>
                 <div className="text-2xl sm:text-3xl font-black text-rose-600">
-                  {remaining.toLocaleString("fr-FR")} <span className="text-xs font-bold text-slate-500">FCFA</span>
+                  {remaining.toLocaleString("fr-FR")} <span className="text-xs font-bold text-[var(--color-fc-gray-mid)]">FCFA</span>
                 </div>
-                <span className="text-xs text-slate-500 block">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block">
                   {remaining === 0 ? "Formation 100% soldée !" : "Selon échéancier prévu"}
                 </span>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-2">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Prochaine Échéance
                 </span>
-                <div className="text-lg sm:text-xl font-bold text-slate-900">
+                <div className="text-lg sm:text-xl font-bold text-[var(--color-fc-black)]">
                   {nextPendingSchedule ? nextPendingSchedule.dueDate : "Aucune échéance en attente"}
                 </div>
-                <span className="text-xs text-blue-600 font-semibold block">
+                <span className="text-xs text-[var(--color-fc-primary)] font-semibold block">
                   {nextPendingSchedule
                     ? `${nextPendingSchedule.amount.toLocaleString("fr-FR")} FCFA à régler`
                     : "Situation à jour"}
@@ -539,12 +539,12 @@ setProfileSaveSuccess(true);
             {/* Recent Notifications & Quick Actions Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Schedules Preview */}
-              <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="lg:col-span-7 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900">Situation de l&apos;Échéancier</h3>
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Situation de l&apos;Échéancier</h3>
                   <button
                     onClick={() => setActiveTab("paiements")}
-                    className="text-xs font-bold text-blue-600 hover:underline"
+                    className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                   >
                     Voir tout →
                   </button>
@@ -554,21 +554,21 @@ setProfileSaveSuccess(true);
                   {data.schedules.slice(0, 4).map((s) => (
                     <div
                       key={s.id}
-                      className="p-3 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-between text-xs"
+                      className="p-3 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] flex items-center justify-between text-xs"
                     >
                       <div>
-                        <span className="font-bold text-slate-900 block">{s.title}</span>
-                        <span className="text-slate-500 text-[11px]">Échéance : {s.dueDate}</span>
+                        <span className="font-bold text-[var(--color-fc-black)] block">{s.title}</span>
+                        <span className="text-[var(--color-fc-gray-mid)] text-[11px]">Échéance : {s.dueDate}</span>
                       </div>
                       <div className="text-right">
-                        <span className="font-extrabold text-slate-900 block">
+                        <span className="font-extrabold text-[var(--color-fc-black)] block">
                           {s.amount.toLocaleString("fr-FR")} FCFA
                         </span>
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
                             s.status === "paye"
                               ? "bg-emerald-100 text-emerald-800"
-                              : "bg-amber-100 text-amber-800"
+                              : "bg-[var(--color-fc-surface)] text-[var(--color-fc-black)]"
                           }`}
                         >
                           {s.status === "paye" ? "Payé ✓" : "En attente"}
@@ -580,15 +580,15 @@ setProfileSaveSuccess(true);
               </div>
 
               {/* Notifications Card */}
-              <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="lg:col-span-5 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-[var(--color-fc-primary)]" />
                     Dernières Notifications
                   </h3>
                   <button
                     onClick={() => setActiveTab("notifications")}
-                    className="text-xs font-bold text-blue-600 hover:underline"
+                    className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                   >
                     Voir ({unreadNotifsCount})
                   </button>
@@ -600,17 +600,17 @@ setProfileSaveSuccess(true);
                       key={notif.id}
                       className={`p-3 rounded-xl border text-xs space-y-1 ${
                         notif.isRead
-                          ? "bg-white border-slate-200 text-slate-600"
-                          : "bg-blue-50/60 border-blue-200 text-slate-900 font-medium"
+                          ? "bg-white border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)]"
+                          : "bg-[var(--color-fc-surface)]/60 border-[var(--color-fc-primary)]/20 text-[var(--color-fc-black)] font-medium"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-900">{notif.title}</span>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="font-bold text-[var(--color-fc-black)]">{notif.title}</span>
+                        <span className="text-[10px] text-[var(--color-fc-gray-mid)]">
                           {new Date(notif.createdAt).toLocaleDateString("fr-FR")}
                         </span>
                       </div>
-                      <p className="text-slate-600 text-[11px] leading-relaxed">{notif.message}</p>
+                      <p className="text-[var(--color-fc-gray-mid)] text-[11px] leading-relaxed">{notif.message}</p>
                     </div>
                   ))}
                 </div>
@@ -624,8 +624,8 @@ setProfileSaveSuccess(true);
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Échéancier Personnalisé de Formation</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Échéancier Personnalisé de Formation</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Visualisez le calendrier complet de vos versements et effectuez vos règlements en ligne.
                 </p>
               </div>
@@ -637,7 +637,7 @@ setProfileSaveSuccess(true);
                     setPaymentAmount(nextPendingSchedule?.amount || 50000);
                     setShowPaymentModal(true);
                   }}
-                  className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all flex items-center gap-2 self-start sm:self-auto"
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  shadow-blue-600/20 transition-all flex items-center gap-2 self-start sm:self-auto"
                 >
                   <CreditCard className="w-4 h-4" />
                   <span>Payer une mensualité</span>
@@ -647,8 +647,8 @@ setProfileSaveSuccess(true);
 
             {/* Pending online payment requests */}
             {data.paymentRequests && data.paymentRequests.some((r) => r.status === "en_attente") && (
-              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
-                <h3 className="text-xs font-bold text-amber-800 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-[var(--color-fc-surface)] border border-[var(--color-fc-primary)]/20 space-y-2">
+                <h3 className="text-xs font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   Paiements en ligne en attente de validation
                 </h3>
@@ -658,32 +658,32 @@ setProfileSaveSuccess(true);
                     .map((r) => (
                       <div
                         key={r.id}
-                        className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-lg border border-amber-200 px-3 py-2 text-[11px]"
+                        className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-lg border border-[var(--color-fc-primary)]/20 px-3 py-2 text-[11px]"
                       >
-                        <span className="font-mono font-bold text-amber-700">{r.reference}</span>
-                        <span className="text-slate-700 font-semibold">
+                        <span className="font-mono font-bold text-[var(--color-fc-primary)]">{r.reference}</span>
+                        <span className="text-[var(--color-fc-black)] font-semibold">
                           {r.amount.toLocaleString("fr-FR")} FCFA via {r.method}
                         </span>
-                        <span className="text-slate-400">
+                        <span className="text-[var(--color-fc-gray-mid)]">
                           {new Date(r.createdAt).toLocaleString("fr-FR")}
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold">
+                        <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold">
                           En attente
                         </span>
                       </div>
                     ))}
                 </div>
-                <p className="text-[10px] text-amber-700/70">
+                <p className="text-[10px] text-[var(--color-fc-primary)]/70">
                   Votre reçu officiel sera généré dès validation par notre équipe financière.
                 </p>
               </div>
             )}
 
             {/* Schedules Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Échéance / Motif</th>
                       <th className="py-3 px-4">Montant</th>
@@ -693,14 +693,14 @@ setProfileSaveSuccess(true);
                       <th className="py-3 px-4 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {data.schedules.map((schedule) => (
-                      <tr key={schedule.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3.5 px-4 font-bold text-slate-900">{schedule.title}</td>
-                        <td className="py-3.5 px-4 font-extrabold text-slate-900">
+                      <tr key={schedule.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                        <td className="py-3.5 px-4 font-bold text-[var(--color-fc-black)]">{schedule.title}</td>
+                        <td className="py-3.5 px-4 font-extrabold text-[var(--color-fc-black)]">
                           {schedule.amount.toLocaleString("fr-FR")} FCFA
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600">{schedule.dueDate}</td>
+                        <td className="py-3.5 px-4 text-[var(--color-fc-gray-mid)]">{schedule.dueDate}</td>
                         <td className="py-3.5 px-4">
                           <span
                             className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -708,7 +708,7 @@ setProfileSaveSuccess(true);
                                 ? "bg-emerald-100 text-emerald-800"
                                 : schedule.status === "en_retard"
                                 ? "bg-rose-100 text-rose-800"
-                                : "bg-amber-100 text-amber-800"
+                                : "bg-[var(--color-fc-surface)] text-[var(--color-fc-black)]"
                             }`}
                           >
                             {schedule.status === "paye"
@@ -718,7 +718,7 @@ setProfileSaveSuccess(true);
                               : "En attente"}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
+                        <td className="py-3.5 px-4 text-[var(--color-fc-gray-mid)] font-mono text-[11px]">
                           {schedule.transactionRef || "—"}
                         </td>
                         <td className="py-3.5 px-4 text-right">
@@ -737,7 +737,7 @@ setProfileSaveSuccess(true);
                                   });
                                 }
                               }}
-                              className="text-xs font-bold text-blue-600 hover:underline"
+                              className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                             >
                               Reçu
                             </button>
@@ -748,7 +748,7 @@ setProfileSaveSuccess(true);
                                 setPaymentAmount(schedule.amount);
                                 setShowPaymentModal(true);
                               }}
-                              className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs"
+                              className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] "
                             >
                               Régler
                             </button>
@@ -762,34 +762,34 @@ setProfileSaveSuccess(true);
             </div>
 
             {/* Payments History */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-              <h3 className="text-base font-bold text-slate-900">Historique des Versements Validés</h3>
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
+              <h3 className="text-base font-bold text-[var(--color-fc-black)]">Historique des Versements Validés</h3>
 
               <div className="space-y-3">
                 {data.payments.length === 0 ? (
-                  <p className="text-xs text-slate-500 italic">Aucun versement enregistré pour le moment.</p>
+                  <p className="text-xs text-[var(--color-fc-gray-mid)] italic">Aucun versement enregistré pour le moment.</p>
                 ) : (
                   data.payments.map((p) => (
                     <div
                       key={p.id}
-                      className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                      className="p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 font-mono text-sm">
+                          <span className="font-bold text-[var(--color-fc-black)] font-mono text-sm">
                             {p.receiptNumber}
                           </span>
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
                             Validé ✓
                           </span>
                         </div>
-                        <p className="text-slate-500 text-[11px]">
+                        <p className="text-[var(--color-fc-gray-mid)] text-[11px]">
                           Mode : <strong>{p.paymentMethod}</strong> • Date : {p.paidAt} • Réf : {p.transactionRef}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <span className="text-base font-black text-slate-900">
+                        <span className="text-base font-black text-[var(--color-fc-black)]">
                           {p.amount.toLocaleString("fr-FR")} FCFA
                         </span>
                         <button
@@ -804,7 +804,7 @@ setProfileSaveSuccess(true);
                               verificationCode: rec?.verificationCode || "FC-SEC-DEFAULT",
                             });
                           }}
-                          className="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 transition-colors flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--color-fc-primary)] bg-white border border-[var(--color-fc-primary)]/20 hover:bg-[var(--color-fc-surface)] transition-colors flex items-center gap-1"
                         >
                           <Printer className="w-3.5 h-3.5" />
                           <span>Reçu</span>
@@ -822,8 +822,8 @@ setProfileSaveSuccess(true);
         {activeTab === "recus" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Reçus de Paiement Numériques Officiels</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Reçus de Paiement Numériques Officiels</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Chaque reçu dispose d&apos;un code de vérification unique et d&apos;un QR code scannable conforme aux normes administratives.
               </p>
             </div>
@@ -834,38 +834,38 @@ setProfileSaveSuccess(true);
                 return (
                   <div
                     key={rec.id}
-                    className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4 relative overflow-hidden"
+                    className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4 relative overflow-hidden"
                   >
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fc-gray-mid)]">
                           Reçu Officiel FuturCraft
                         </span>
-                        <h4 className="text-lg font-mono font-black text-slate-900">
+                        <h4 className="text-lg font-mono font-black text-[var(--color-fc-black)]">
                           {rec.receiptNumber}
                         </h4>
-                        <span className="text-xs text-slate-500 block">Émis le : {rec.issuedAt}</span>
+                        <span className="text-xs text-[var(--color-fc-gray-mid)] block">Émis le : {rec.issuedAt}</span>
                       </div>
 
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
-                        <QrCode className="w-7 h-7 text-slate-700" />
+                      <div className="w-12 h-12 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] flex items-center justify-center text-[var(--color-fc-black)]">
+                        <QrCode className="w-7 h-7 text-[var(--color-fc-black)]" />
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-150 text-xs space-y-1 font-mono">
+                    <div className="p-3 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] text-xs space-y-1 font-mono">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Montant :</span>
-                        <strong className="text-slate-900">
+                        <span className="text-[var(--color-fc-gray-mid)]">Montant :</span>
+                        <strong className="text-[var(--color-fc-black)]">
                           {payment ? payment.amount.toLocaleString("fr-FR") : "—"} FCFA
                         </strong>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Moyen :</span>
+                        <span className="text-[var(--color-fc-gray-mid)]">Moyen :</span>
                         <span>{payment?.paymentMethod || "Mobile Money"}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Code sécurité :</span>
-                        <span className="text-blue-600 font-bold">{rec.verificationCode}</span>
+                        <span className="text-[var(--color-fc-gray-mid)]">Code sécurité :</span>
+                        <span className="text-[var(--color-fc-primary)] font-bold">{rec.verificationCode}</span>
                       </div>
                     </div>
 
@@ -881,7 +881,7 @@ setProfileSaveSuccess(true);
                             verificationCode: rec.verificationCode,
                           })
                         }
-                        className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center justify-center gap-1.5"
                       >
                         <Printer className="w-3.5 h-3.5" />
                         <span>Imprimer / PDF</span>
@@ -890,7 +890,7 @@ setProfileSaveSuccess(true);
                       <Link
                         href={`/recu/${rec.receiptNumber}`}
                         target="_blank"
-                        className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center gap-1"
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] flex items-center gap-1"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>Page publique</span>
@@ -907,28 +907,28 @@ setProfileSaveSuccess(true);
         {activeTab === "documents" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Documents Administratifs &amp; Scolarité</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Documents Administratifs &amp; Scolarité</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Téléchargez vos attestations officielles générées au format PDF certifié pour vos démarches.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Document 1: Attestation d'inscription */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] flex items-center justify-center">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Attestation d&apos;Inscription 2024-2025</h3>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Attestation d&apos;Inscription 2024-2025</h3>
+                  <p className="text-xs text-[var(--color-fc-gray-mid)] mt-1">
                     Document officiel certifiant votre inscription en formation professionnelle à FuturCraft Institut.
                   </p>
                 </div>
                 <div className="pt-2">
                   <button
                     onClick={() => window.print()}
-                    className="w-full py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 shadow-xs"
+                    className="w-full py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] flex items-center justify-center gap-2 "
                   >
                     <Download className="w-4 h-4" />
                     <span>Télécharger l&apos;Attestation Certifiée</span>
@@ -937,20 +937,20 @@ setProfileSaveSuccess(true);
               </div>
 
               {/* Document 2: Certificat de scolarité */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/8 text-[var(--color-fc-primary)]">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Règlement Intérieur &amp; Charte Pédagogique</h3>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Règlement Intérieur &amp; Charte Pédagogique</h3>
+                  <p className="text-xs text-[var(--color-fc-gray-mid)] mt-1">
                     Guide de l&apos;étudiant, critères d&apos;évaluation, modalités de soutenance et charte du matériel informatique.
                   </p>
                 </div>
                 <div className="pt-2">
                   <button
                     onClick={() => alert("Le règlement intérieur est disponible auprès de la scolarité de FuturCraft.")}
-                    className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center justify-center gap-2"
+                    className="w-full py-2.5 rounded-xl text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] flex items-center justify-center gap-2"
                   >
                     <Download className="w-4 h-4" />
                     <span>Consulter le guide PDF</span>
@@ -964,9 +964,9 @@ setProfileSaveSuccess(true);
         {/* TAB 5: MA FORMATION */}
         {activeTab === "formation" && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-              <h2 className="text-xl font-bold text-slate-900">{data.formation?.title}</h2>
-              <div className="flex flex-wrap gap-4 text-xs text-slate-600">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">{data.formation?.title}</h2>
+              <div className="flex flex-wrap gap-4 text-xs text-[var(--color-fc-gray-mid)]">
                 <span>⏱️ Durée : <strong>{data.formation?.duration}</strong></span>
                 <span>📍 Campus : <strong>{data.formation?.campus}</strong></span>
                 <span>🎓 Mode : <strong>{data.formation?.mode}</strong></span>
@@ -974,25 +974,25 @@ setProfileSaveSuccess(true);
             </div>
 
             {/* Modules details */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-              <h3 className="text-base font-bold text-slate-900">Progression du Curriculum</h3>
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
+              <h3 className="text-base font-bold text-[var(--color-fc-black)]">Progression du Curriculum</h3>
               <div className="space-y-3">
                 {data.formation?.modules ? (
                   (JSON.parse(data.formation.modules) as any[]).map((m, idx) => (
                     <div
                       key={idx}
-                      className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs"
+                      className="p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] space-y-1 text-xs"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-blue-600">{m.moduleNumber}</span>
-                        <span className="text-slate-500 font-medium">{m.duration}</span>
+                        <span className="font-extrabold text-[var(--color-fc-primary)]">{m.moduleNumber}</span>
+                        <span className="text-[var(--color-fc-gray-mid)] font-medium">{m.duration}</span>
                       </div>
-                      <h4 className="font-bold text-slate-900 text-sm">{m.title}</h4>
-                      <p className="text-slate-600 text-[11px] leading-relaxed">{m.description}</p>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">{m.title}</h4>
+                      <p className="text-[var(--color-fc-gray-mid)] text-[11px] leading-relaxed">{m.description}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-slate-500">Modules disponibles au secrétariat.</p>
+                  <p className="text-xs text-[var(--color-fc-gray-mid)]">Modules disponibles au secrétariat.</p>
                 )}
               </div>
             </div>
@@ -1004,8 +1004,8 @@ setProfileSaveSuccess(true);
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Centre de Notifications</h2>
-                <p className="text-xs text-slate-500">Alertes sur vos paiements, événements et documents.</p>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Centre de Notifications</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">Alertes sur vos paiements, événements et documents.</p>
               </div>
 
               {unreadNotifsCount > 0 && (
@@ -1021,7 +1021,7 @@ setProfileSaveSuccess(true);
                       notifications: prev.notifications.map((n) => ({ ...n, isRead: true })),
                     }));
                   }}
-                  className="text-xs font-bold text-blue-600 hover:underline"
+                  className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                 >
                   Tout marquer comme lu
                 </button>
@@ -1034,21 +1034,21 @@ setProfileSaveSuccess(true);
                   key={n.id}
                   className={`p-4 rounded-2xl border transition-all flex items-start justify-between gap-4 text-xs ${
                     n.isRead
-                      ? "bg-white border-slate-200"
-                      : "bg-blue-50/70 border-blue-200 font-medium"
+                      ? "bg-white border-[var(--color-fc-gray-light)]"
+                      : "bg-[var(--color-fc-surface)]/70 border-[var(--color-fc-primary)]/20 font-medium"
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm">{n.title}</span>
+                      <span className="font-bold text-[var(--color-fc-black)] text-sm">{n.title}</span>
                       {!n.isRead && (
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-600 text-white">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--color-fc-deep)] text-white">
                           Nouveau
 </span>
                       )}
                     </div>
-                    <p className="text-slate-600 text-xs leading-relaxed">{n.message}</p>
-                    <span className="text-[10px] text-slate-400 block pt-1">
+                    <p className="text-[var(--color-fc-gray-mid)] text-xs leading-relaxed">{n.message}</p>
+                    <span className="text-[10px] text-[var(--color-fc-gray-mid)] block pt-1">
                       {new Date(n.createdAt).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
@@ -1060,7 +1060,7 @@ setProfileSaveSuccess(true);
                   {!n.isRead && (
                     <button
                       onClick={() => handleMarkNotifRead(n.id)}
-                      className="text-[11px] font-bold text-blue-600 hover:underline shrink-0"
+                      className="text-[11px] font-bold text-[var(--color-fc-primary)] hover:underline shrink-0"
                     >
                       Marquer lu
                     </button>
@@ -1075,10 +1075,10 @@ setProfileSaveSuccess(true);
         {activeTab === "profil" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* Identité visuelle & CV */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 max-w-2xl">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-5 max-w-2xl">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Photo de profil &amp; Curriculum Vitae</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Photo de profil &amp; Curriculum Vitae</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Ces éléments sont mis en avant sur notre page Entreprises pour les recruteurs, une fois votre compte validé.
                 </p>
               </div>
@@ -1092,8 +1092,8 @@ setProfileSaveSuccess(true);
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {/* Avatar */}
-                <div className="rounded-2xl border border-slate-200 p-4 space-y-3">
-                  <span className="text-xs font-bold text-slate-700 block">Photo de profil</span>
+                <div className="rounded-2xl border border-[var(--color-fc-gray-light)] p-4 space-y-3">
+                  <span className="text-xs font-bold text-[var(--color-fc-black)] block">Photo de profil</span>
                   <div className="flex items-center gap-3">
                     {data.student.avatarUrl ? (
                       <Image
@@ -1105,13 +1105,13 @@ setProfileSaveSuccess(true);
                         className="w-16 h-16 rounded-full object-cover border-2 border-blue-100"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
-                        <Camera className="w-6 h-6 text-slate-400" />
+                      <div className="w-16 h-16 rounded-full bg-[var(--color-fc-bg)] border-2 border-[var(--color-fc-gray-light)] flex items-center justify-center">
+                        <Camera className="w-6 h-6 text-[var(--color-fc-gray-mid)]" />
                       </div>
                     )}
                     <div className="space-y-1.5 flex-1">
                       <label className="block">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] hover:bg-blue-100 cursor-pointer transition-colors">
                           <Upload className="w-3.5 h-3.5" />
                           {isUploadingAvatar ? "Envoi..." : "Choisir une photo"}
                         </span>
@@ -1141,27 +1141,27 @@ setProfileSaveSuccess(true);
                 </div>
 
                 {/* CV */}
-                <div className="rounded-2xl border border-slate-200 p-4 space-y-3">
-                  <span className="text-xs font-bold text-slate-700 block">Curriculum Vitae (PDF)</span>
+                <div className="rounded-2xl border border-[var(--color-fc-gray-light)] p-4 space-y-3">
+                  <span className="text-xs font-bold text-[var(--color-fc-black)] block">Curriculum Vitae (PDF)</span>
                   <div className="space-y-2">
                     {data.student.cvUrl ? (
                       <a
                         href={data.student.cvUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-2 text-[11px] font-bold text-blue-600 hover:underline"
+                        className="flex items-center gap-2 text-[11px] font-bold text-[var(--color-fc-primary)] hover:underline"
                       >
                         <FileText className="w-4 h-4" />
                         Voir mon CV actuel
                       </a>
                     ) : (
-                      <p className="text-[11px] text-slate-400 flex items-center gap-2">
+                      <p className="text-[11px] text-[var(--color-fc-gray-mid)] flex items-center gap-2">
                         <FileText className="w-4 h-4" />
                         Aucun CV déposé pour le moment.
                       </p>
                     )}
                     <label className="block">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] hover:bg-blue-100 cursor-pointer transition-colors">
                         <Upload className="w-3.5 h-3.5" />
                         {isUploadingCv ? "Envoi..." : data.student.cvUrl ? "Remplacer le CV" : "Déposer mon CV"}
                       </span>
@@ -1191,10 +1191,10 @@ setProfileSaveSuccess(true);
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6 max-w-2xl">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-6 max-w-2xl">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Coordonnées Étudiant</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Coordonnées Étudiant</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Mettez à jour vos coordonnées directes pour recevoir les alertes SMS et WhatsApp.
                 </p>
               </div>
@@ -1208,55 +1208,55 @@ setProfileSaveSuccess(true);
 
               <div className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Nom complet (Verrouillé)</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nom complet (Verrouillé)</label>
                   <input
                     type="text"
                     disabled
                     value={`${data.student.firstName} ${data.student.lastName}`}
-                    className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-semibold"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)] font-semibold"
                   />
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-[var(--color-fc-gray-mid)]">
                     Modifiable uniquement par l&apos;administration avec pièce d&apos;identité.
                   </span>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Matricule Étudiant</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Matricule Étudiant</label>
                   <input
                     type="text"
                     disabled
                     value={data.student.studentNumber}
-                    className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 font-mono font-bold text-blue-700"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] font-mono font-bold text-blue-700"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Téléphone d&apos;appel *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Téléphone d&apos;appel *</label>
                   <input
                     type="text"
                     value={phoneEdit}
                     onChange={(e) => setPhoneEdit(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-slate-200"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Ville</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Ville</label>
                   <input
                     type="text"
                     value={cityEdit}
                     onChange={(e) => setCityEdit(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-slate-200"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Adresse ou Quartier</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Adresse ou Quartier</label>
                   <input
                     type="text"
                     value={addressEdit}
                     onChange={(e) => setAddressEdit(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-slate-200"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
 
@@ -1264,7 +1264,7 @@ setProfileSaveSuccess(true);
                   <button
                     onClick={handleSaveProfile}
                     disabled={isSavingProfile}
-                    className="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-2"
+                    className="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center gap-2"
                   >
                     {isSavingProfile ? <span>Enregistrement...</span> : <span>Enregistrer les modifications</span>}
                   </button>
@@ -1277,11 +1277,11 @@ setProfileSaveSuccess(true);
 
       {/* PAYMENT MODAL GATEWAY SIMULATOR */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-md w-full p-6 sm:p-8  space-y-6 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-[var(--color-fc-primary)]" />
                 <span>Régler une échéance en ligne</span>
               </h3>
               <button
@@ -1290,7 +1290,7 @@ setProfileSaveSuccess(true);
                   setPaymentSuccessReceipt(null);
                   setPaymentRequestReference(null);
                 }}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -1298,15 +1298,15 @@ setProfileSaveSuccess(true);
 
             {paymentRequestReference ? (
               <div className="text-center py-4 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 rounded-full bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] flex items-center justify-center mx-auto">
                   <Clock className="w-8 h-8" />
                 </div>
-                <h4 className="text-xl font-bold text-slate-900">Demande de paiement envoyée</h4>
-                <p className="text-xs text-slate-600 space-y-2">
+                <h4 className="text-xl font-bold text-[var(--color-fc-black)]">Demande de paiement envoyée</h4>
+                <p className="text-xs text-[var(--color-fc-gray-mid)] space-y-2">
                   <span className="block">
-                    Votre paiement en ligne est <strong className="text-amber-600">en attente de validation</strong> par notre équipe financière.
+                    Votre paiement en ligne est <strong className="text-[var(--color-fc-primary)]">en attente de validation</strong> par notre équipe financière.
                   </span>
-                  <span className="block font-mono font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-xl py-2">
+                  <span className="block font-mono font-bold text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] border border-blue-100 rounded-xl py-2">
                     Référence : {paymentRequestReference}
                   </span>
                   <span className="block">
@@ -1320,7 +1320,7 @@ setProfileSaveSuccess(true);
                       setPaymentSuccessReceipt(null);
                       setPaymentRequestReference(null);
                     }}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs"
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] "
                   >
                     Fermer
                   </button>
@@ -1330,18 +1330,18 @@ setProfileSaveSuccess(true);
               <div className="space-y-4 text-xs">
                 {/* Method selector */}
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">Moyen de paiement :</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1.5">Moyen de paiement :</label>
                   <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("MTN Mobile Money")}
                       className={`p-3 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
                         paymentMethod === "MTN Mobile Money"
-                          ? "border-yellow-400 bg-yellow-50 text-slate-900 ring-2 ring-yellow-400"
-                          : "border-slate-200 bg-white text-slate-600"
+                          ? "border-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] text-[var(--color-fc-black)] ring-2 ring-[var(--color-fc-primary)]"
+                          : "border-[var(--color-fc-gray-light)] bg-white text-[var(--color-fc-gray-mid)]"
                       }`}
                     >
-                      <Smartphone className="w-4 h-4 text-yellow-600" />
+                      <Smartphone className="w-4 h-4 text-[var(--color-fc-primary)]" />
                       <span>MTN MoMo</span>
                     </button>
 
@@ -1350,11 +1350,11 @@ setProfileSaveSuccess(true);
                       onClick={() => setPaymentMethod("Moov Money")}
                       className={`p-3 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
                         paymentMethod === "Moov Money"
-                          ? "border-blue-500 bg-blue-50 text-slate-900 ring-2 ring-blue-500"
-                          : "border-slate-200 bg-white text-slate-600"
+                          ? "border-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] text-[var(--color-fc-black)] ring-2 ring-[var(--color-fc-primary)]"
+                          : "border-[var(--color-fc-gray-light)] bg-white text-[var(--color-fc-gray-mid)]"
                       }`}
                     >
-                      <Smartphone className="w-4 h-4 text-blue-600" />
+                      <Smartphone className="w-4 h-4 text-[var(--color-fc-primary)]" />
                       <span>Moov Money</span>
                     </button>
 
@@ -1363,8 +1363,8 @@ setProfileSaveSuccess(true);
                       onClick={() => setPaymentMethod("Carte Bancaire")}
                       className={`p-3 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
                         paymentMethod === "Carte Bancaire"
-                          ? "border-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/5 text-slate-900 ring-2 ring-[var(--color-fc-primary)]"
-                          : "border-slate-200 bg-white text-slate-600"
+                          ? "border-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/5 text-[var(--color-fc-black)] ring-2 ring-[var(--color-fc-primary)]"
+                          : "border-[var(--color-fc-gray-light)] bg-white text-[var(--color-fc-gray-mid)]"
                       }`}
                     >
                       <CreditCard className="h-4 w-4 text-[var(--color-fc-primary)]" />
@@ -1374,36 +1374,36 @@ setProfileSaveSuccess(true);
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">
                     Numéro de débit / Compte Mobile Money *
                   </label>
                   <input
                     type="text"
                     value={momoNumber}
                     onChange={(e) => setMomoNumber(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-slate-200 text-sm font-semibold"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] text-sm font-semibold"
                   />
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-[var(--color-fc-gray-mid)]">
                     Bénin : indicatif +229 (MTN Bénin ou Moov Bénin)
                   </span>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Montant à régler (FCFA) *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Montant à régler (FCFA) *</label>
                   <input
                     type="number"
                     value={paymentAmount}
                     onChange={(e) => setPaymentAmount(Number(e.target.value))}
-                    className="w-full p-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-900"
+                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] text-sm font-bold text-[var(--color-fc-black)]"
                   />
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
+                <div className="p-3 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] text-[11px] text-[var(--color-fc-gray-mid)] space-y-1">
                   <div className="flex justify-between">
                     <span>Frais de passerelle :</span>
                     <strong className="text-emerald-600">0 FCFA (Offerts par FuturCraft)</strong>
                   </div>
-                  <div className="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200">
+                  <div className="flex justify-between font-bold text-[var(--color-fc-black)] pt-1 border-t border-[var(--color-fc-gray-light)]">
                     <span>Total débité :</span>
                     <span>{paymentAmount.toLocaleString("fr-FR")} FCFA</span>
                   </div>
@@ -1413,7 +1413,7 @@ setProfileSaveSuccess(true);
                   <button
                     disabled={isProcessingPayment}
                     onClick={handleExecutePayment}
-                    className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700  shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isProcessingPayment ? (
                       <span>Validation de la transaction en cours...</span>
@@ -1433,24 +1433,24 @@ setProfileSaveSuccess(true);
 
       {/* OFFICIAL DIGITAL RECEIPT PREVIEW MODAL (Printable / Downloadable) */}
       {viewingReceipt && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-xl w-full p-6 sm:p-10 shadow-2xl space-y-6 my-8 animate-in zoom-in-95 duration-200 print:border-none print:shadow-none">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-xl w-full p-6 sm:p-10  space-y-6 my-8 animate-in zoom-in-95 duration-200 print:border-none print:shadow-none">
             {/* Action header */}
             <div className="flex items-center justify-between print:hidden">
-              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] px-2.5 py-1 rounded-md">
                 Reçu Numérique Certifié
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] flex items-center gap-1.5"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Imprimer</span>
                 </button>
                 <button
                   onClick={() => setViewingReceipt(null)}
-                  className="text-slate-400 hover:text-slate-600 font-bold p-1"
+                  className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold p-1"
                 >
                   ✕
                 </button>
@@ -1458,97 +1458,97 @@ setProfileSaveSuccess(true);
             </div>
 
             {/* Printable Receipt Certificate Container */}
-            <div className="border-2 border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 relative bg-white">
+            <div className="border-2 border-[var(--color-fc-gray-light)] rounded-2xl p-6 sm:p-8 space-y-6 relative bg-white">
               {/* Seal watermark */}
               <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
                 <ShieldCheck className="w-80 h-80 text-blue-900" />
               </div>
 
               {/* Header */}
-              <div className="flex items-start justify-between border-b border-slate-200 pb-4">
+              <div className="flex items-start justify-between border-b border-[var(--color-fc-gray-light)] pb-4">
                 <div>
-                  <h2 className="text-xl font-black text-slate-950">FUTURCRAFT INSTITUT</h2>
-                  <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                  <h2 className="text-xl font-black text-[var(--color-fc-black)]">FUTURCRAFT INSTITUT</h2>
+                  <p className="text-[10px] uppercase font-bold text-[var(--color-fc-gray-mid)] tracking-wider">
                     Centre d&apos;Excellence aux Métiers du Numérique • Bénin
                   </p>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] text-[var(--color-fc-gray-mid)]">
                     Godomey, Cotonou • IFU : 3202511489201 • contact@futurcraftinstitut.com
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-mono font-black text-blue-600 block">
+                  <span className="text-xs font-mono font-black text-[var(--color-fc-primary)] block">
                     {viewingReceipt.receiptNumber}
                   </span>
-                  <span className="text-[10px] text-slate-500 block">Date : {viewingReceipt.date}</span>
+                  <span className="text-[10px] text-[var(--color-fc-gray-mid)] block">Date : {viewingReceipt.date}</span>
                 </div>
               </div>
 
               {/* Student details */}
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Étudiant bénéficiaire :</span>
-                  <strong className="text-slate-900 text-sm block">
+                  <span className="text-[var(--color-fc-gray-mid)] block text-[10px]">Étudiant bénéficiaire :</span>
+                  <strong className="text-[var(--color-fc-black)] text-sm block">
                     {data.student.firstName} {data.student.lastName}
                   </strong>
-                  <span className="text-slate-600 text-[11px] font-mono">
+                  <span className="text-[var(--color-fc-gray-mid)] text-[11px] font-mono">
                     Matricule : {data.student.studentNumber}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Formation suivie :</span>
-                  <strong className="text-slate-900 text-xs block">
+                  <span className="text-[var(--color-fc-gray-mid)] block text-[10px]">Formation suivie :</span>
+                  <strong className="text-[var(--color-fc-black)] text-xs block">
                     {data.formation?.title || "Formation Professionnelle"}
                   </strong>
-                  <span className="text-slate-500 text-[10px]">
+                  <span className="text-[var(--color-fc-gray-mid)] text-[10px]">
                     {data.formation?.campus || "Campus Cotonou"}
                   </span>
                 </div>
               </div>
 
               {/* Payment Details Box */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
-                <div className="flex justify-between items-center text-sm font-black text-slate-950 pb-2 border-b border-slate-200">
+              <div className="p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] text-xs space-y-2">
+                <div className="flex justify-between items-center text-sm font-black text-[var(--color-fc-black)] pb-2 border-b border-[var(--color-fc-gray-light)]">
                   <span>MONTANT TOTAL ENCAISSÉ :</span>
                   <span className="text-emerald-600 text-lg">
                     {viewingReceipt.amount.toLocaleString("fr-FR")} FCFA
                   </span>
                 </div>
-                <div className="flex justify-between text-slate-600 text-[11px]">
+                <div className="flex justify-between text-[var(--color-fc-gray-mid)] text-[11px]">
                   <span>Mode de règlement :</span>
                   <strong>{viewingReceipt.method}</strong>
                 </div>
-                <div className="flex justify-between text-slate-600 text-[11px]">
+                <div className="flex justify-between text-[var(--color-fc-gray-mid)] text-[11px]">
                   <span>Référence de transaction :</span>
                   <span className="font-mono">{viewingReceipt.ref}</span>
                 </div>
-                <div className="flex justify-between text-slate-600 text-[11px]">
+                <div className="flex justify-between text-[var(--color-fc-gray-mid)] text-[11px]">
                   <span>Statut légal :</span>
                   <strong className="text-emerald-700">PAYÉ &amp; ENCAISSÉ (SOLDE VALIDÉ)</strong>
                 </div>
               </div>
 
               {/* QR Verification and Security code */}
-              <div className="pt-2 flex items-center justify-between border-t border-slate-200 gap-4">
+              <div className="pt-2 flex items-center justify-between border-t border-[var(--color-fc-gray-light)] gap-4">
                 <div className="space-y-1">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                  <span className="text-[10px] text-[var(--color-fc-gray-mid)] uppercase font-bold block">
                     Code de vérification d&apos;authenticité :
                   </span>
-                  <span className="font-mono font-bold text-xs text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  <span className="font-mono font-bold text-xs text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] px-2 py-0.5 rounded border border-[var(--color-fc-gray-light)]">
                     {viewingReceipt.verificationCode}
                   </span>
-                  <span className="text-[10px] text-slate-400 block pt-0.5">
+                  <span className="text-[10px] text-[var(--color-fc-gray-mid)] block pt-0.5">
                     Vérifiable sur : futurcraft.bj/recu/{viewingReceipt.receiptNumber}
                   </span>
                 </div>
 
-                <div className="w-16 h-16 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center shrink-0">
-                  <QrCode className="w-12 h-12 text-slate-900" />
+                <div className="w-16 h-16 bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] rounded-lg flex items-center justify-center shrink-0">
+                  <QrCode className="w-12 h-12 text-[var(--color-fc-black)]" />
                 </div>
               </div>
 
               {/* Stamp and signature note */}
-              <div className="pt-2 text-center text-[10px] text-slate-400">
+              <div className="pt-2 text-center text-[10px] text-[var(--color-fc-gray-mid)]">
                 Document généré électroniquement sous mandat de la Direction Financière de FuturCraft Institut. Fait foi de quittance libératoire.
               </div>
             </div>

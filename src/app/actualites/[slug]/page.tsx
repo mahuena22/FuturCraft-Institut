@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Clock, Share2 } from "lucide-react";
 import { PageIntro } from "@/components/PageIntro";
 
 export const dynamic = "force-dynamic";
@@ -87,18 +87,11 @@ export default async function ArticleDetailPage(props: {
           <span className="text-sm text-[var(--color-fc-gray-mid)]">Partager cet article</span>
         </div>
 
-        {/* CTA inscription */}
-        <div className="space-y-4 rounded-3xl bg-[var(--color-fc-deep)] p-8 text-center text-white">
-          <h3 className="text-xl font-bold">Envie de vous former avec nous ?</h3>
-          <p className="text-sm text-white/75">
-            Découvrez nos formations et lancez votre carrière dans la tech.
-          </p>
-          <Link
-            href="/#formations"
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3 font-bold text-[var(--color-fc-deep)] transition-colors hover:bg-white"
-          >
-            Voir nos formations
-            <ArrowLeft className="w-4 h-4 rotate-180" />
+        <div className="rounded-[1.75rem] bg-[var(--color-fc-deep)] p-8 text-center text-white sm:p-10">
+          <h3 className="font-display text-2xl font-extrabold tracking-tight">Envie de te former avec nous ?</h3>
+          <p className="mt-3 text-sm leading-7 text-white/65">Découvre nos formations et lance ta carrière dans le numérique.</p>
+          <Link href="/formations" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3 font-bold text-[#06122f] transition-colors hover:bg-white">
+            Voir les formations <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </article>

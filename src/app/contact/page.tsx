@@ -43,171 +43,105 @@ export default function ContactPage() {
         description="Nos équipes pédagogiques et administratives sont à votre écoute pour vous guider vers le métier du numérique qui vous correspond."
       />
       <div className="page-container py-12 sm:py-16">
-        {/* 2 Column Content */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-          {/* Left: Contact Details & Campus */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="space-y-6 rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-8">
-              <h3 className="text-xl font-bold text-[var(--color-fc-black)]">Coordonnées Officielles</h3>
+          <div className="space-y-6 lg:col-span-5">
+            <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-7 sm:p-8">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">Coordonnées</p>
+              <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Parlons de ton projet</h2>
 
-              <div className="space-y-4 text-xs">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-primary)] flex items-center justify-center shrink-0 mt-0.5">
-                    <MapPin className="w-4 h-4" />
-                  </div>
+              <div className="mt-8 space-y-6 text-sm">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]"><MapPin className="h-4 w-4" /></div>
                   <div>
-                    <strong className="text-[var(--color-fc-black)] text-sm block">Campus FuturCraft Institut</strong>
-                    <span className="text-[var(--color-fc-gray-mid)] leading-relaxed">
-                      Godomey, Supermarché O Bénin, avant pk14, Cotonou, Bénin.
-                    </span>
+                    <p className="font-semibold text-[var(--color-fc-black)]">Campus FuturCraft</p>
+                    <p className="mt-1 leading-7 text-[var(--color-fc-gray-mid)]">Godomey, Supermarché O Bénin, avant pk14, Abomey-Calavi</p>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[var(--color-fc-cyan)]/10 text-[var(--color-fc-cyan)] flex items-center justify-center shrink-0 mt-0.5">
-                    <Phone className="w-4 h-4" />
-                  </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]"><Phone className="h-4 w-4" /></div>
                   <div>
-                    <strong className="text-[var(--color-fc-black)] text-sm block">Téléphone & WhatsApp</strong>
-                    <span className="text-[var(--color-fc-gray-mid)] block">+229 43 32 78 32</span>
-                    <span className="text-[var(--color-fc-gray-mid)] block">+229 01 97 30 30 50</span>
+                    <p className="font-semibold text-[var(--color-fc-black)]">Téléphone & WhatsApp</p>
+                    <a href="tel:+22943327832" className="mt-1 block text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-primary)]">+229 43 32 78 32</a>
+                    <a href="tel:+2290197303050" className="block text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-primary)]">+229 01 97 30 30 50</a>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[var(--color-fc-light)]/20 text-[var(--color-fc-light)] flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4" />
-                  </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]"><Mail className="h-4 w-4" /></div>
                   <div>
-                    <strong className="text-[var(--color-fc-black)] text-sm block">Courrier Électronique</strong>
-                    <span className="text-[var(--color-fc-gray-mid)] block">futurcraftinstitut@gmail.com</span>
-                    <span className="text-[var(--color-fc-gray-mid)] block">entreprisebenin@gmail.com</span>
+                    <p className="font-semibold text-[var(--color-fc-black)]">Email</p>
+                    <a href="mailto:futurcraftinstitut@gmail.com" className="mt-1 block text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-primary)]">futurcraftinstitut@gmail.com</a>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-primary)] flex items-center justify-center shrink-0 mt-0.5">
-                    <Clock className="w-4 h-4" />
-                  </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]"><Clock className="h-4 w-4" /></div>
                   <div>
-                    <strong className="text-[var(--color-fc-black)] text-sm block">Horaires d&apos;Ouverture</strong>
-                    <span className="text-[var(--color-fc-gray-mid)] block">Du Lundi au Vendredi : 09h00 — 13h00 / 19h00 — 22h30</span>
-                    <span className="text-[var(--color-fc-gray-mid)] block">Samedi : 09h00 — 14h00</span>
+                    <p className="font-semibold text-[var(--color-fc-black)]">Horaires</p>
+                    <p className="mt-1 leading-7 text-[var(--color-fc-gray-mid)]">Lun – Ven : 09h–13h / 19h–22h30<br />Samedi : 09h–14h</p>
                   </div>
                 </div>
               </div>
 
-              {/* Direct WhatsApp CTA */}
-              <div className="pt-2">
-                <WhatsAppButton
-                  defaultMessage="Bonjour, je souhaite des informations sur les formations FuturCraft"
-                  variant="default"
-                />
+              <div className="mt-8 border-t border-[var(--color-fc-gray-light)] pt-6">
+                <WhatsAppButton defaultMessage="Bonjour, je souhaite des informations sur les formations FuturCraft" variant="default" />
               </div>
             </div>
           </div>
 
-          {/* Right: Message Form */}
-          <div className="space-y-6 rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-10 lg:col-span-7">
-            <div>
-              <h3 className="text-2xl font-bold text-[var(--color-fc-black)]">Envoyez-nous un Message</h3>
-              <p className="text-xs text-[var(--color-fc-gray-mid)] mt-1">
-                Remplissez ce formulaire et un conseiller pédagogique vous répondra sous 24h.
-              </p>
-            </div>
+          <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-7 sm:p-10 lg:col-span-7">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">Message</p>
+            <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Écris-nous</h2>
+            <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+              Décris ton besoin, on te répond rapidement avec les informations utiles.
+            </p>
 
             {submitted ? (
-              <div className="p-8 rounded-2xl bg-[var(--color-fc-cyan)]/10 border border-[var(--color-fc-cyan)]/20 text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-[var(--color-fc-cyan)] mx-auto" />
-                <h4 className="text-lg font-bold text-[var(--color-fc-black)]">Message transmis avec succès !</h4>
-                <p className="text-xs text-[var(--color-fc-gray-mid)] max-w-sm mx-auto">
-                  Merci {form.name}, notre équipe a bien reçu votre demande et vous contactera très prochainement.
+              <div className="mt-8 rounded-2xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-10 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                  <CheckCircle2 className="h-7 w-7" />
+                </div>
+                <h4 className="mt-5 font-display text-xl font-bold text-[var(--color-fc-black)]">Message envoyé</h4>
+                <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+                  Merci {form.name}, notre équipe te recontactera très vite.
                 </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="mt-2 text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
-                >
+                <button onClick={() => setSubmitted(false)} className="mt-5 text-sm font-bold text-[var(--color-fc-primary)] hover:underline">
                   Envoyer un autre message
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-bold text-[var(--color-fc-gray-mid)] mb-1">Votre Nom & Prénom *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="ex: Jean DOSSOU"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[var(--color-fc-gray-mid)] mb-1">Adresse Email *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="votre.email@gmail.com"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
-                    />
-                  </div>
+              <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-semibold text-[var(--color-fc-black)]">Nom complet *</span>
+                    <input type="text" required placeholder="ex: Jean DOSSOU" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-fc-primary)]" />
+                  </label>
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-semibold text-[var(--color-fc-black)]">Email *</span>
+                    <input type="email" required placeholder="vous@email.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-fc-primary)]" />
+                  </label>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-bold text-[var(--color-fc-gray-mid)] mb-1">Numéro de Téléphone *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="+229 ..."
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[var(--color-fc-gray-mid)] mb-1">Objet de la demande *</label>
-                    <select
-                      value={form.subject}
-                      onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)]"
-                    >
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-semibold text-[var(--color-fc-black)]">Téléphone *</span>
+                    <input type="text" required placeholder="+229 ..." value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-fc-primary)]" />
+                  </label>
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-semibold text-[var(--color-fc-black)]">Objet *</span>
+                    <select value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-fc-primary)]">
                       <option value="Renseignement sur les formations">Renseignement sur les formations</option>
                       <option value="Candidature & Inscription">Candidature & Inscription</option>
                       <option value="Modalités de paiement">Modalités de paiement</option>
                       <option value="Partenariat entreprise">Partenariat entreprise</option>
                       <option value="Autre demande">Autre demande</option>
                     </select>
-                  </div>
+                  </label>
                 </div>
-
-                <div>
-                  <label className="block font-bold text-[var(--color-fc-gray-mid)] mb-1">Votre Message *</label>
-                  <textarea
-                    rows={4}
-                    required
-                    placeholder="Expliquez-nous votre projet ou posez vos questions..."
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)]"
-                  />
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 rounded-xl text-xs font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-md transition-all flex items-center justify-center gap-2"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Transmettre mon message</span>
-                  </button>
-                </div>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-[var(--color-fc-black)]">Message *</span>
+                  <textarea rows={5} required placeholder="Explique ton projet ou ta question..." value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-fc-primary)]" />
+                </label>
+                <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)] sm:w-auto">
+                  <Send className="h-4 w-4" /> Envoyer le message
+                </button>
               </form>
             )}
           </div>

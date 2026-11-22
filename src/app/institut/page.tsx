@@ -71,144 +71,111 @@ export default function InstitutPage() {
         description="Nous ne formons pas simplement des étudiants. Nous aidons une génération à construire, créer et transformer son avenir."
       />
 
-      {/* 21.1 HISTOIRE, MISSION, VISION */}
-      <section className="page-container space-y-16 py-14 sm:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 space-y-6">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
-              Notre Histoire
-            </span>
-            <h2 className="text-3xl font-extrabold text-slate-950 leading-tight">
-              Une ambition née pour combler le fossé entre diplômes et compétences réelles
+      <section className="page-container py-14 sm:py-20 lg:py-24">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="space-y-6 lg:col-span-6">
+            <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+              Notre histoire
+            </p>
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
+              Former des talents utiles, pas seulement diplômés.
             </h2>
-            <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
+            <div className="space-y-4 text-base leading-8 text-[var(--color-fc-gray-mid)]">
               <p>
-                FuturCraft Institut est né d&apos;un constat lucide sur le marché de l&apos;emploi en Afrique de l&apos;Ouest : des milliers de diplômés sortent chaque année d&apos;écoles supérieures avec des connaissances théoriques dépassées, tandis que les entreprises et startups peinent désespérément à recruter des développeurs opérationnels, des designers UI/UX ou des spécialistes en intelligence artificielle.
+                FuturCraft Institut est né d&apos;un constat simple : beaucoup de jeunes apprennent la théorie, mais peu ont l&apos;occasion de pratiquer dans des conditions proches du réel.
               </p>
               <p>
-                Sous l&apos;impulsion de Gauthier I. ORE et d&apos;une équipe d&apos;ingénieurs et pédagogues engagés, FuturCraft s&apos;est donné pour mission de proposer un modèle disruptif : 80% de pratique en atelier, immersion en conditions d&apos;entreprise réelles, et mentorat continu par des professionnels en activité.
+                Notre réponse : des formations courtes, pratiques, encadrées par des professionnels, avec des projets concrets, du mentorat et un accompagnement vers l&apos;emploi ou l&apos;entrepreneuriat.
               </p>
             </div>
           </div>
 
-          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="p-6 rounded-2xl bg-blue-50/60 border border-blue-150 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
-                <Target className="w-5 h-5" />
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:col-span-6">
+            <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-7">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                <Target className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Notre Mission</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Former des talents agiles, techniquement solides et dotés d&apos;un savoir-faire directement valorisable sur le marché local et mondial du numérique.
+              <h3 className="mt-5 font-display text-xl font-bold text-[var(--color-fc-black)]">Notre mission</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+                Donner aux apprenants les compétences, la confiance et le portfolio pour créer de la valeur sur le marché du numérique.
               </p>
             </div>
-
-            <div className="p-6 rounded-2xl bg-violet-50/60 border border-violet-150 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
-                <Eye className="w-5 h-5" />
+            <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-7">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                <Eye className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Notre Vision</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Faire du Bénin le hub d&apos;ingénierie et de créativité numérique le plus dynamique d&apos;Afrique subsaharienne, capable d&apos;exporter des compétences d&apos;élite.
+              <h3 className="mt-5 font-display text-xl font-bold text-[var(--color-fc-black)]">Notre vision</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+                Faire de FuturCraft une référence de la formation numérique pratique au Bénin et en Afrique de l&apos;Ouest.
               </p>
             </div>
           </div>
         </div>
 
-        {/* 21.2 NOS 6 VALEURS */}
-        <div className="space-y-8 pt-8 border-t border-slate-200">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">
-              Notre ADN
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
-              Les 6 Valeurs Cardinales de FuturCraft
+        <div className="mt-20 border-t border-[var(--color-fc-gray-light)] pt-16 lg:mt-24 lg:pt-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+              Nos valeurs
+            </p>
+            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
+              Ce qui guide notre manière de former
             </h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {values.map((v, i) => (
-              <div
-                key={i}
-                className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] space-y-2 hover:border-blue-300 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
-                  <h3 className="text-base font-bold text-slate-900">{v.title}</h3>
+          <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {values.map((v) => (
+              <div key={v.title} className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                  <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed pl-6">{v.desc}</p>
+                <h3 className="mt-4 font-display text-lg font-bold text-[var(--color-fc-black)]">{v.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">{v.desc}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 21.3 NOTRE ÉQUIPE */}
-        <div className="space-y-8 pt-8 border-t border-slate-200">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2.5 py-1 rounded">
-              Direction &amp; Pédagogie
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
-              L&apos;Équipe FuturCraft Institut
-            </h2>
-            <p className="text-xs text-slate-500">
-              Des professionnels engagés au quotidien pour la réussite de chaque promotion d&apos;étudiants.
+        <div className="mt-20 border-t border-[var(--color-fc-gray-light)] pt-16 lg:mt-24 lg:pt-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+              L&apos;équipe
             </p>
+            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
+              Des professionnels engagés pour ta progression
+            </h2>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {team.map((m, i) => (
-              <div
-                key={i}
-                className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 text-center group"
-              >
-                <div className="w-24 h-24 mx-auto rounded-2xl overflow-hidden border-2 border-slate-100 group-hover:border-blue-500 transition-colors relative">
+          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {team.map((m) => (
+              <article key={m.name} className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-6 text-center">
+                <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-2xl bg-[var(--color-fc-gray-light)]/40">
                   <Image src={m.image} alt={m.name} fill sizes="96px" className="object-cover" />
                 </div>
-                <div className="space-y-1">
-                  <h4 className="font-bold text-slate-900 text-sm">{m.name}</h4>
-                  <p className="text-[11px] text-blue-600 font-semibold">{m.role}</p>
-                  <p className="text-[11px] text-slate-500 leading-relaxed pt-1">{m.bio}</p>
-                </div>
-              </div>
+                <h3 className="mt-5 font-display text-base font-bold text-[var(--color-fc-black)]">{m.name}</h3>
+                <p className="mt-1 text-xs font-semibold text-[var(--color-fc-primary)]">{m.role}</p>
+                <p className="mt-3 text-sm leading-7 text-[var(--color-fc-gray-mid)]">{m.bio}</p>
+              </article>
             ))}
           </div>
         </div>
 
-        {/* 21.4 NOS CAMPUS AU BÉNIN */}
-        <div className="p-8 rounded-3xl bg-slate-900 text-white space-y-6">
-          <div className="max-w-2xl">
-            <span className="text-xs uppercase font-bold text-blue-400">Infrastructures</span>
-            <h3 className="text-2xl font-bold mt-1">Nos Campus au Bénin</h3>
-            <p className="text-xs text-slate-300 mt-1">
-              Des environnements immersifs, connectés à la fibre optique et équipés pour la pratique intensive.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-blue-400 shrink-0" />
-                <h4 className="font-bold text-white text-sm">Campus FuturCraft Institut</h4>
+        <div className="mt-20 overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] px-8 py-12 text-white sm:px-12 lg:mt-24">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">Campus</p>
+              <h3 className="mt-4 font-display text-3xl font-extrabold tracking-tight">Un espace conçu pour la pratique</h3>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-white/65">
+                À Godomey, les apprenants travaillent dans un environnement équipé pour apprendre vite, collaborer et produire des projets concrets.
+              </p>
+              <div className="mt-6 flex items-start gap-3 text-sm text-white/75">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-fc-cyan)]" />
+                <span>Godomey, Supermarché O Bénin, avant pk14, Abomey-Calavi</span>
               </div>
-              <p className="text-slate-300">
-                Godomey, Supermarché O Bénin, avant pk14, Cotonou, Bénin.
-              </p>
-              <p className="text-[11px] text-slate-400">
-                • Salles informatiques climatisées • Studio audiovisuel • Lab drones &amp; IA
-              </p>
             </div>
-
-            <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-indigo-400 shrink-0" />
-                <h4 className="font-bold text-white text-sm">Découvrez nos installations</h4>
-              </div>
-              <p className="text-slate-300">
-                Un pôle unique entièrement dédié à la pratique : laboratoires connectés, ateliers créatifs et espaces de collaboration.
-              </p>
-              <p className="text-[11px] text-slate-400">
-                • Ateliers pratiques • Espace co-working • Espace de vol extérieur drones
-              </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {["Salles informatiques équipées", "Studio audiovisuel", "Ateliers pratiques", "Accompagnement mentoré"].map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-medium text-white/85">
+                  {item}
+                </div>
+              ))}
             </div>
           </div>
         </div>

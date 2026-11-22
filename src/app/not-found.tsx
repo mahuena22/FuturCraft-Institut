@@ -4,7 +4,7 @@ import { Compass, ArrowRight, Search } from "lucide-react";
 export default function NotFound() {
   return (
     <div className="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-[var(--color-fc-bg)] px-4">
-      <div className="pointer-events-none absolute inset-0 bg-grid opacity-20" />
+      <div className="pointer-events-none absolute inset-0 opacity-0" />
       <div className="relative mx-auto w-full max-w-lg space-y-6 py-20 text-center">
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--color-fc-deep)] text-white shadow-xl shadow-[var(--color-fc-deep)]/20">
           <Compass className="w-9 h-9" />

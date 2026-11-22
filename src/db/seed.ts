@@ -2,7 +2,6 @@ import { db } from "./index";
 import {
   formations,
   promotions,
-  studentProjects,
   companyOffers,
   events,
   blogArticles,
@@ -28,9 +27,9 @@ export async function seedDatabase() {
           title: "Développement Web Fullstack",
           category: "Développement & Code",
           shortDescription:
-            "Devenez un développeur complet capable de concevoir, développer et déployer des applications web modernes et scalables.",
+            "Apprenez à concevoir et déployer des applications web modernes, du frontend au backend.",
           fullDescription:
-            "La formation Développement Web Fullstack de FuturCraft Institut forme des développeurs polyvalents et opérationnels dès leur sortie. Du frontend réactif avec React et Tailwind CSS au backend robuste avec Node.js, Express, PostgreSQL et Drizzle/Prisma, vous concevrez de bout en bout des solutions logicielles conformes aux normes internationales.",
+            "Formation en développement web : React et Tailwind côté interface, Node.js, Express et PostgreSQL côté serveur. Vous construisez des applications complètes du début à la fin.",
           duration: "2 ans",
           level: "Débutant à Avancé (BAC ou équivalent)",
           price: 600000,
@@ -255,7 +254,7 @@ export async function seedDatabase() {
           shortDescription:
             "Concevez des interfaces centrées utilisateur élégantes, ergonomiques et performantes pour le web et le mobile.",
           fullDescription:
-            "Devenez un designer d'expérience convoité. ì travers une démarche human-centered design, apprenez la recherche utilisateur, l'architecture de l'information, le wireframing, le prototypage interactif avancé sur Figma et la création de design systems cohérents.",
+            "Formation en design d'interfaces et expérience utilisateur : recherche utilisateur, wireframes, prototypage sur Figma et design systems.",
           duration: "9 mois",
           level: "Tous niveaux (BEPC / BAC)",
           price: 250000,
@@ -626,96 +625,7 @@ export async function seedDatabase() {
       ])
       .returning();
 
-    // 3. Student Projects (matching Cahier des charges: GEN3RVTO + others)
-    await db.insert(studentProjects).values([
-      {
-        slug: "gen3rvto-rh",
-        title: "GEN3RVTO",
-        tagline: "Plateforme intelligente de gestion des ressources humaines et des talents pour PME africaines",
-        description:
-          "Conçue par des étudiants en Développement Fullstack, GEN3RVTO automatise la gestion des congés, la paie instantanée avec intégration Mobile Money et le suivi des performances avec des analytics en temps réel.",
-        coverImage: "/images/GEN3RVTO.png",
-        formationTitle: "Développement Web Fullstack",
-        technologies: JSON.stringify(["React", "NestJS", "PostgreSQL", "Prisma", "Tailwind CSS"]),
-        teamMembers: JSON.stringify([
-          { name: "Onesim Graça", role: "Lead Frontend & Architecture" },
-          { name: "Boris KPADONOU", role: "Backend & API NestJS" },
-          { name: "Amina SOSSOU", role: "UI/UX Design & Prototypage" },
-        ]),
-        projectUrl: "https://gen3rvto.vercel.app/",
-        githubUrl: "https://github.com/futurcraft-students/gen3rvto-rh",
-        isFeatured: true,
-      },
-      {
-        slug: "ayiha-boost",
-        title: "AYIHA-Boost",
-        tagline: "Application de accompagnement et de boost de la réussite scolaire",
-        description:
-          "Projet étudiant conçu pour accompagner et dynamiser le parcours scolaire : suivi personnalisé, motivation et outils d'apprentissage destinés aux lycéens et étudiants.",
-        coverImage: "/images/AYIHA-Boost.webp",
-        formationTitle: "Développement Web Fullstack",
-        technologies: JSON.stringify(["Next.js", "TypeScript", "Tailwind CSS"]),
-        teamMembers: JSON.stringify([
-          { name: "Loïc Assogba", role: "Développeur Fullstack" },
-        ]),
-        projectUrl: "https://ayiha-psi.vercel.app/",
-        githubUrl: "",
-        isFeatured: true,
-      },
-      {
-        slug: "agroconnect-benin",
-        title: "AgroConnect Bénin",
-        tagline: "Marketplace agricole intelligente connectant producteurs locaux et distributeurs urbains",
-        description:
-          "Plateforme web et mobile facilitant l'achat direct de produits vivriers béninois (ananas pain de sucre, maïs, manioc) sans intermédiaires abusifs, avec géolocalisation et paiement sécurisé.",
-        coverImage: "https://images.pexels.com/photos/9159001/pexels-photo-9159001.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-        formationTitle: "E-commerce & Web Fullstack",
-        technologies: JSON.stringify(["Next.js", "Node.js", "PostgreSQL", "FedaPay", "Tailwind CSS"]),
-        teamMembers: JSON.stringify([
-          { name: "Sylvain DOHOU", role: "Fullstack Developer" },
-          { name: "Marielle AKPO", role: "E-commerce & Growth" },
-        ]),
-        projectUrl: "https://agroconnect.demo.futurcraft.bj",
-        githubUrl: "https://github.com/futurcraft-students/agroconnect-bj",
-        isFeatured: true,
-      },
-      {
-        slug: "skyfarm-drone-ai",
-        title: "SkyFarm Drone Vision",
-        tagline: "Système de télédétection par drone et IA pour la détection précoce des maladies des cultures",
-        description:
-          "Fusionnant le pilotage de drone et la vision par ordinateur avec PyTorch, ce projet permet de survoler les champs et cartographier les foyers d'infestation avec une précision centimétrique.",
-        coverImage: "https://images.pexels.com/photos/14484029/pexels-photo-14484029.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-        formationTitle: "Pilotage de Drone & Intelligence Artificielle",
-        technologies: JSON.stringify(["Python", "PyTorch", "DJI SDK", "OpenCV", "FastAPI", "React"]),
-        teamMembers: JSON.stringify([
-          { name: "Koffi MENSAH", role: "Télépilote & Cartographie" },
-          { name: "Bérénice DOSSOU", role: "Modélisation IA & Vision" },
-        ]),
-        projectUrl: "https://skyfarm.demo.futurcraft.bj",
-        githubUrl: "https://github.com/futurcraft-students/skyfarm-vision",
-        isFeatured: true,
-      },
-      {
-        slug: "djidjo-esante",
-        title: "DjiDjo Santé",
-        tagline: "Dossier médical patient numérique et télé-orientation pour cliniques béninoises",
-        description:
-          "Interface fluide pensée pour les centres de santé en zone péri-urbaine, facilitant les rendez-vous, les prescriptions sécurisées et l'historique vaccinal.",
-        coverImage: "https://images.pexels.com/photos/7014919/pexels-photo-7014919.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-        formationTitle: "Web Design (UI/UX) & Fullstack",
-        technologies: JSON.stringify(["Figma", "React", "TypeScript", "Tailwind CSS"]),
-        teamMembers: JSON.stringify([
-          { name: "Amina SOSSOU", role: "Lead UI/UX Designer" },
-          { name: "Félicien ZANNOU", role: "Développeur Frontend" },
-        ]),
-        projectUrl: "https://djidjo.demo.futurcraft.bj",
-        githubUrl: "https://github.com/futurcraft-students/djidjo-esante",
-        isFeatured: true,
-      },
-    ]);
-
-    // 4. Company Offers
+    // 3. Company Offers
     await db.insert(companyOffers).values([
       {
         companyName: "InnovTech Bénin",
@@ -761,7 +671,7 @@ export async function seedDatabase() {
       },
     ]);
 
-    // 5. Events
+    // 4. Events
     await db.insert(events).values([
       {
         title: "Hackathon FuturTech 2025 : L'IA au service de l'Afrique",
@@ -795,18 +705,18 @@ export async function seedDatabase() {
       },
     ]);
 
-    // 6. Blog Articles / Actualités
+    // 5. Blog Articles / Actualités
     await db.insert(blogArticles).values([
       {
         slug: "pourquoi-se-former-au-numerique-au-benin-en-2025",
         title: "Pourquoi se former aux métiers du numérique au Bénin en 2025 ?",
         excerpt:
           "Le numérique explose en Afrique de l'Ouest. Découvrez les compétences les plus recherchées par les recruteurs et comment FuturCraft prépare les talents.",
-        content: `Le continent africain vit une révolution technologique sans précédent. Au Bénin, l'essor de la digitalisation des services publics, l'arrivée de la fibre optique et la création d'écosystèmes d'innovation comme Sèmè City démontrent l'urgence d'une main-d'œuvre hautement qualifiée.
+        content: `Au Bénin, la demande en compétences numériques dépasse largement l'offre. Les entreprises de Cotonou et d'Abomey-Calavi peinent à recruter des profils opérationnels en développement, en design ou en audiovisuel.
 
-ì FuturCraft Institut, nous avons fait le choix radical de la pratique : 80% de nos cours se font face à un projet réel, avec un mentorat continu et des technologies utilisées au quotidien dans les entreprises de premier plan.
+À FuturCraft Institut, on a choisi de former sur le terrain : environ 80 % des heures de cours se font sur des projets réels, avec un mentor qui suit l'étudiant du début à la fin. Pas de cours magistraux interminables, on code, on monte, on filme, on pilote.
 
-Qu'il s'agisse de développement Fullstack, de modélisation en intelligence artificielle, d'audiovisuel ou de pilotage de drones, notre mission est de transformer la curiosité en expertise professionnelle rentable.`,
+Le but n'est pas de collectionner des certificats, mais de sortir avec un portfolio et des réflexes de travail en équipe. Les anciens étudiants le disent souvent : c'est la pratique qui a fait la différence lors des entretiens.`,
         coverImage: "https://images.pexels.com/photos/33920044/pexels-photo-33920044.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
         author: "Gauthier I. ORE, Co-Fondateur",
         readTime: "4 min",
@@ -818,9 +728,9 @@ Qu'il s'agisse de développement Fullstack, de modélisation en intelligence art
         title: "Les étudiants de FuturCraft dévoilent leurs projets de fin de cohorte devant un jury d'entreprises",
         excerpt:
           "De la gestion intelligente des RH à la cartographie agricole par drone, retour sur une journée de pitchs impressionnants au campus de Godomey.",
-        content: `Ce samedi s'est tenue la soutenance officielle de la cohorte TechCraft. Devant un jury composé de directeurs techniques, de fondateurs de startups et de directeurs d'agences digitales de Cotonou, 15 équipes ont défendu leurs applications en conditions réelles.
+        content: `Ce samedi, la cohorte TechCraft a présenté ses projets de fin de formation devant un jury composé de directeurs techniques, de fondateurs de startups et de responsables d'agences digitales de Cotonou. Quinze équipes ont défendu leurs applications en conditions réelles.
 
-Les projets présentés ont démontré une maturité technique remarquable : architectures réactives, APIs résilientes, interfaces soignées et respect rigoureux des contraintes de performance. Plusieurs étudiants ont reçu des offres de stage et d'embauche immédiates à l'issue de la journée.`,
+Les projets étaient variés : gestion RH, cartographie agricole par drone, plateformes e-commerce. Le jury a souligné la qualité du code et la capacité des étudiants à expliquer leurs choix techniques. Quelques-uns sont repartis avec des propositions de stage ou d'embauche.`,
         coverImage: "https://images.pexels.com/photos/9159042/pexels-photo-9159042.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
         author: "Équipe Pédagogique FuturCraft",
         readTime: "3 min",
@@ -832,9 +742,9 @@ Les projets présentés ont démontré une maturité technique remarquable : arc
         title: "Comment l'IA transforme le travail des créatifs et marketeurs en Afrique",
         excerpt:
           "Loin de remplacer les humains, les outils d'IA augmentent la productivité de ceux qui savent les maîtriser. Analyse et conseils pratiques.",
-        content: `L'intelligence artificielle n'est pas une menace pour les créatifs, c'est un amplificateur de talent. Les marketeurs et designers qui adoptent des workflows intégrant Midjourney, Claude et ChatGPT produisent cinq fois plus vite des maquettes, du copywriting percutant et des analyses de marché précises.
+        content: `L'intelligence artificielle change la façon de travailler des créatifs, mais elle ne les remplace pas. Les marketeurs et designers qui apprennent à utiliser Midjourney, Claude ou ChatGPT dans leur quotidien gagnent du temps sur les tâches répétitives et peuvent se concentrer sur l'idée et la stratégie.
 
-Dans notre formation intensive 'Maîtrise des outils d'IA', nous guidons les professionnels pour passer du statut de spectateur à celui d'artisan augmenté.`,
+Dans notre formation courte « Maîtrise des outils d'IA », on montre aux professionnels comment intégrer ces outils dans leur workflow sans perdre leur style. Le but est de rester aux commandes, pas de déléguer la réflexion à la machine.`,
         coverImage: "https://images.pexels.com/photos/8199137/pexels-photo-8199137.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
         author: "Marcelle Agossou",
         readTime: "5 min",

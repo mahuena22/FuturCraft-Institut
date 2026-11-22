@@ -132,10 +132,9 @@ export function FormationsExplorer({ formations, isLoading = false }: Formations
             return (
               <div
                 key={f.id}
-                className="group flex flex-col overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-fc-primary)]/30 hover:shadow-xl hover:shadow-[var(--color-fc-deep)]/10"
+                className="group flex flex-col overflow-hidden rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-fc-primary)]/25 hover:shadow-[0_24px_60px_-20px_rgba(7,22,61,0.15)]"
               >
-                {/* Media */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)]">
+                <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)]/40">
                   <Image
                     src={f.imageUrl}
                     alt={f.title}
@@ -143,103 +142,64 @@ export function FormationsExplorer({ formations, isLoading = false }: Formations
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                   />
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[var(--color-fc-bg)]/95 backdrop-blur-xs text-[var(--color-fc-deep)] shadow-xs border border-[var(--color-fc-gray-light)]/60">
+                  <div className="absolute left-4 top-4 flex gap-2">
+                    <span className="rounded-full bg-white/95 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--color-fc-primary)] shadow-sm">
                       {f.category}
                     </span>
-                  </div>
-                  {f.isPopular && (
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[var(--color-fc-primary)] text-[var(--color-fc-bg)] shadow-xs flex items-center gap-1">
-                        <Flame className="w-3 h-3" /> Populaire
+                    {f.isPopular && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-fc-deep)] px-3 py-1.5 text-[10px] font-bold text-white">
+                        <Flame className="h-3 w-3" /> Populaire
                       </span>
-                    </div>
-                  )}
-
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl bg-[var(--color-fc-deep)]/85 px-3 py-2 text-xs font-semibold text-white backdrop-blur-xs">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-[var(--color-fc-light)]" /> {f.duration}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <GraduationCap className="w-3.5 h-3.5 text-[var(--color-fc-light)]" /> {f.level}
-                    </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="flex flex-1 flex-col p-5 sm:p-6">
-                  <h3 className="mb-2 text-lg font-bold leading-snug text-[var(--color-fc-black)] transition-colors group-hover:text-[var(--color-fc-primary)]">
+                <div className="flex flex-1 flex-col p-6">
+                  <div className="flex items-center gap-3 text-xs font-semibold text-[var(--color-fc-gray-mid)]">
+                    <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{f.duration}</span>
+                    <span className="h-1 w-1 rounded-full bg-[var(--color-fc-gray-light)]" />
+                    <span className="inline-flex items-center gap-1.5"><GraduationCap className="h-3.5 w-3.5" />{f.level}</span>
+                  </div>
+
+                  <h3 className="mt-3 font-display text-xl font-bold leading-snug tracking-tight text-[var(--color-fc-black)] transition-colors group-hover:text-[var(--color-fc-primary)]">
                     {f.title}
                   </h3>
-                  <p className="mb-5 line-clamp-2 text-sm leading-6 text-[var(--color-fc-gray-mid)]">
+                  <p className="mt-3 line-clamp-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
                     {f.shortDescription}
                   </p>
 
-                  {/* Badges campus and mode */}
-                  <div className="mb-5 flex items-center gap-2 text-xs text-[var(--color-fc-gray-mid)]">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-[var(--color-fc-gray-mid)]" /> {f.campus}
-                    </span>
+                  <div className="mt-5 space-y-2">
+                    {competencies.slice(0, 2).map((comp, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-xs text-[var(--color-fc-gray-mid)]">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-fc-primary)]" />
+                        <span className="line-clamp-1">{comp}</span>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Competencies */}
-                  <div className="mb-5 flex-1 space-y-2">
-                    <span className="block text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--color-fc-gray-mid)]">
-                      Compétences acquises :
-                    </span>
-                    <div className="space-y-1">
-                      {competencies.slice(0, 3).map((comp, idx) => (
-                        <div key={idx} className="flex items-start gap-1.5 text-xs text-[var(--color-fc-gray-mid)]">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-fc-primary)] shrink-0 mt-0.5" />
-                          <span className="line-clamp-1">{comp}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tools preview */}
-                  <div className="mb-4">
-                    <div className="flex flex-wrap gap-1">
-                      {tools.slice(0, 4).map((t, idx) => (
-                        <span
-                          key={idx}
-                          className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--color-fc-gray-light)]/30 text-[var(--color-fc-gray-mid)]"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                      {tools.length > 4 && (
-                        <span className="text-[10px] text-[var(--color-fc-gray-mid)] self-center">
-                          +{tools.length - 4}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Pricing footer */}
-                  <div className="pt-4 border-t border-[var(--color-fc-gray-light)]/50 flex items-center justify-between gap-2">
-                    <div>
-                      <span className="text-[10px] text-[var(--color-fc-gray-mid)] block font-medium">Coût global :</span>
-                      <span className="text-base font-black text-[var(--color-fc-black)]">
-                        {f.price.toLocaleString("fr-FR")} <span className="text-xs font-bold text-[var(--color-fc-gray-mid)]">FCFA</span>
+                  <div className="mt-5 flex flex-wrap gap-1.5">
+                    {tools.slice(0, 3).map((t, idx) => (
+                      <span key={idx} className="rounded-md bg-[var(--color-fc-bg)] px-2 py-1 text-[10px] font-medium text-[var(--color-fc-gray-mid)]">
+                        {t}
                       </span>
-                    </div>
+                    ))}
+                  </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <Link
-                        href={`/formation/${f.slug}`}
-                        className="px-3 py-2 rounded-xl text-xs font-bold text-[var(--color-fc-deep)] bg-[var(--color-fc-deep)]/8 hover:bg-[var(--color-fc-deep)]/15 border border-[var(--color-fc-deep)]/30 transition-colors"
-                      >
+                  <div className="mt-auto flex items-end justify-between gap-4 pt-6">
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-fc-gray-mid)]">À partir de</p>
+                      <p className="font-display text-lg font-extrabold text-[var(--color-fc-black)]">
+                        {f.price.toLocaleString("fr-FR")} <span className="text-sm font-bold text-[var(--color-fc-gray-mid)]">FCFA</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link href={`/formation/${f.slug}`} className="rounded-xl border border-[var(--color-fc-gray-light)] px-4 py-2.5 text-xs font-bold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]">
                         Détails
                       </Link>
-                      <Link
-                        href={`/inscription?formationId=${f.id}`}
-                        className="px-3 py-2 rounded-xl text-xs font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-xs transition-colors flex items-center gap-1"
-                      >
-                        <span>Candidater</span>
-                        <ArrowRight className="w-3 h-3" />
+                      <Link href={`/inscription?formationId=${f.id}`} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-fc-deep)] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
+                        Candidater <ArrowRight className="h-3.5 w-3.5" />
                       </Link>
                     </div>
                   </div>
