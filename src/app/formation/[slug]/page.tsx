@@ -150,9 +150,9 @@ export default async function FormationDetailPage(props: {
 
     return (
         <div className="bg-[var(--color-fc-bg)] min-h-screen">
-            {/* 9.1 HERO SECTION */}
-            <section className="relative overflow-hidden bg-[var(--color-fc-deep)] text-white py-16 lg:py-24 border-b border-[var(--color-fc-primary)]/30">
-                <div className="absolute inset-0 opacity-25 relative">
+            {/* HERO */}
+            <section className="relative isolate overflow-hidden bg-[var(--color-fc-deep)] text-white">
+                <div className="absolute inset-0">
                     <Image
                         src={formation.imageUrl}
                         alt={formation.title}
@@ -161,419 +161,287 @@ export default async function FormationDetailPage(props: {
                         sizes="100vw"
                         placeholder="blur"
                         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                        className="object-cover object-center blur-xs"
+                        className="object-cover object-center opacity-20"
                     />
-                    <div className="absolute inset-0 bg-[var(--color-fc-deep)]/90" />
+                    <div className="absolute inset-0 bg-[#06122f]/75" />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="max-w-3xl space-y-6">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-fc-primary)]/20 text-[var(--color-fc-cyan)] border border-[var(--color-fc-primary)]/30">
-                                {formation.category}
-                            </span>
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-fc-primary)]/20 text-[var(--color-fc-cyan)] border border-[var(--color-fc-primary)]/30">
-                                🇧🇯 {formation.campus}
-                            </span>
-                        </div>
+                <div className="relative mx-auto max-w-[84rem] px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
+                    <nav className="mb-8 flex flex-wrap items-center gap-2 text-xs text-white/55">
+                        <Link href="/" className="hover:text-white">Accueil</Link>
+                        <span>/</span>
+                        <Link href="/formations" className="hover:text-white">Formations</Link>
+                        <span>/</span>
+                        <span className="text-white/80">{formation.title}</span>
+                    </nav>
 
-                        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                            {formation.title}
-                        </h1>
-
-                        <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-                            {formation.shortDescription}
-                        </p>
-
-                        {/* Quick meta bar */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-[var(--color-fc-bg)]/90 backdrop-blur-md border border-[var(--color-fc-gray-light)]/30 text-xs">
-                            <div>
-                                <span className="text-slate-400 block mb-0.5">
-                                    Durée :
+                    <div className="grid gap-10 lg:grid-cols-[1fr_360px] lg:items-end">
+                        <div className="max-w-4xl">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-fc-cyan)]">
+                                    {formation.category}
                                 </span>
-                                <span className="font-bold text-white flex items-center gap-1">
-                                    <Clock className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
-                                    {formation.duration}
+                                <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold text-white/75">
+                                    {formation.campus}
                                 </span>
                             </div>
-                            <div>
-                                <span className="text-slate-400 block mb-0.5">
-                                    Niveau requis :
-                                </span>
-                                <span className="font-bold text-white flex items-center gap-1">
-                                    <GraduationCap className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
-                                    {formation.level}
-                                </span>
-                            </div>
-                            <div>
-                                <span className="text-slate-400 block mb-0.5">
-                                    Frais de scolarité :
-                                </span>
-                                <span className="font-bold text-[var(--color-fc-primary)] text-sm">
-                                    {formation.price.toLocaleString('fr-FR')}{' '}
-                                    FCFA
-                                </span>
-                            </div>
-                            <div>
-                                <span className="text-slate-400 block mb-0.5">
-                                    Modalité :
-                                </span>
-                                <span className="font-bold text-white flex items-center gap-1">
-                                    <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-light)]" />
-                                    {formation.mode}
-                                </span>
+
+                            <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.06] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+                                {formation.title}
+                            </h1>
+
+                            <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 sm:text-lg">
+                                {formation.shortDescription}
+                            </p>
+
+                            <div className="mt-8 flex flex-wrap gap-3">
+                                <Link
+                                    href={`/inscription?formationId=${formation.id}`}
+                                    className="inline-flex items-center gap-2 rounded-2xl bg-[var(--color-fc-cyan)] px-7 py-4 text-sm font-extrabold text-[#06122f] transition-colors hover:bg-white"
+                                >
+                                    Candidater à cette formation
+                                    <ArrowRight className="h-4 w-4" />
+                                </Link>
+                                <a
+                                    href="#programme"
+                                    className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-7 py-4 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                                >
+                                    Voir le programme
+                                    <ChevronDown className="h-4 w-4" />
+                                </a>
                             </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex flex-wrap items-center gap-4 pt-2">
-                            <Link
-                                href={`/inscription?formationId=${formation.id}`}
-                                className="px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-xl shadow-[var(--color-fc-deep)]/30 transition-all flex items-center gap-2 transform active:scale-95"
-                            >
-                                <span>Je candidate maintenant</span>
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
-
-                            <a
-                                href="#programme"
-                                className="px-5 py-3.5 rounded-xl font-semibold text-sm text-[var(--color-fc-deep)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-light)]/30 border border-[var(--color-fc-gray-light)]/30 transition-all"
-                            >
-                                Consulter le programme détaillé
-                            </a>
+                        <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">En bref</p>
+                            <div className="mt-5 space-y-4 text-sm">
+                                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                    <span className="text-white/60">Durée</span>
+                                    <span className="font-semibold text-white">{formation.duration}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                    <span className="text-white/60">Niveau</span>
+                                    <span className="font-semibold text-white">{formation.level}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                    <span className="text-white/60">Modalité</span>
+                                    <span className="font-semibold text-white">{formation.mode}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-white/60">Tarif</span>
+                                    <span className="font-display text-lg font-extrabold text-[var(--color-fc-cyan)]">{formation.price.toLocaleString('fr-FR')} FCFA</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* MAIN TWO-COLUMN BODY */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Main left content */}
-                    <div className="lg:col-span-8 space-y-14">
-                        {/* 9.2 PRÉSENTATION */}
-                        <section className="space-y-4">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
-                                Présentation détaillée
-                            </span>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
-                                À propos de la formation
+            <div className="mx-auto max-w-[84rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
+                    <div className="space-y-14 lg:col-span-8">
+                        <section className="space-y-5">
+                            <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                À propos
+                            </p>
+                            <h2 className="font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
+                                Une formation conçue pour la pratique.
                             </h2>
-                            <p className="text-[var(--color-fc-gray-mid)] text-base leading-relaxed whitespace-pre-line">
+                            <p className="max-w-3xl text-base leading-8 text-[var(--color-fc-gray-mid)] whitespace-pre-line">
                                 {formation.fullDescription}
                             </p>
                         </section>
 
-                        {/* 9.3 CE QUE VOUS ALLEZ APPRENDRE (MODULES) */}
-                        <section
-                            id="programme"
-                            className="space-y-6 scroll-mt-24"
-                        >
-                            <div className="flex items-center justify-between">
+                        <section id="programme" className="scroll-mt-24 space-y-6">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
-                                        Curriculum Pédagogique
-                                    </span>
-                                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
-                                        Ce que vous allez apprendre
-                                    </h2>
+                                    <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                        Programme
+                                    </p>
+                                    <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Ce que tu vas apprendre</h2>
                                 </div>
-                                <span className="text-xs font-semibold text-[var(--color-fc-gray-mid)]">
-                                    {modules.length} modules structurés
-                                </span>
+                                <span className="text-sm font-semibold text-[var(--color-fc-gray-mid)]">{modules.length} modules</span>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {modules.map((m, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="p-5 rounded-2xl border border-[var(--color-fc-gray-light)]/50 bg-[var(--color-fc-bg)] hover:border-[var(--color-fc-primary)] transition-all shadow-xs space-y-2"
-                                    >
-                                        <div className="flex items-center justify-between flex-wrap gap-2">
-                                            <span className="text-xs font-extrabold px-2.5 py-1 rounded-md bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-primary)]">
+                                    <div key={idx} className="rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-5 transition-colors hover:border-[var(--color-fc-primary)]/25 sm:p-6">
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <span className="rounded-lg bg-[var(--color-fc-bg)] px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[var(--color-fc-primary)]">
                                                 {m.moduleNumber}
                                             </span>
-                                            <span className="text-xs text-[var(--color-fc-gray-mid)] font-medium flex items-center gap-1">
-                                                <Clock className="w-3.5 h-3.5 text-[var(--color-fc-gray-mid)]" />{' '}
-                                                {m.duration}
+                                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-fc-gray-mid)]">
+                                                <Clock className="h-3.5 w-3.5" /> {m.duration}
                                             </span>
                                         </div>
-                                        <h3 className="text-lg font-bold text-[var(--color-fc-black)]">
-                                            {m.title}
-                                        </h3>
-                                        <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed">
-                                            {m.description}
-                                        </p>
+                                        <h3 className="mt-3 font-display text-lg font-bold text-[var(--color-fc-black)]">{m.title}</h3>
+                                        <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">{m.description}</p>
                                     </div>
                                 ))}
                             </div>
                         </section>
 
-                        {/* 9.4 COMPÉTENCES ACQUISES */}
-                        <section className="space-y-4">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
-                                Objectifs opérationnels
-                            </span>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
-                                Compétences acquises
-                            </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                {competencies.map((comp, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50"
-                                    >
-                                        <CheckCircle2 className="w-4 h-4 text-[var(--color-fc-primary)] shrink-0 mt-0.5" />
-                                        <span className="text-xs text-[var(--color-fc-gray-mid)] font-medium">
-                                            {comp}
-                                        </span>
-                                    </div>
-                                ))}
+                        <section className="grid gap-10 sm:grid-cols-2">
+                            <div className="space-y-5">
+                                <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                    Compétences
+                                </p>
+                                <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Ce que tu sauras faire</h2>
+                                <div className="space-y-3">
+                                    {competencies.map((comp, idx) => (
+                                        <div key={idx} className="flex items-start gap-3">
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-fc-primary)]" />
+                                            <span className="text-sm leading-7 text-[var(--color-fc-gray-mid)]">{comp}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-5">
+                                <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                    Débouchés
+                                </p>
+                                <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Métiers accessibles</h2>
+                                <div className="space-y-3">
+                                    {jobs.map((j, idx) => (
+                                        <div key={idx} className="flex items-center gap-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-white px-4 py-3">
+                                            <Briefcase className="h-4 w-4 shrink-0 text-[var(--color-fc-primary)]" />
+                                            <span className="text-sm font-semibold text-[var(--color-fc-black)]">{j}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </section>
 
-                        {/* 9.5 OUTILS UTILISÉS */}
-                        <section className="space-y-4">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
-                                Environnement Technique
-                            </span>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
-                                Outils & Technologies maîtrisés
-                            </h2>
-                            <div className="flex flex-wrap gap-2.5 pt-2">
+                        <section className="space-y-5">
+                            <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                Outils
+                            </p>
+                            <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Outils & technologies</h2>
+                            <div className="flex flex-wrap gap-2">
                                 {tools.map((t, idx) => (
-                                    <span
-                                        key={idx}
-                                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)] border border-[var(--color-fc-gray-light)]/50 shadow-xs hover:border-[var(--color-fc-primary)] hover:text-[var(--color-fc-primary)] transition-colors"
-                                    >
-                                        <Wrench className="w-3.5 h-3.5 text-[var(--color-fc-primary)]" />
+                                    <span key={idx} className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-fc-gray-mid)]">
+                                        <Wrench className="h-3.5 w-3.5 text-[var(--color-fc-primary)]" />
                                         {t}
                                     </span>
                                 ))}
                             </div>
                         </section>
 
-                        {/* 9.6 DÉBOUCHÉS */}
-                        <section className="space-y-4">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
-                                Opportunités de Carrière
-                            </span>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
-                                Métiers accessibles
-                            </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                {jobs.map((j, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center gap-3 p-4 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50 shadow-xs group hover:border-[var(--color-fc-primary)] transition-colors"
-                                    >
-                                        <div className="w-8 h-8 rounded-lg bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-primary)] flex items-center justify-center font-bold text-xs shrink-0">
-                                            <Briefcase className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-xs font-bold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)]">
-                                            {j}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* 9.7 PROJETS ÉTUDIANTS LIÉS */}
                         {relatedProjects.length > 0 && (
-                            <section className="space-y-4">
-                                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
-                                    Réalisations concrètes
-                                </span>
-                                <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
-                                    Projets développés dans cette filière
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                            <section className="space-y-6">
+                                <div>
+                                    <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                        Projets
+                                    </p>
+                                    <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Réalisations liées à cette filière</h2>
+                                </div>
+                                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                                     {relatedProjects.map((proj) => (
-                                        <div
-                                            key={proj.id}
-                                            className="bg-[var(--color-fc-bg)] rounded-xl border border-[var(--color-fc-gray-light)]/50 p-4 space-y-3 shadow-xs"
-                                        >
-                                            <div className="relative h-32 rounded-lg overflow-hidden bg-[var(--color-fc-gray-light)]/30">
-                                                <Image
-                                                    src={proj.coverImage}
-                                                    alt={proj.title}
-                                                    fill
-                                                    sizes="(max-width: 768px) 100vw, 25vw"
-                                                    className="object-cover"
-                                                />
+                                        <article key={proj.id} className="overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white">
+                                            <div className="relative h-40 bg-[var(--color-fc-gray-light)]/30">
+                                                <Image src={proj.coverImage} alt={proj.title} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover" />
                                             </div>
-                                            <h4 className="font-bold text-[var(--color-fc-black)] text-sm">
-                                                {proj.title}
-                                            </h4>
-                                            <p className="text-xs text-[var(--color-fc-gray-mid)] line-clamp-2">
-                                                {proj.description}
-                                            </p>
-                                            <Link
-                                                href="/projets-etudiants"
-                                                className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline inline-flex items-center gap-1"
-                                            >
-                                                Découvrir la fiche projet →
-                                            </Link>
-                                        </div>
+                                            <div className="p-5">
+                                                <h4 className="font-display font-bold text-[var(--color-fc-black)]">{proj.title}</h4>
+                                                <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)] line-clamp-2">{proj.description}</p>
+                                                <Link href="/projets-etudiants" className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-[var(--color-fc-primary)] hover:underline">
+                                                    Voir les projets <ArrowRight className="h-3.5 w-3.5" />
+                                                </Link>
+                                            </div>
+                                        </article>
                                     ))}
                                 </div>
                             </section>
                         )}
 
-                        {/* 9.8 FAQ */}
-                        <section className="space-y-4">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-gray-light)]/30 px-2.5 py-1 rounded">
-                                Questions Fréquentes
-                            </span>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)]">
-                                Tout savoir sur cette formation
-                            </h2>
-                            <div className="space-y-3 pt-2">
+                        <section className="space-y-6">
+                            <div>
+                                <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                                    FAQ
+                                </p>
+                                <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Questions fréquentes</h2>
+                            </div>
+                            <div className="space-y-3">
                                 {faqs.map((faq, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="p-4 rounded-xl bg-[var(--color-fc-gray-light)]/30 border border-[var(--color-fc-gray-light)]/50 space-y-1.5"
-                                    >
-                                        <h4 className="text-xs font-bold text-[var(--color-fc-black)] flex items-center gap-2">
-                                            <HelpCircle className="w-3.5 h-3.5 text-[var(--color-fc-primary)] shrink-0" />
-                                            {faq.q}
-                                        </h4>
-                                        <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed pl-5.5">
-                                            {faq.a}
-                                        </p>
-                                    </div>
+                                    <details key={idx} className="group rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-5">
+                                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-[var(--color-fc-black)]">
+                                            <span className="flex items-start gap-3"><HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-fc-primary)]" />{faq.q}</span>
+                                            <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-fc-gray-mid)] transition-transform group-open:rotate-180" />
+                                        </summary>
+                                        <p className="mt-3 pl-7 text-sm leading-7 text-[var(--color-fc-gray-mid)]">{faq.a}</p>
+                                    </details>
                                 ))}
                             </div>
                         </section>
                     </div>
 
-                    {/* Right sticky sidebar */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <div className="sticky top-28 space-y-6">
-                            {/* Enrollment Card */}
-                            <div className="bg-[var(--color-fc-bg)] rounded-2xl border-2 border-[var(--color-fc-primary)]/30 p-6 shadow-xl space-y-6">
-                                <div>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] block mb-1">
-                                        Candidature &amp; Inscription
-                                    </span>
-                                    <div className="text-2xl sm:text-3xl font-black text-[var(--color-fc-black)]">
-                                        {formation.price.toLocaleString(
-                                            'fr-FR'
-                                        )}{' '}
-                                        <span className="text-xs font-bold text-[var(--color-fc-gray-mid)]">
-                                            FCFA
-                                        </span>
-                                    </div>
-                                    <p className="text-[11px] text-[var(--color-fc-gray-mid)] mt-1">
-                                        Frais de dossier :{' '}
-                                        {formation.registrationFee.toLocaleString(
-                                            'fr-FR'
-                                        )}{' '}
-                                        FCFA + mensualités
-                                    </p>
+                    <aside className="lg:col-span-4">
+                        <div className="sticky top-28 space-y-5">
+                            <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-6 shadow-sm sm:p-7">
+                                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[var(--color-fc-gray-mid)]">Inscription</p>
+                                <div className="mt-3 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)]">
+                                    {formation.price.toLocaleString('fr-FR')} <span className="text-base font-bold text-[var(--color-fc-gray-mid)]">FCFA</span>
                                 </div>
+                                <p className="mt-1 text-sm text-[var(--color-fc-gray-mid)]">
+                                    Frais de dossier : {formation.registrationFee.toLocaleString('fr-FR')} FCFA
+                                </p>
 
-                                {/* Next available promotions */}
                                 {promotions.length > 0 && (
-                                    <div className="space-y-2 pt-2 border-t border-[var(--color-fc-gray-light)]/50">
-                                        <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] block">
-                                            Sessions disponibles :
-                                        </span>
+                                    <div className="mt-6 space-y-2 border-t border-[var(--color-fc-gray-light)] pt-5">
+                                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-fc-gray-mid)]">Prochaines sessions</p>
                                         {promotions.map((p) => (
-                                            <div
-                                                key={p.id}
-                                                className="p-2.5 rounded-xl bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)]/50 text-xs space-y-0.5"
-                                            >
-                                                <span className="font-bold text-slate-900 block">
-                                                    {p.name}
-                                                </span>
-                                                <span className="text-[11px] text-[var(--color-fc-gray-mid)]">
-                                                    Début : {p.startDate} •{' '}
-                                                    {p.campus}
-                                                </span>
+                                            <div key={p.id} className="rounded-xl bg-[var(--color-fc-bg)] px-4 py-3 text-sm">
+                                                <p className="font-semibold text-[var(--color-fc-black)]">{p.name}</p>
+                                                <p className="mt-0.5 text-xs text-[var(--color-fc-gray-mid)]">Début : {p.startDate} · {p.campus}</p>
                                             </div>
                                         ))}
                                     </div>
                                 )}
 
-                                {/* Primary CTA */}
                                 <Link
                                     href={`/inscription?formationId=${formation.id}`}
-                                    className="w-full py-3.5 rounded-xl text-center text-sm font-extrabold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-md shadow-[var(--color-fc-deep)]/25 transition-all flex items-center justify-center gap-2"
+                                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-5 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]"
                                 >
-                                    <span>Candidater à cette formation</span>
-                                    <ArrowRight className="w-4 h-4" />
+                                    Candidater <ArrowRight className="h-4 w-4" />
                                 </Link>
 
-                                {/* Guarantees */}
-                                <div className="space-y-2 pt-2 border-t border-[var(--color-fc-gray-light)]/50 text-xs text-[var(--color-fc-gray-mid)]">
-                                    <div className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                                        <span>
-                                            Paiement échelonné jusqu&apos;à{' '}
-                                            {formation.installmentsCount} fois
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                                        <span>
-                                            Accompagnement insertion
-                                            professionnelle
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                                        <span>
-                                            Attestation officielle &amp; Reçus
-                                            certifiés
-                                        </span>
-                                    </div>
+                                <div className="mt-6 space-y-3 border-t border-[var(--color-fc-gray-light)] pt-5 text-sm text-[var(--color-fc-gray-mid)]">
+                                    <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-fc-primary)]" /><span>Paiement échelonné jusqu&apos;à {formation.installmentsCount} fois</span></div>
+                                    <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-fc-primary)]" /><span>Accompagnement projet et insertion</span></div>
+                                    <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-fc-primary)]" /><span>Attestation officielle vérifiable</span></div>
                                 </div>
                             </div>
 
-                            {/* WhatsApp Quick Contact */}
-                            <div className="bg-[var(--color-fc-primary)]/10 rounded-2xl border border-[var(--color-fc-primary)]/30 p-5 space-y-2 text-xs">
-                                <span className="font-bold text-[var(--color-fc-primary)] block text-sm">
-                                    Une question sur cette filière ?
-                                </span>
-                                <p className="text-[var(--color-fc-primary)]/80">
-                                    Échangez instantanément avec notre
-                                    conseiller d&apos;orientation sur WhatsApp
-                                    au <strong>+229 43 32 78 32</strong>.
+                            <div className="rounded-[1.75rem] border border-[var(--color-fc-primary)]/15 bg-[var(--color-fc-surface)] p-6">
+                                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[var(--color-fc-primary)]">Besoin d&apos;infos ?</p>
+                                <p className="mt-3 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+                                    Échange avec un conseiller sur cette formation avant de candidater.
                                 </p>
-                                <a
-                                    href="https://wa.me/22943327832"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-block pt-1 font-bold text-[var(--color-fc-primary)] hover:underline"
-                                >
-                                    Ouvrir WhatsApp →
+                                <a href="https://wa.me/22943327832" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[var(--color-fc-primary)] hover:underline">
+                                    WhatsApp +229 43 32 78 32 <ArrowRight className="h-3.5 w-3.5" />
                                 </a>
                             </div>
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </div>
 
-            {/* 9.9 CTA FINAL */}
-            <section className="py-16 bg-[var(--color-fc-gray-light)]/30 border-t border-[var(--color-fc-gray-light)]/50">
-                <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
-                    <h2 className="text-2xl sm:text-4xl font-extrabold text-[var(--color-fc-black)]">
-                        Prêt à rejoindre la prochaine génération de
-                        professionnels ?
-                    </h2>
-                    <p className="text-[var(--color-fc-gray-mid)] text-sm sm:text-base max-w-xl mx-auto">
-                        Les candidatures pour la session {formation.title} sont
-                        examinées par ordre d&apos;arrivée.
-                    </p>
-                    <div className="pt-2">
-                        <Link
-                            href={`/inscription?formationId=${formation.id}`}
-                            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-extrabold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-xl shadow-[var(--color-fc-deep)]/30 transition-all"
-                        >
-                            <span>Je candidate maintenant</span>
-                            <ArrowRight className="w-5 h-5" />
-                        </Link>
+            <section className="border-t border-[var(--color-fc-gray-light)] bg-white">
+                <div className="mx-auto max-w-[84rem] px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
+                    <div className="flex flex-col items-start justify-between gap-8 rounded-[2rem] bg-[var(--color-fc-deep)] px-8 py-12 text-white sm:px-12 lg:flex-row lg:items-center">
+                        <div className="max-w-2xl">
+                            <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">Prochaine cohorte</p>
+                            <h2 className="mt-4 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Prêt à te lancer en {formation.title} ?</h2>
+                            <p className="mt-3 text-sm leading-7 text-white/65">Les places sont limitées. Candidate maintenant ou échange avec un conseiller pour valider ton choix.</p>
+                        </div>
+                        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                            <Link href={`/inscription?formationId=${formation.id}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-bold text-[#06122f] transition-colors hover:bg-white">
+                                Candidater <ArrowRight className="h-4 w-4" />
+                            </Link>
+                            <Link href="/contact" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+                                Parler à un conseiller
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </section>

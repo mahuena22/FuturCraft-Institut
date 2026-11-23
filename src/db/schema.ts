@@ -138,6 +138,7 @@ export const notifications = pgTable("notifications", {
 
 export const studentProjects = pgTable("student_projects", {
   id: serial("id").primaryKey(),
+  studentId: integer("student_id").references(() => students.id, { onDelete: "cascade" }),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
   tagline: text("tagline").notNull(),

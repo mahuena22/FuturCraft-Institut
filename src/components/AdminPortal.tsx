@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Users,
   CreditCard,
@@ -25,6 +25,7 @@ import {
   LogOut,
   Handshake,
   FileText,
+  FolderGit2,
   Pencil,
   Trash2,
   DollarSign,
@@ -32,14 +33,7 @@ import {
   Mail,
   AlertCircle,
   Download,
-  Eye,
-  EyeOff,
-  Upload,
-  Sparkles,
-  ExternalLink,
-  X,
 } from "lucide-react";
-import Image from "next/image";
 
 import { ReminderMonitor } from "./ReminderMonitor";
 
@@ -61,24 +55,14 @@ interface StudentItem {
   lastName: string;
   email: string;
   phone: string;
-  whatsapp?: string | null;
   city: string | null;
   status: string;
-  professionalStatus?: string | null;
-  skills?: string | null;
-  avatarUrl?: string | null;
-  cvUrl?: string | null;
-  profileVisible: boolean;
   totalAmount: number;
   paidAmount: number;
   remainingAmount: number;
   formationId: number;
-  customFormation?: string | null;
-  formationTitle?: string | null;
-  validationNote?: string | null;
-  validatedBy?: string | null;
-  validatedAt?: string | Date | null;
-  createdAt?: string | Date;
+  profileVisible: boolean;
+  validatedAt: Date | null;
 }
 
 interface PaymentItem {
@@ -125,8 +109,6 @@ interface FormationItem {
   mode: string;
   isActive: boolean | null;
   isPopular: boolean | null;
-  tools?: string | null;
-  competencies?: string | null;
 }
 
 interface PartnershipItem {
@@ -154,6 +136,24 @@ interface ArticleItem {
   publishedAt: string;
 }
 
+interface StudentProjectItem {
+  id: number;
+  studentId: number | null;
+  studentNumber: string | null;
+  studentName: string | null;
+  slug: string;
+  title: string;
+  tagline: string;
+  description: string;
+  coverImage: string;
+  formationTitle: string;
+  technologies: string;
+  teamMembers: string;
+  projectUrl: string | null;
+  githubUrl: string | null;
+  isFeatured: boolean | null;
+}
+
 interface AdmissionItem {
   id: number;
   studentNumber: string;
@@ -177,6 +177,7 @@ export function AdminPortal({
   formationsList,
   initialPartnerships,
   initialArticles,
+  initialProjects,
 }: {
   initialStats: AdminStats;
   initialStudents: StudentItem[];
@@ -184,6 +185,7 @@ export function AdminPortal({
   formationsList: FormationItem[];
   initialPartnerships: PartnershipItem[];
   initialArticles?: ArticleItem[];
+  initialProjects: StudentProjectItem[];
 }) {
   const [stats, setStats] = useState<AdminStats>(initialStats);
   const [students, setStudents] = useState<StudentItem[]>(initialStudents);
@@ -191,52 +193,14 @@ export function AdminPortal({
   const [partnerships, setPartnerships] = useState<PartnershipItem[]>(initialPartnerships);
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequestItem[]>([]);
   const [articles, setArticles] = useState<ArticleItem[]>(initialArticles || []);
+  const [projects, setProjects] = useState<StudentProjectItem[]>(initialProjects);
   const [formations, setFormations] = useState<FormationItem[]>(formationsList);
   const [admissions, setAdmissions] = useState<AdmissionItem[]>([]);
 
   const [currentRole, setCurrentRole] = useState<"super_admin" | "agent" | "financier">("super_admin");
-  const [activeTab, setActiveTab] = useState<
-    | "dashboard"
-    | "validations"
-    | "talents"
-    | "etudiants"
-    | "paiements"
-    | "formations"
-    | "articles"
-    | "roles"
-    | "partenariats"
-    | "rappels"
-  >("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "validations" | "etudiants" | "paiements" | "formations" | "articles" | "projects" | "roles" | "partenariats" | "rappels">("dashboard");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Support direct navigation from /entreprises (?tab=talents&edit=ID)
-  useEffect(() => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam === "talents") {
-      setActiveTab("talents");
-    }
-    const editId = searchParams.get("edit");
-    if (editId && students.length > 0) {
-      const found = students.find((s) => s.id === Number(editId));
-      if (found) {
-        setActiveTab("talents");
-        handleOpenEditStudent(found);
-      }
-    }
-  }, [searchParams, students]);
-
-  // Group all formations by category (matches /formations catalog)
-  const formationsByCategory = useMemo(() => {
-    const groups: Record<string, FormationItem[]> = {};
-    formations.forEach((f) => {
-      const cat = f.category || "Autres Formations";
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(f);
-    });
-    return groups;
-  }, [formations]);
 
   // Load online payment requests on mount
   useEffect(() => {
@@ -266,13 +230,6 @@ export function AdminPortal({
   const [searchStudent, setSearchStudent] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [formationFilter, setFormationFilter] = useState("all");
-  const [visibilityFilter, setVisibilityFilter] = useState<"all" | "visible" | "hidden">("all");
-
-  // Filters & Search for Talents tab (defaults to "visible" to immediately show profiles displayed on /entreprises)
-  const [searchTalent, setSearchTalent] = useState("");
-  const [talentStatusFilter, setTalentStatusFilter] = useState("all");
-  const [talentFormationFilter, setTalentFormationFilter] = useState("all");
-  const [talentVisibilityFilter, setTalentVisibilityFilter] = useState<"all" | "visible" | "hidden">("visible");
 
   // Manual payment recording modal
   const [showManualPaymentModal, setShowManualPaymentModal] = useState(false);
@@ -282,7 +239,7 @@ export function AdminPortal({
   const [manualPayNotes, setManualPayNotes] = useState<string>("Règlement physique à la caisse du campus de Cotonou");
   const [isRecordingPayment, setIsRecordingPayment] = useState(false);
 
-  // Student / Talent creation modal
+  // Manual student creation modal
   const [showNewStudentModal, setShowNewStudentModal] = useState(false);
   const [newStudentForm, setNewStudentForm] = useState({
     firstName: "",
@@ -291,39 +248,10 @@ export function AdminPortal({
     phone: "",
     city: "Cotonou",
     formationId: formationsList[0]?.id || 1,
-    customFormation: formationsList[0]?.title || "Développement Web Fullstack",
-    status: "actif",
-    professionalStatus: "Disponible immédiatement",
-    skills: [] as string[],
-    newSkillInput: "",
-    avatarUrl: "",
-    cvUrl: "",
-    profileVisible: true,
+    studyLevel: "BAC",
+    previousDiploma: "Baccalauréat",
   });
   const [isCreatingStudent, setIsCreatingStudent] = useState(false);
-
-  // Edit student / talent modal
-  const [editingStudent, setEditingStudent] = useState<StudentItem | null>(null);
-  const [editStudentForm, setEditStudentForm] = useState({
-    id: 0,
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    city: "Cotonou",
-    formationId: 1,
-    customFormation: "",
-    status: "actif",
-    professionalStatus: "Disponible immédiatement",
-    skills: [] as string[],
-    newSkillInput: "",
-    avatarUrl: "",
-    cvUrl: "",
-    profileVisible: true,
-  });
-  const [isSavingStudent, setIsSavingStudent] = useState(false);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const [isUploadingCv, setIsUploadingCv] = useState(false);
 
   // Edit status modal
   const [selectedStudentForStatus, setSelectedStudentForStatus] = useState<StudentItem | null>(null);
@@ -399,68 +327,53 @@ export function AdminPortal({
     category: "",
     publishedAt: "",
   });
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [projectForm, setProjectForm] = useState({
+    studentId: "",
+    title: "",
+    tagline: "",
+    description: "",
+    coverImage: "",
+    technologies: "",
+    projectUrl: "",
+    githubUrl: "",
+  });
+  const [isSavingProject, setIsSavingProject] = useState(false);
+  const validatedStudents = students.filter(
+    (student) =>
+      student.profileVisible &&
+      student.validatedAt &&
+      ["inscrit", "actif", "termine", "alumni"].includes(student.status)
+  );
 
   // Filter students
   const filteredStudents = students.filter((s) => {
-    const query = searchStudent.toLowerCase().trim();
+    const query = searchStudent.toLowerCase();
     const matchesSearch =
       query === "" ||
       s.firstName.toLowerCase().includes(query) ||
       s.lastName.toLowerCase().includes(query) ||
       s.studentNumber.toLowerCase().includes(query) ||
       s.email.toLowerCase().includes(query) ||
-      s.phone.toLowerCase().includes(query) ||
-      (s.skills && s.skills.toLowerCase().includes(query)) ||
-      (s.professionalStatus && s.professionalStatus.toLowerCase().includes(query)) ||
-      (s.formationTitle && s.formationTitle.toLowerCase().includes(query));
+      s.phone.toLowerCase().includes(query);
 
     const matchesStatus = statusFilter === "all" || s.status === statusFilter;
     const matchesFormation =
       formationFilter === "all" || s.formationId === Number(formationFilter);
-    const matchesVisibility =
-      visibilityFilter === "all" ||
-      (visibilityFilter === "visible" ? s.profileVisible : !s.profileVisible);
 
-    return matchesSearch && matchesStatus && matchesFormation && matchesVisibility;
-  });
-
-  // Filter talents specifically for the Vivier de Talents tab
-  const filteredTalentsList = students.filter((s) => {
-    const query = searchTalent.toLowerCase().trim();
-    const matchesSearch =
-      query === "" ||
-      s.firstName.toLowerCase().includes(query) ||
-      s.lastName.toLowerCase().includes(query) ||
-      s.studentNumber.toLowerCase().includes(query) ||
-      s.email.toLowerCase().includes(query) ||
-      s.phone.toLowerCase().includes(query) ||
-      (s.skills && s.skills.toLowerCase().includes(query)) ||
-      (s.professionalStatus && s.professionalStatus.toLowerCase().includes(query)) ||
-      (s.formationTitle && s.formationTitle.toLowerCase().includes(query));
-
-    const matchesStatus =
-      talentStatusFilter === "all" ||
-      (s.professionalStatus && s.professionalStatus.toLowerCase().includes(talentStatusFilter.toLowerCase()));
-    const matchesFormation =
-      talentFormationFilter === "all" || s.formationId === Number(talentFormationFilter);
-    const matchesVisibility =
-      talentVisibilityFilter === "all" ||
-      (talentVisibilityFilter === "visible" ? s.profileVisible : !s.profileVisible);
-
-    return matchesSearch && matchesStatus && matchesFormation && matchesVisibility;
+    return matchesSearch && matchesStatus && matchesFormation;
   });
 
   // Reload data helper
   const reloadData = async () => {
     try {
-      const [resStats, resStudents, resPayments, resPartnerships, resPaymentRequests, resAdmissions, resFormations] = await Promise.all([
+      const [resStats, resStudents, resPayments, resPartnerships, resPaymentRequests, resAdmissions] = await Promise.all([
         fetch("/api/admin/stats").then((r) => r.json()),
         fetch("/api/students").then((r) => r.json()),
         fetch("/api/payments").then((r) => r.json()),
         fetch("/api/partnerships").then((r) => r.json()),
         fetch("/api/payment-requests").then((r) => r.json()),
         fetch("/api/admin/admissions").then((r) => r.json()),
-        fetch("/api/formations").then((r) => r.json()).catch(() => null),
       ]);
       setStats(resStats);
       setStudents(resStudents);
@@ -468,7 +381,6 @@ export function AdminPortal({
       setPartnerships(resPartnerships);
       setPaymentRequests(resPaymentRequests);
       if (Array.isArray(resAdmissions)) setAdmissions(resAdmissions);
-      if (Array.isArray(resFormations)) setFormations(resFormations);
     } catch (e) {
       console.error(e);
     }
@@ -632,6 +544,49 @@ export function AdminPortal({
     }
   };
 
+  const handleSaveProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProject(true);
+    try {
+      const res = await fetch("/api/admin/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(projectForm),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur lors de l’enregistrement du projet");
+      setProjects((current) => [data.project, ...current]);
+      setProjectModalOpen(false);
+      setProjectForm({
+        studentId: "",
+        title: "",
+        tagline: "",
+        description: "",
+        coverImage: "",
+        technologies: "",
+        projectUrl: "",
+        githubUrl: "",
+      });
+      alert("Projet ajouté. Il est visible sur le site car l’étudiant est validé.");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Erreur lors de l’enregistrement");
+    } finally {
+      setIsSavingProject(false);
+    }
+  };
+
+  const handleDeleteProject = async (project: StudentProjectItem) => {
+    if (!window.confirm(`Supprimer le projet « ${project.title} » ?`)) return;
+    try {
+      const res = await fetch(`/api/admin/projects/${project.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erreur lors de la suppression");
+      setProjects((current) => current.filter((item) => item.id !== project.id));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Erreur lors de la suppression");
+    }
+  };
+
   // Submit manual payment
   const handleRecordPayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -668,210 +623,30 @@ export function AdminPortal({
     }
   };
 
-  // Upload photo or CV file via /api/admin/upload
-  const handleUploadFile = async (
-    file: File,
-    kind: "avatar" | "cv",
-    target: "new" | "edit"
-  ) => {
-    const isPhoto = kind === "avatar";
-    if (isPhoto) setIsUploadingPhoto(true);
-    else setIsUploadingCv(true);
-
-    try {
-      const fd = new FormData();
-      fd.append("kind", kind);
-      fd.append("file", file);
-
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: fd,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erreur de téléversement");
-
-      if (target === "new") {
-        setNewStudentForm((prev) => ({
-          ...prev,
-          ...(isPhoto ? { avatarUrl: data.url } : { cvUrl: data.url }),
-        }));
-      } else {
-        setEditStudentForm((prev) => ({
-          ...prev,
-          ...(isPhoto ? { avatarUrl: data.url } : { cvUrl: data.url }),
-        }));
-      }
-    } catch (err: any) {
-      alert(err.message || "Erreur lors du téléversement du fichier");
-    } finally {
-      if (isPhoto) setIsUploadingPhoto(false);
-      else setIsUploadingCv(false);
-    }
-  };
-
-  // Create student / talent profile
+  // Create manual student
   const handleCreateStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudentForm.firstName.trim() || !newStudentForm.lastName.trim() || !newStudentForm.phone.trim() || !newStudentForm.email.trim()) {
-      alert("Veuillez renseigner le nom, le prénom, le numéro de téléphone et l'email.");
+    if (!newStudentForm.firstName || !newStudentForm.lastName || !newStudentForm.phone || !newStudentForm.email) {
+      alert("Veuillez renseigner tous les champs obligatoires.");
       return;
     }
 
     setIsCreatingStudent(true);
     try {
-      const payload = {
-        firstName: newStudentForm.firstName.trim(),
-        lastName: newStudentForm.lastName.trim(),
-        email: newStudentForm.email.trim(),
-        phone: newStudentForm.phone.trim(),
-        city: newStudentForm.city.trim() || "Cotonou",
-        formationId: Number(newStudentForm.formationId),
-        customFormation: newStudentForm.customFormation.trim() || undefined,
-        status: newStudentForm.status,
-        professionalStatus: newStudentForm.professionalStatus,
-        skills: newStudentForm.skills,
-        avatarUrl: newStudentForm.avatarUrl.trim() || undefined,
-        cvUrl: newStudentForm.cvUrl.trim() || undefined,
-        profileVisible: newStudentForm.profileVisible,
-      };
-
       const res = await fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(newStudentForm),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Erreur création profil étudiant");
-      }
-
+      if (!res.ok) throw new Error("Erreur création étudiant");
       await reloadData();
       setShowNewStudentModal(false);
-      setNewStudentForm({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        city: "Cotonou",
-        formationId: formations[0]?.id || 1,
-        customFormation: formations[0]?.title || "Développement Web Fullstack",
-        status: "actif",
-        professionalStatus: "Disponible immédiatement",
-        skills: [],
-        newSkillInput: "",
-        avatarUrl: "",
-        cvUrl: "",
-        profileVisible: true,
-      });
-      alert("Profil étudiant et talent créé avec succès !");
+      alert("Nouvel étudiant créé et matricule généré avec succès !");
     } catch (err: any) {
       alert(err.message || "Erreur");
     } finally {
       setIsCreatingStudent(false);
-    }
-  };
-
-  // Open edit modal for student
-  const handleOpenEditStudent = (st: StudentItem) => {
-    let parsedSkills: string[] = [];
-    if (st.skills) {
-      try {
-        const parsed = JSON.parse(st.skills);
-        if (Array.isArray(parsed)) parsedSkills = parsed.map(String).map((s) => s.trim()).filter(Boolean);
-      } catch {
-        parsedSkills = st.skills.split(",").map((s) => s.trim()).filter(Boolean);
-      }
-    }
-    setEditingStudent(st);
-    setEditStudentForm({
-      id: st.id,
-      firstName: st.firstName,
-      lastName: st.lastName,
-      email: st.email,
-      phone: st.phone,
-      city: st.city || "Cotonou",
-      formationId: st.formationId,
-      customFormation: st.customFormation || st.formationTitle || "",
-      status: st.status,
-      professionalStatus: st.professionalStatus || (st.profileVisible ? "Disponible immédiatement" : "Recherche de stage"),
-      skills: parsedSkills,
-      newSkillInput: "",
-      avatarUrl: st.avatarUrl || "",
-      cvUrl: st.cvUrl || "",
-      profileVisible: Boolean(st.profileVisible),
-    });
-  };
-
-  // Save edit student
-  const handleSaveEditStudent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingStudent) return;
-    setIsSavingStudent(true);
-    try {
-      const payload = {
-        firstName: editStudentForm.firstName.trim(),
-        lastName: editStudentForm.lastName.trim(),
-        email: editStudentForm.email.trim(),
-        phone: editStudentForm.phone.trim(),
-        city: editStudentForm.city.trim() || "Cotonou",
-        formationId: Number(editStudentForm.formationId),
-        customFormation: editStudentForm.customFormation.trim() || null,
-        status: editStudentForm.status,
-        professionalStatus: editStudentForm.professionalStatus,
-        skills: editStudentForm.skills,
-        avatarUrl: editStudentForm.avatarUrl.trim() || null,
-        cvUrl: editStudentForm.cvUrl.trim() || null,
-        profileVisible: editStudentForm.profileVisible,
-      };
-
-      const res = await fetch(`/api/students/${editingStudent.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Erreur mise à jour profil étudiant");
-      }
-
-      await reloadData();
-      setEditingStudent(null);
-      alert("Profil talent mis à jour avec succès ! Les modifications sont immédiatement synchronisées sur la page Entreprises.");
-    } catch (err: any) {
-      alert(err.message || "Erreur");
-    } finally {
-      setIsSavingStudent(false);
-    }
-  };
-
-  // Toggle visibility on Entreprises page
-  const handleToggleVisibility = async (st: StudentItem) => {
-    const nextVal = !st.profileVisible;
-    try {
-      const res = await fetch(`/api/students/${st.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profileVisible: nextVal }),
-      });
-      if (!res.ok) throw new Error("Erreur mise à jour visibilité");
-      await reloadData();
-    } catch (err: any) {
-      alert(err.message || "Erreur");
-    }
-  };
-
-  // Delete student
-  const handleDeleteStudent = async (st: StudentItem) => {
-    if (!window.confirm(`Supprimer définitivement le profil de l'étudiant ${st.firstName} ${st.lastName} (${st.studentNumber}) ?\nCette action est irréversible.`)) return;
-    try {
-      const res = await fetch(`/api/students/${st.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Erreur suppression étudiant");
-      await reloadData();
-      alert("Profil étudiant supprimé.");
-    } catch (err: any) {
-      alert(err.message || "Erreur");
     }
   };
 
@@ -915,36 +690,36 @@ export function AdminPortal({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="admin-portal min-h-screen bg-[var(--color-fc-bg)] py-8">
+      <div className="page-container space-y-6">
         {/* Top bar with Role Switcher */}
-        <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl bg-[var(--color-fc-deep)] p-4 text-white shadow-lg sm:p-5 md:flex-row">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-fc-primary)] text-white">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <h1 className="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">
                 Console d&apos;Administration FuturCraft
-                <span className="text-xs px-2 py-0.5 rounded bg-violet-500/30 text-violet-300 font-normal border border-violet-400/30">
+                <span className="rounded border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-normal text-[var(--color-fc-cyan)]">
                   v1.2
                 </span>
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Supervision des inscriptions, encaissements, cursus et délivrance des reçus
               </p>
             </div>
           </div>
 
           {/* Role selector dropdown */}
-          <div className="flex items-center gap-2 bg-slate-800 p-1.5 rounded-xl border border-slate-700 text-xs">
-            <span className="text-slate-400 font-semibold px-2">Rôle actif :</span>
+          <div className="flex items-center gap-2 bg-white/10 p-1.5 rounded-xl border border-white/15 text-xs">
+            <span className="text-[var(--color-fc-gray-mid)] font-semibold px-2">Rôle actif :</span>
             <button
               onClick={() => setCurrentRole("super_admin")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "super_admin"
-                  ? "bg-violet-600 text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-[var(--color-fc-primary)] text-white "
+                  : "text-white/60 hover:text-white"
               }`}
             >
               Super Admin
@@ -953,8 +728,8 @@ export function AdminPortal({
               onClick={() => setCurrentRole("financier")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "financier"
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-emerald-600 text-white "
+                  : "text-white/60 hover:text-white"
               }`}
             >
               Caissier / Financier
@@ -963,8 +738,8 @@ export function AdminPortal({
               onClick={() => setCurrentRole("agent")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                 currentRole === "agent"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-[var(--color-fc-deep)] text-white "
+                  : "text-white/60 hover:text-white"
               }`}
             >
               Agent Administratif
@@ -974,7 +749,7 @@ export function AdminPortal({
           <button
             onClick={handleLogout}
             title="Se déconnecter"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 hover:text-white hover:bg-red-600/20 border border-slate-700 hover:border-red-500/40 transition-all"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 hover:text-white hover:bg-red-600/20 border border-white/15 hover:border-red-500/40 transition-all"
           >
             <LogOut className="w-4 h-4" />
             Déconnexion
@@ -982,13 +757,13 @@ export function AdminPortal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-bold border-b border-slate-200">
+        <div className="flex items-center gap-2 overflow-x-auto rounded-2xl border border-[var(--color-fc-gray-light)] bg-white px-2 pb-1 text-xs font-bold shadow-sm scrollbar-none">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "dashboard"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -999,37 +774,25 @@ export function AdminPortal({
             onClick={() => setActiveTab("validations")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "validations"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Validations</span>
             {pendingValidations > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+              <span className="px-1.5 py-0.5 rounded-full bg-[var(--color-fc-surface)]0 text-white text-[10px] font-black">
                 {pendingValidations}
               </span>
             )}
           </button>
 
           <button
-            onClick={() => setActiveTab("talents")}
-            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
-              activeTab === "talents"
-                ? "border-blue-600 text-blue-600 font-extrabold"
-                : "border-transparent text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span>Vivier de Talents ({students.filter((s) => s.profileVisible).length})</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab("etudiants")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "etudiants"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Users className="w-4 h-4" />
@@ -1040,8 +803,8 @@ export function AdminPortal({
             onClick={() => setActiveTab("paiements")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "paiements"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <CreditCard className="w-4 h-4" />
@@ -1052,8 +815,8 @@ export function AdminPortal({
             onClick={() => setActiveTab("formations")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "formations"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -1064,8 +827,8 @@ export function AdminPortal({
             onClick={() => setActiveTab("articles")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "articles"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -1073,11 +836,23 @@ export function AdminPortal({
           </button>
 
           <button
+            onClick={() => setActiveTab("projects")}
+            className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "projects"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
+            }`}
+          >
+            <FolderGit2 className="w-4 h-4" />
+            <span>Projets étudiants ({projects.length})</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("partenariats")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "partenariats"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <Handshake className="w-4 h-4" />
@@ -1088,8 +863,8 @@ export function AdminPortal({
             onClick={() => setActiveTab("roles")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "roles"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -1100,8 +875,8 @@ export function AdminPortal({
             onClick={() => setActiveTab("rappels")}
             className={`px-4 py-3 border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
               activeTab === "rappels"
-                ? "border-violet-600 text-violet-600"
-                : "border-transparent text-slate-600 hover:text-slate-900"
+                ? "border-[var(--color-fc-primary)] text-[var(--color-fc-primary)]"
+                : "border-transparent text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
             }`}
           >
             <AlertTriangle className="w-4 h-4" />
@@ -1114,98 +889,77 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* KPI Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Dossiers en attente
                 </span>
-                <div className="text-3xl font-black text-amber-600">{pendingValidations}</div>
+                <div className="text-3xl font-black text-[var(--color-fc-primary)]">{pendingValidations}</div>
                 <div className="flex items-center gap-2 text-xs pt-1">
                   <button
                     onClick={() => setActiveTab("validations")}
-                    className="text-blue-600 font-bold hover:underline"
+                    className="text-[var(--color-fc-primary)] font-bold hover:underline"
                   >
                     Valider les comptes →
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Total Étudiants
                 </span>
-                <div className="text-3xl font-black text-slate-900">{stats.totalStudents}</div>
+                <div className="text-3xl font-black text-[var(--color-fc-black)]">{stats.totalStudents}</div>
                 <div className="flex items-center gap-2 text-xs pt-1">
                   <span className="text-emerald-600 font-bold">{stats.activeStudents} actifs</span>
-                  <span className="text-slate-300">•</span>
-                  <span className="text-blue-600 font-semibold">{stats.newInscriptions} préinscrits</span>
+                  <span className="text-white/60">•</span>
+                  <span className="text-[var(--color-fc-primary)] font-semibold">{stats.newInscriptions} préinscrits</span>
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Montant Encaissé (FCFA)
                 </span>
                 <div className="text-3xl font-black text-emerald-600">
                   {stats.totalCollectedAmount.toLocaleString("fr-FR")}
                 </div>
-                <span className="text-xs text-slate-500 block pt-1">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
                   Taux de recouvrement : <strong>{stats.recoveryRate}%</strong>
                 </span>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Reste à Percevoir
                 </span>
                 <div className="text-3xl font-black text-rose-600">
                   {stats.totalRemainingAmount.toLocaleString("fr-FR")}
                 </div>
-                <span className="text-xs text-slate-500 block pt-1">
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
                   Sur <strong>{stats.totalExpectedAmount.toLocaleString("fr-FR")} FCFA</strong> prévus
                 </span>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
+                <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
                   Cursus Ouverts
                 </span>
-                <div className="text-3xl font-black text-violet-600">{stats.formationsCount}</div>
-                <span className="text-xs text-slate-500 block pt-1">
+                <div className="text-3xl font-black text-[var(--color-fc-primary)]">{stats.formationsCount}</div>
+                <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
                   Tous campus (Godomey, Supermarché O Bénin Avant pk14)
                 </span>
-              </div>
-
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                    Talents en Ligne
-                  </span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <div className="text-3xl font-black text-blue-600">
-                  {students.filter((s) => s.profileVisible).length}
-                </div>
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-slate-400">Sur {students.length} profils</span>
-                  <button
-                    onClick={() => setActiveTab("talents")}
-                    className="text-blue-600 font-bold hover:underline flex items-center gap-1"
-                  >
-                    Gérer les talents →
-                  </button>
-                </div>
               </div>
             </div>
 
             {/* Quick Actions & Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Recent Payments Table */}
-              <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="lg:col-span-8 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900">Derniers Encaissements Enregistrés</h3>
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Derniers Encaissements Enregistrés</h3>
                   <button
                     onClick={() => setActiveTab("paiements")}
-                    className="text-xs font-bold text-violet-600 hover:underline"
+                    className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                   >
                     Voir tous les encaissements →
                   </button>
@@ -1213,7 +967,7 @@ export function AdminPortal({
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="border-b border-slate-200 text-slate-500 text-[11px] font-bold">
+                    <thead className="border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] text-[11px] font-bold">
                       <tr>
                         <th className="py-2">Reçu N°</th>
                         <th className="py-2">Étudiant</th>
@@ -1223,25 +977,25 @@ export function AdminPortal({
                         <th className="py-2">Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                       {payments.slice(0, 5).map((p) => (
-                        <tr key={p.id} className="hover:bg-slate-50">
-                          <td className="py-2.5 font-mono font-bold text-blue-600">
+                        <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]">
+                          <td className="py-2.5 font-mono font-bold text-[var(--color-fc-primary)]">
                             <Link href={`/recu/${p.receiptNumber}`} target="_blank" className="hover:underline">
                               {p.receiptNumber}
                             </Link>
                           </td>
-                          <td className="py-2.5 font-semibold text-slate-900">
+                          <td className="py-2.5 font-semibold text-[var(--color-fc-black)]">
                             {p.studentFirstName} {p.studentLastName}
                           </td>
-                          <td className="py-2.5 text-slate-600 truncate max-w-[150px]">
+                          <td className="py-2.5 text-[var(--color-fc-gray-mid)] truncate max-w-[150px]">
                             {p.formationTitle || "Formation"}
                           </td>
                           <td className="py-2.5 font-bold text-emerald-600">
                             {p.amount.toLocaleString("fr-FR")} FCFA
                           </td>
-                          <td className="py-2.5 text-slate-500">{p.paymentMethod}</td>
-                          <td className="py-2.5 text-slate-400">{p.paidAt}</td>
+                          <td className="py-2.5 text-[var(--color-fc-gray-mid)]">{p.paymentMethod}</td>
+                          <td className="py-2.5 text-[var(--color-fc-gray-mid)]">{p.paidAt}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1250,8 +1004,8 @@ export function AdminPortal({
               </div>
 
               {/* Action shortcuts */}
-              <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-                <h3 className="text-base font-bold text-slate-900">Opérations Rapides</h3>
+              <div className="lg:col-span-4 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
+                <h3 className="text-base font-bold text-[var(--color-fc-black)]">Opérations Rapides</h3>
                 <div className="space-y-2.5">
                   <button
                     onClick={() => setShowManualPaymentModal(true)}
@@ -1266,35 +1020,24 @@ export function AdminPortal({
 
                   <button
                     onClick={() => setShowNewStudentModal(true)}
-                    className="w-full p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 text-xs font-bold flex items-center justify-between transition-colors"
+                    className="w-full p-3 rounded-xl bg-[var(--color-fc-surface)] hover:bg-blue-100 border border-[var(--color-fc-primary)]/20 text-blue-800 text-xs font-bold flex items-center justify-between transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Users className="w-4 h-4 text-[var(--color-fc-primary)]" />
                       Inscrire un étudiant au guichet
                     </span>
                     <Plus className="w-4 h-4" />
                   </button>
 
-                  <button
-                    onClick={() => setActiveTab("talents")}
-                    className="w-full p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold flex items-center justify-between transition-colors"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-indigo-600" />
-                      Vivier de talents ({students.filter((s) => s.profileVisible).length} en ligne)
-                    </span>
-                    <ArrowUpRight className="w-4 h-4 text-indigo-400" />
-                  </button>
-
                   <Link
                     href="/recu"
-                    className="w-full p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold flex items-center justify-between transition-colors"
+                    className="w-full p-3 rounded-xl bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-bg)] border border-[var(--color-fc-gray-light)] text-[var(--color-fc-black)] text-xs font-bold flex items-center justify-between transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      <QrCode className="w-4 h-4 text-slate-600" />
+                      <QrCode className="w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                       Vérifier l&apos;authenticité d&apos;un reçu
                     </span>
-                    <ArrowUpRight className="w-4 h-4 text-slate-400" />
+                    <ArrowUpRight className="w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                   </Link>
                 </div>
               </div>
@@ -1307,14 +1050,14 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Validation des Comptes Étudiants</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Validation des Comptes Étudiants</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Chaque nouvel étudiant doit être validé avant de pouvoir se connecter et apparaître sur la page Entreprises.
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                  pendingValidations > 0 ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                  pendingValidations > 0 ? "bg-[var(--color-fc-surface)] text-[var(--color-fc-black)]" : "bg-emerald-100 text-emerald-800"
                 }`}>
                   {pendingValidations > 0 ? `${pendingValidations} dossiers en attente` : "Aucun dossier en attente"}
                 </span>
@@ -1323,16 +1066,16 @@ export function AdminPortal({
 
             {/* Pending validations */}
             {pendingValidations > 0 && (
-              <div className="bg-white rounded-2xl border border-amber-200 overflow-hidden shadow-xs">
-                <div className="bg-amber-50 px-5 py-3 border-b border-amber-200 flex items-center justify-between">
-                  <span className="text-sm font-bold text-amber-800 flex items-center gap-2">
+              <div className="bg-white rounded-2xl border border-[var(--color-fc-primary)]/20 overflow-hidden ">
+                <div className="bg-[var(--color-fc-surface)] px-5 py-3 border-b border-[var(--color-fc-primary)]/20 flex items-center justify-between">
+                  <span className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     Dossiers en attente de validation
                   </span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="py-3 px-4">Matricule</th>
                         <th className="py-3 px-4">Étudiant</th>
@@ -1342,20 +1085,20 @@ export function AdminPortal({
                         <th className="py-3 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                       {admissions.filter((a) => a.status === "preinscrit").map((a) => (
-                        <tr key={a.id} className="hover:bg-amber-50/40 transition-colors">
-                          <td className="py-3 px-4 font-mono font-bold text-blue-600">{a.studentNumber}</td>
+                        <tr key={a.id} className="hover:bg-[var(--color-fc-surface)] transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">{a.studentNumber}</td>
                           <td className="py-3 px-4">
-                            <strong className="text-slate-900 block">{a.firstName} {a.lastName}</strong>
-                            <span className="text-[10px] text-slate-400">{a.city || "Cotonou"}</span>
+                            <strong className="text-[var(--color-fc-black)] block">{a.firstName} {a.lastName}</strong>
+                            <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.city || "Cotonou"}</span>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
                             <div>{a.phone}</div>
-                            <div className="text-[10px] text-slate-400">{a.email}</div>
+                            <div className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.email}</div>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">{a.formationTitle || "—"}</td>
-                          <td className="py-3 px-4 text-slate-500 text-[10px]">
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "—"}</td>
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] text-[10px]">
                             {a.createdAt ? new Date(a.createdAt).toLocaleDateString("fr-FR") : "—"}
                           </td>
                           <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
@@ -1381,21 +1124,21 @@ export function AdminPortal({
             )}
 
             {/* Recent reviews (validated / rejected) */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-              <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
-                <span className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
+              <div className="px-5 py-3 border-b border-[var(--color-fc-gray-light)] flex items-center justify-between">
+                <span className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   Dossiers traités récemment
                 </span>
               </div>
               {admissions.filter((a) => a.status !== "preinscrit").length === 0 ? (
-                <div className="p-8 text-center text-sm text-slate-400">
+                <div className="p-8 text-center text-sm text-[var(--color-fc-gray-mid)]">
                   Aucun dossier traité pour le moment.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="py-3 px-4">Matricule</th>
                         <th className="py-3 px-4">Étudiant</th>
@@ -1404,18 +1147,18 @@ export function AdminPortal({
                         <th className="py-3 px-4">Note</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                       {admissions
                         .filter((a) => a.status !== "preinscrit")
                         .slice(0, 20)
                         .map((a) => (
-                          <tr key={a.id} className="hover:bg-slate-50/70 transition-colors">
-                            <td className="py-3 px-4 font-mono font-bold text-blue-600">{a.studentNumber}</td>
+                          <tr key={a.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                            <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">{a.studentNumber}</td>
                             <td className="py-3 px-4">
-                              <strong className="text-slate-900 block">{a.firstName} {a.lastName}</strong>
-                              <span className="text-[10px] text-slate-400">{a.email}</span>
+                              <strong className="text-[var(--color-fc-black)] block">{a.firstName} {a.lastName}</strong>
+                              <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.email}</span>
                             </td>
-                            <td className="py-3 px-4 text-slate-600">{a.formationTitle || "—"}</td>
+                            <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "—"}</td>
                             <td className="py-3 px-4">
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -1423,7 +1166,7 @@ export function AdminPortal({
                                     ? "bg-emerald-100 text-emerald-800"
                                     : a.status === "rejete"
                                     ? "bg-rose-100 text-rose-700"
-                                    : "bg-slate-100 text-slate-600"
+                                    : "bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)]"
                                 }`}
                               >
                                 {a.status === "inscrit" && "Validé (inscrit)"}
@@ -1433,7 +1176,7 @@ export function AdminPortal({
                                 {!["inscrit", "actif", "termine", "rejete"].includes(a.status) && a.status}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-slate-500 italic max-w-[220px]">
+                            <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] italic max-w-[220px]">
                               {a.validationNote || "—"}
                             </td>
                           </tr>
@@ -1446,774 +1189,140 @@ export function AdminPortal({
           </div>
         )}
 
-        {/* TAB VIVIER DE TALENTS & PROFILS ENTREPRISES */}
-        {activeTab === "talents" && (
-          <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Header + Add Talent button */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-blue-600" /> Vivier de Talents Certifiés
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    {students.filter((s) => s.profileVisible).length} profil(s) en ligne sur Entreprises
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                  Gestion des Talents &amp; Profils Entreprises
-                </h2>
-                <p className="text-xs text-slate-500 max-w-2xl">
-                  Créez, modifiez et supprimez les profils étudiants valorisés auprès des recruteurs et entreprises partenaires.
-                  Gérez leurs compétences, CV (PDF), photo d&apos;identité et statut de disponibilité en un clic.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <Link
-                  href="/entreprises"
-                  target="_blank"
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center gap-1.5 transition-colors shadow-2xs"
-                  title="Ouvrir la page Entreprises dans un nouvel onglet"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Voir la page Entreprises</span>
-                </Link>
-
-                <button
-                  onClick={() => {
-                    setNewStudentForm({
-                      firstName: "",
-                      lastName: "",
-                      email: "",
-                      phone: "",
-                      city: "Cotonou",
-                      formationId: formations[0]?.id || 1,
-                      customFormation: formations[0]?.title || "Développement Web Fullstack",
-                      status: "actif",
-                      professionalStatus: "Disponible immédiatement",
-                      skills: [],
-                      newSkillInput: "",
-                      avatarUrl: "",
-                      cvUrl: "",
-                      profileVisible: true,
-                    });
-                    setShowNewStudentModal(true);
-                  }}
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 transition-all hover:shadow-lg"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>+ Créer un Nouveau Talent</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Quick KPI stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                  En ligne sur Entreprises
-                </span>
-                <div className="text-2xl font-black text-emerald-600">
-                  {students.filter((s) => s.profileVisible).length}
-                </div>
-                <span className="text-[11px] text-slate-400">Visibles par les recruteurs</span>
-              </div>
-
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                  Disponible immédiatement
-                </span>
-                <div className="text-2xl font-black text-blue-600">
-                  {
-                    students.filter(
-                      (s) =>
-                        s.profileVisible &&
-                        (s.professionalStatus || "").toLowerCase().includes("disponible")
-                    ).length
-                  }
-                </div>
-                <span className="text-[11px] text-slate-400">Prêts pour embauche directe</span>
-              </div>
-
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                  Recherche d&apos;alternance
-                </span>
-                <div className="text-2xl font-black text-indigo-600">
-                  {
-                    students.filter(
-                      (s) =>
-                        s.profileVisible &&
-                        (s.professionalStatus || "").toLowerCase().includes("alternance")
-                    ).length
-                  }
-                </div>
-                <span className="text-[11px] text-slate-400">Rythme école / entreprise</span>
-              </div>
-
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                  Recherche de stage
-                </span>
-                <div className="text-2xl font-black text-amber-600">
-                  {
-                    students.filter(
-                      (s) =>
-                        s.profileVisible &&
-                        (s.professionalStatus || "").toLowerCase().includes("stage")
-                    ).length
-                  }
-                </div>
-                <span className="text-[11px] text-slate-400">Stages pratiques 3 à 6 mois</span>
-              </div>
-            </div>
-
-            {/* RECHERCHE & FILTRES RAPIDES TALENTS */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div className="sm:col-span-6 relative">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Rechercher par compétence (ex: React, Python, Drone, Figma), nom ou formation..."
-                    value={searchTalent}
-                    onChange={(e) => setSearchTalent(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <select
-                    value={talentStatusFilter}
-                    onChange={(e) => setTalentStatusFilter(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
-                  >
-                    <option value="all">Tous les statuts professionnels</option>
-                    <option value="disponible">Disponible immédiatement</option>
-                    <option value="alternance">Recherche d&apos;alternance</option>
-                    <option value="stage">Recherche de stage</option>
-                    <option value="diplômé">Diplômé / En poste</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <select
-                    value={talentFormationFilter}
-                    onChange={(e) => setTalentFormationFilter(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
-                  >
-                    <option value="all">Toutes les formations ({formations.length})</option>
-                    {Object.entries(formationsByCategory).map(([cat, items]) => (
-                      <optgroup key={cat} label={`📂 ${cat}`}>
-                        {items.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.title}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Visibility quick toggle filters */}
-              <div className="flex items-center gap-2 pt-1 border-t border-slate-100 overflow-x-auto text-[11px] font-semibold text-slate-600">
-                <span className="text-slate-400">Filtrer par visibilité :</span>
-                <button
-                  onClick={() => setTalentVisibilityFilter("visible")}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                    talentVisibilityFilter === "visible"
-                      ? "bg-emerald-600 text-white font-black shadow-xs ring-2 ring-emerald-300"
-                      : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 font-bold"
-                  }`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>En ligne sur Entreprises ({students.filter((s) => s.profileVisible).length})</span>
-                </button>
-
-                <button
-                  onClick={() => setTalentVisibilityFilter("all")}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all ${
-                    talentVisibilityFilter === "all"
-                      ? "bg-slate-900 text-white font-bold shadow-xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  Tous ({students.length})
-                </button>
-
-                <button
-                  onClick={() => setTalentVisibilityFilter("hidden")}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                    talentVisibilityFilter === "hidden"
-                      ? "bg-slate-800 text-white font-bold shadow-xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  <EyeOff className="w-3.5 h-3.5" />
-                  <span>Masqués ({students.filter((s) => !s.profileVisible).length})</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Talents Table */}
-            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-                    <tr>
-                      <th className="py-3 px-4">Talent &amp; Photo</th>
-                      <th className="py-3 px-4">Formation Suivie</th>
-                      <th className="py-3 px-4">Disponibilité Recrutement</th>
-                      <th className="py-3 px-4">Compétences validées</th>
-                      <th className="py-3 px-4">CV</th>
-                      <th className="py-3 px-4 text-center">Page Entreprises</th>
-                      <th className="py-3 px-4 text-right">Actions (Modifier / Supprimer)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-150">
-                    {filteredTalentsList.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="p-10 text-center text-slate-400 space-y-2">
-                          <Sparkles className="w-8 h-8 text-slate-300 mx-auto" />
-                          <p className="font-bold text-slate-600">Aucun talent trouvé avec les critères actuels.</p>
-                          <button
-                            onClick={() => {
-                              setSearchTalent("");
-                              setTalentStatusFilter("all");
-                              setTalentFormationFilter("all");
-                              setTalentVisibilityFilter("all");
-                            }}
-                            className="text-xs text-blue-600 font-bold hover:underline"
-                          >
-                            Réinitialiser les filtres
-                          </button>
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredTalentsList.map((st) => {
-                        let parsedSkills: string[] = [];
-                        if (st.skills) {
-                          try {
-                            const p = JSON.parse(st.skills);
-                            if (Array.isArray(p))
-                              parsedSkills = p.map(String).map((s) => s.trim()).filter(Boolean);
-                          } catch {
-                            parsedSkills = st.skills.split(",").map((s) => s.trim()).filter(Boolean);
-                          }
-                        }
-
-                        const initials = `${st.firstName?.[0] || ""}${st.lastName?.[0] || ""}`.toUpperCase() || "FC";
-                        const displayFormation =
-                          st.formationTitle ||
-                          formations.find((f) => f.id === st.formationId)?.title ||
-                          "Formation générale";
-
-                        return (
-                          <tr key={st.id} className="hover:bg-slate-50/70 transition-colors">
-                            {/* Talent & Photo */}
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                {st.avatarUrl ? (
-                                  <Image
-                                    src={st.avatarUrl}
-                                    alt={`${st.firstName} ${st.lastName}`}
-                                    width={44}
-                                    height={44}
-                                    unoptimized
-                                    className="w-11 h-11 rounded-2xl object-cover border-2 border-blue-200 shrink-0 shadow-2xs"
-                                  />
-                                ) : (
-                                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white font-black text-xs flex items-center justify-center shrink-0 border-2 border-blue-100 shadow-2xs">
-                                    {initials}
-                                  </div>
-                                )}
-                                <div>
-                                  <strong className="text-slate-900 block font-bold text-sm">
-                                    {st.firstName} {st.lastName}
-                                  </strong>
-                                  <span className="text-[10px] font-mono text-blue-600 font-bold block">
-                                    {st.studentNumber}
-                                  </span>
-                                  <span className="text-[10px] text-slate-400">
-                                    {st.phone} • {st.email}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Formation */}
-                            <td className="py-3 px-4">
-                              <span className="font-semibold text-slate-800 block text-xs">
-                                {displayFormation}
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-medium">
-                                Campus: {st.city || "Cotonou"}
-                              </span>
-                            </td>
-
-                            {/* Disponibilité Recrutement */}
-                            <td className="py-3 px-4">
-                              <span
-                                className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold inline-flex items-center gap-1.5 border ${
-                                  (st.professionalStatus || "").toLowerCase().includes("disponible")
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                    : (st.professionalStatus || "").toLowerCase().includes("alternance")
-                                    ? "bg-blue-50 text-blue-700 border-blue-200"
-                                    : (st.professionalStatus || "").toLowerCase().includes("stage")
-                                    ? "bg-amber-50 text-amber-700 border-amber-200"
-                                    : "bg-purple-50 text-purple-700 border-purple-200"
-                                }`}
-                              >
-                                {(st.professionalStatus || "").toLowerCase().includes("disponible") && (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                )}
-                                {st.professionalStatus || "Disponible immédiatement"}
-                              </span>
-                            </td>
-
-                            {/* Compétences validées */}
-                            <td className="py-3 px-4">
-                              {parsedSkills.length > 0 ? (
-                                <div className="flex flex-wrap gap-1 max-w-[240px]">
-                                  {parsedSkills.slice(0, 5).map((sk, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
-                                    >
-                                      #{sk}
-                                    </span>
-                                  ))}
-                                  {parsedSkills.length > 5 && (
-                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600">
-                                      +{parsedSkills.length - 5}
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-[11px] text-slate-400 italic">Compétences non renseignées</span>
-                              )}
-                            </td>
-
-                            {/* CV */}
-                            <td className="py-3 px-4 whitespace-nowrap">
-                              {st.cvUrl ? (
-                                <a
-                                  href={st.cvUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
-                                  title="Consulter ou télécharger le CV (PDF)"
-                                >
-                                  <FileText className="w-3.5 h-3.5 text-red-600" />
-                                  <span>CV PDF ↗</span>
-                                </a>
-                              ) : (
-                                <span className="text-[11px] text-slate-400 italic">Aucun CV</span>
-                              )}
-                            </td>
-
-                            {/* Page Entreprises Toggle */}
-                            <td className="py-3 px-4 text-center whitespace-nowrap">
-                              <button
-                                onClick={() => handleToggleVisibility(st)}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold transition-all border ${
-                                  st.profileVisible
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300"
-                                    : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
-                                }`}
-                                title={
-                                  st.profileVisible
-                                    ? "Visible sur /entreprises. Cliquer pour masquer."
-                                    : "Masqué. Cliquer pour afficher sur /entreprises."
-                                }
-                              >
-                                {st.profileVisible ? (
-                                  <>
-                                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
-                                    <span>En ligne sur Entreprises</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <EyeOff className="w-3.5 h-3.5 text-slate-400" />
-                                    <span>Masqué</span>
-                                  </>
-                                )}
-                              </button>
-                            </td>
-
-                            {/* Actions (Modifier / Supprimer) */}
-                            <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                              <button
-                                onClick={() => handleOpenEditStudent(st)}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors"
-                                title="Modifier toutes les informations du profil"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                                <span>Modifier</span>
-                              </button>
-
-                              <button
-                                onClick={() => handleDeleteStudent(st)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors"
-                                title="Supprimer définitivement ce talent"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Supprimer</span>
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 26 & 30. TAB GESTION DES ÉTUDIANTS & TALENTS ENTREPRISES */}
+        {/* 26 & 30. TAB GESTION DES ÉTUDIANTS */}
         {activeTab === "etudiants" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* Header + Add Student button */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-blue-600" /> Vivier de Talents &amp; Candidats
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    {students.filter((s) => s.profileVisible).length} profil(s) en ligne sur Entreprises
-                  </span>
-                </div>
-                <h2 className="text-xl font-black text-slate-900 tracking-tight">Répertoire des Candidats &amp; Profils Entreprises</h2>
-                <p className="text-xs text-slate-500">
-                  Créez et administrez les profils étudiants, compétences validées, CV, photos d&apos;identité et leur mise en avant auprès des recruteurs.
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Répertoire des Candidats &amp; Étudiants</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
+                  Recherchez par nom, matricule, téléphone et gérez les statuts d&apos;admission.
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5">
-                <Link
-                  href="/entreprises"
-                  target="_blank"
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center gap-1.5 transition-colors shadow-2xs"
-                  title="Ouvrir la page Entreprises dans un nouvel onglet"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Voir la page Entreprises</span>
-                </Link>
-
-                <button
-                  onClick={() => setShowNewStudentModal(true)}
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 transition-all hover:shadow-lg"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Nouveau profil étudiant / Talent</span>
-                </button>
-              </div>
+              <button
+                onClick={() => setShowNewStudentModal(true)}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center gap-2 self-start sm:self-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Inscrire un nouvel étudiant</span>
+              </button>
             </div>
 
             {/* 30. RECHERCHE & FILTRES RAPIDES */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div className="sm:col-span-6 relative">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Rechercher par nom, matricule, compétence (React, Figma...), email, tél..."
-                    value={searchStudent}
-                    onChange={(e) => setSearchStudent(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
-                  >
-                    <option value="all">Tous les statuts administratifs</option>
-                    <option value="preinscrit">En attente de validation</option>
-                    <option value="rejete">Rejetés</option>
-                    <option value="inscrit">Inscrits (validés)</option>
-                    <option value="actif">Étudiants actifs</option>
-                    <option value="termine">Formation terminée</option>
-                    <option value="alumni">Alumni</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <select
-                    value={formationFilter}
-                    onChange={(e) => setFormationFilter(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700"
-                  >
-                    <option value="all">Toutes les formations</option>
-                    {formations.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            <div className="bg-white p-4 rounded-2xl border border-[var(--color-fc-gray-light)]  grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
+              <div className="sm:col-span-6 relative">
+                <Search className="w-4 h-4 text-[var(--color-fc-gray-mid)] absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Rechercher par nom, matricule FC-..., email, téléphone..."
+                  value={searchStudent}
+                  onChange={(e) => setSearchStudent(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)]/50 text-xs"
+                />
               </div>
 
-              {/* Visibility quick toggle filters */}
-              <div className="flex items-center gap-2 pt-1 border-t border-slate-100 overflow-x-auto text-[11px] font-semibold text-slate-600">
-                <span className="text-slate-400">Affichage Entreprises :</span>
-                <button
-                  onClick={() => setVisibilityFilter("all")}
-                  className={`px-3 py-1 rounded-lg transition-all ${
-                    visibilityFilter === "all"
-                      ? "bg-slate-900 text-white font-bold"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+              <div className="sm:col-span-3">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs text-[var(--color-fc-black)]"
                 >
-                  Tous ({students.length})
-                </button>
-                <button
-                  onClick={() => setVisibilityFilter("visible")}
-                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
-                    visibilityFilter === "visible"
-                      ? "bg-emerald-600 text-white font-bold shadow-xs"
-                      : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
-                  }`}
+                  <option value="all">Tous les statuts</option>
+                  <option value="preinscrit">En attente de validation</option>
+                  <option value="rejete">Rejetés</option>
+                  <option value="inscrit">Inscrits (validés)</option>
+                  <option value="actif">Étudiants actifs</option>
+                  <option value="termine">Formation terminée</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-3">
+                <select
+                  value={formationFilter}
+                  onChange={(e) => setFormationFilter(e.target.value)}
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs text-[var(--color-fc-black)]"
                 >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>En ligne sur Entreprises ({students.filter((s) => s.profileVisible).length})</span>
-                </button>
-                <button
-                  onClick={() => setVisibilityFilter("hidden")}
-                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
-                    visibilityFilter === "hidden"
-                      ? "bg-slate-700 text-white font-bold shadow-xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  <EyeOff className="w-3.5 h-3.5" />
-                  <span>Masqués ({students.filter((s) => !s.profileVisible).length})</span>
-                </button>
+                  <option value="all">Toutes les formations</option>
+                  {formations.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.title}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
             {/* Students Table */}
-            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
-                      <th className="py-3 px-4">Étudiant &amp; Photo</th>
-                      <th className="py-3 px-4">Formation</th>
-                      <th className="py-3 px-4">Statut &amp; Disponibilité</th>
-                      <th className="py-3 px-4">Compétences validées</th>
-                      <th className="py-3 px-4">CV</th>
-                      <th className="py-3 px-4 text-center">Page Entreprises</th>
+                      <th className="py-3 px-4">Matricule</th>
+                      <th className="py-3 px-4">Étudiant</th>
+                      <th className="py-3 px-4">Contact</th>
+                      <th className="py-3 px-4">Statut</th>
+                      <th className="py-3 px-4">Payé / Total</th>
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
-                    {filteredStudents.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="p-8 text-center text-slate-400">
-                          Aucun étudiant trouvé avec les critères sélectionnés.
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
+                    {filteredStudents.map((st) => (
+                      <tr key={st.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">
+                          {st.studentNumber}
+                        </td>
+                        <td className="py-3 px-4">
+                          <strong className="text-[var(--color-fc-black)] block">
+                            {st.firstName} {st.lastName}
+                          </strong>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{st.city || "Cotonou"}</span>
+                        </td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
+                          <div>{st.phone}</div>
+                          <div className="text-[10px] text-[var(--color-fc-gray-mid)]">{st.email}</div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              st.status === "actif"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : st.status === "inscrit" || st.status === "termine" || st.status === "alumni"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : st.status === "preinscrit"
+                                ? "bg-[var(--color-fc-surface)] text-[var(--color-fc-black)]"
+                                : st.status === "rejete"
+                                ? "bg-rose-100 text-rose-700"
+                                : "bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)]"
+                            }`}
+                          >
+                            {st.status === "preinscrit" && "En attente de validation"}
+                            {!["preinscrit"].includes(st.status) && st.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-[var(--color-fc-black)]">
+                            {st.paidAmount.toLocaleString("fr-FR")} / {st.totalAmount.toLocaleString("fr-FR")} FCFA
+                          </div>
+                          <div className="text-[10px] text-rose-600">
+                            Reste : {st.remainingAmount.toLocaleString("fr-FR")} FCFA
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right space-x-2">
+                          <button
+                            onClick={() => {
+                              setSelectedStudentForStatus(st);
+                              setNewStatusValue(st.status);
+                            }}
+                            className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
+                          >
+                            Changer statut
+                          </button>
                         </td>
                       </tr>
-                    ) : (
-                      filteredStudents.map((st) => {
-                        let parsedSkills: string[] = [];
-                        if (st.skills) {
-                          try {
-                            const p = JSON.parse(st.skills);
-                            if (Array.isArray(p)) parsedSkills = p.map(String).map((s) => s.trim()).filter(Boolean);
-                          } catch {
-                            parsedSkills = st.skills.split(",").map((s) => s.trim()).filter(Boolean);
-                          }
-                        }
-
-                        const initials = `${st.firstName?.[0] || ""}${st.lastName?.[0] || ""}`.toUpperCase() || "FC";
-                        const displayFormation = st.formationTitle || formations.find((f) => f.id === st.formationId)?.title || "Formation générale";
-
-                        return (
-                          <tr key={st.id} className="hover:bg-slate-50/70 transition-colors">
-                            {/* Étudiant & Photo */}
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                {st.avatarUrl ? (
-                                  <Image
-                                    src={st.avatarUrl}
-                                    alt={`${st.firstName} ${st.lastName}`}
-                                    width={40}
-                                    height={40}
-                                    unoptimized
-                                    className="w-10 h-10 rounded-full object-cover border-2 border-blue-200 shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black text-xs flex items-center justify-center shrink-0 border-2 border-blue-200">
-                                    {initials}
-                                  </div>
-                                )}
-                                <div>
-                                  <strong className="text-slate-900 block font-bold">
-                                    {st.firstName} {st.lastName}
-                                  </strong>
-                                  <span className="text-[10px] font-mono text-blue-600 font-bold block">
-                                    {st.studentNumber}
-                                  </span>
-                                  <span className="text-[10px] text-slate-400">
-                                    {st.phone} • {st.city || "Cotonou"}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Formation */}
-                            <td className="py-3 px-4">
-                              <span className="font-semibold text-slate-800 block text-xs">
-                                {displayFormation}
-                              </span>
-                              <span className="text-[10px] text-slate-400">
-                                {st.paidAmount.toLocaleString("fr-FR")} / {st.totalAmount.toLocaleString("fr-FR")} FCFA
-                              </span>
-                            </td>
-
-                            {/* Statut & Disponibilité */}
-                            <td className="py-3 px-4 space-y-1">
-                              <div>
-                                <span
-                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-block ${
-                                    st.status === "actif"
-                                      ? "bg-emerald-100 text-emerald-800"
-                                      : st.status === "inscrit" || st.status === "termine" || st.status === "alumni"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : st.status === "preinscrit"
-                                      ? "bg-amber-100 text-amber-800"
-                                      : st.status === "rejete"
-                                      ? "bg-rose-100 text-rose-700"
-                                      : "bg-slate-100 text-slate-600"
-                                  }`}
-                                >
-                                  {st.status === "preinscrit" && "En attente validation"}
-                                  {st.status === "actif" && "Actif"}
-                                  {st.status === "inscrit" && "Validé (Inscrit)"}
-                                  {st.status === "termine" && "Diplômé"}
-                                  {st.status === "rejete" && "Rejeté"}
-                                  {!["preinscrit", "actif", "inscrit", "termine", "rejete"].includes(st.status) && st.status}
-                                </span>
-                              </div>
-                              {st.professionalStatus && (
-                                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-200 block w-fit">
-                                  {st.professionalStatus}
-                                </span>
-                              )}
-                            </td>
-
-                            {/* Compétences validées */}
-                            <td className="py-3 px-4">
-                              {parsedSkills.length > 0 ? (
-                                <div className="flex flex-wrap gap-1 max-w-[220px]">
-                                  {parsedSkills.slice(0, 4).map((sk, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
-                                    >
-                                      {sk}
-                                    </span>
-                                  ))}
-                                  {parsedSkills.length > 4 && (
-                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600">
-                                      +{parsedSkills.length - 4}
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-[11px] text-slate-400 italic">Non renseignées</span>
-                              )}
-                            </td>
-
-                            {/* CV */}
-                            <td className="py-3 px-4 whitespace-nowrap">
-                              {st.cvUrl ? (
-                                <a
-                                  href={st.cvUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
-                                  title="Consulter le CV (PDF)"
-                                >
-                                  <FileText className="w-3.5 h-3.5 text-red-600" />
-                                  <span>CV PDF ↗</span>
-                                </a>
-                              ) : (
-                                <span className="text-[11px] text-slate-400 italic">Aucun CV</span>
-                              )}
-                            </td>
-
-                            {/* Page Entreprises Toggle */}
-                            <td className="py-3 px-4 text-center whitespace-nowrap">
-                              <button
-                                onClick={() => handleToggleVisibility(st)}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold transition-all border ${
-                                  st.profileVisible
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300"
-                                    : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
-                                }`}
-                                title={st.profileVisible ? "Visible sur Entreprises. Cliquer pour masquer." : "Masqué. Cliquer pour afficher sur Entreprises."}
-                              >
-                                {st.profileVisible ? (
-                                  <>
-                                    <Eye className="w-3 h-3 text-emerald-600" />
-                                    <span>En ligne</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <EyeOff className="w-3 h-3 text-slate-400" />
-                                    <span>Masqué</span>
-                                  </>
-                                )}
-                              </button>
-                            </td>
-
-                            {/* Actions */}
-                            <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                              <button
-                                onClick={() => handleOpenEditStudent(st)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                                title="Modifier toutes les informations du profil"
-                              >
-                                <Pencil className="w-3 h-3" />
-                                <span>Modifier</span>
-                              </button>
-
-                              <button
-                                onClick={() => {
-                                  setSelectedStudentForStatus(st);
-                                  setNewStatusValue(st.status);
-                                }}
-                                className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors"
-                                title="Changer le statut administratif"
-                              >
-                                Statut
-                              </button>
-
-                              <button
-                                onClick={() => handleDeleteStudent(st)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                                title="Supprimer définitivement ce profil"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -2226,15 +1335,15 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Registre Comptable &amp; Encaissements</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Registre Comptable &amp; Encaissements</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Enregistrez les versements en espèces à la caisse ou validez les paiements Mobile Money.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowManualPaymentModal(true)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700  flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Enregistrer un versement (Caisse / MoMo)</span>
@@ -2247,11 +1356,11 @@ export function AdminPortal({
               return (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-600" />
+                    <h3 className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-[var(--color-fc-primary)]" />
                       Demandes de paiement en ligne
                       {pending.length > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[11px] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] text-[11px] font-bold">
                           {pending.length} en attente
                         </span>
                       )}
@@ -2259,14 +1368,14 @@ export function AdminPortal({
                   </div>
 
                   {paymentRequests.length === 0 ? (
-                    <div className="p-6 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
+                    <div className="p-6 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] text-center text-xs text-[var(--color-fc-gray-mid)]">
                       Aucune demande de paiement en ligne pour le moment.
                     </div>
                   ) : (
-                    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                    <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
                       <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs">
-                          <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                          <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                             <tr>
                               <th className="py-3 px-4">Référence</th>
                               <th className="py-3 px-4">Étudiant</th>
@@ -2278,26 +1387,26 @@ export function AdminPortal({
                               <th className="py-3 px-4 text-right">Action</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-150">
+                          <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                             {paymentRequests.map((r) => (
-                              <tr key={r.id} className="hover:bg-slate-50/70 transition-colors">
-                                <td className="py-3 px-4 font-mono font-bold text-blue-600">{r.reference}</td>
-                                <td className="py-3 px-4 font-semibold text-slate-900">
+                              <tr key={r.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                                <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">{r.reference}</td>
+                                <td className="py-3 px-4 font-semibold text-[var(--color-fc-black)]">
                                   {r.studentFirstName} {r.studentLastName} ({r.studentNumber})
                                 </td>
                                 <td className="py-3 px-4 font-extrabold text-emerald-600">
                                   {r.amount.toLocaleString("fr-FR")} FCFA
                                 </td>
                                 <td className="py-3 px-4">
-                                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-[11px]">
+                                  <span className="px-2 py-0.5 rounded bg-[var(--color-fc-bg)] text-[var(--color-fc-black)] font-medium text-[11px]">
                                     {r.method}
                                   </span>
                                 </td>
-                                <td className="py-3 px-4 font-mono text-slate-600">{r.phone}</td>
-                                <td className="py-3 px-4 text-slate-400">{new Date(r.createdAt).toLocaleString("fr-FR")}</td>
+                                <td className="py-3 px-4 font-mono text-[var(--color-fc-gray-mid)]">{r.phone}</td>
+                                <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{new Date(r.createdAt).toLocaleString("fr-FR")}</td>
                                 <td className="py-3 px-4">
                                   {r.status === "en_attente" ? (
-                                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold text-[11px]">
+                                    <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold text-[11px]">
                                       En attente
                                     </span>
                                   ) : r.status === "valide" ? (
@@ -2330,7 +1439,7 @@ export function AdminPortal({
                                       </button>
                                     </div>
                                   ) : (
-                                    <span className="text-[11px] text-slate-400">Traité</span>
+                                    <span className="text-[11px] text-[var(--color-fc-gray-mid)]">Traité</span>
                                   )}
                                 </td>
                               </tr>
@@ -2345,10 +1454,10 @@ export function AdminPortal({
             })()}
 
             {/* Payments Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">N° Reçu</th>
                       <th className="py-3 px-4">Étudiant</th>
@@ -2360,31 +1469,31 @@ export function AdminPortal({
                       <th className="py-3 px-4 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {payments.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-blue-600">
+                      <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-[var(--color-fc-primary)]">
                           {p.receiptNumber}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-slate-900">
+                        <td className="py-3 px-4 font-semibold text-[var(--color-fc-black)]">
                           {p.studentFirstName} {p.studentLastName} ({p.studentNumber})
                         </td>
-                        <td className="py-3 px-4 text-slate-600">{p.formationTitle}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{p.formationTitle}</td>
                         <td className="py-3 px-4 font-extrabold text-emerald-600 text-sm">
                           {p.amount.toLocaleString("fr-FR")} FCFA
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-[11px]">
+                          <span className="px-2 py-0.5 rounded bg-[var(--color-fc-bg)] text-[var(--color-fc-black)] font-medium text-[11px]">
                             {p.paymentMethod}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-500 text-[11px]">{p.recordedBy}</td>
-                        <td className="py-3 px-4 text-slate-400">{p.paidAt}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] text-[11px]">{p.recordedBy}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{p.paidAt}</td>
                         <td className="py-3 px-4 text-right">
                           <Link
                             href={`/recu/${p.receiptNumber}`}
                             target="_blank"
-                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                           >
                             <Printer className="w-3.5 h-3.5" />
                             <span>Voir reçu</span>
@@ -2403,8 +1512,8 @@ export function AdminPortal({
         {activeTab === "formations" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Gestion des Formations &amp; Tarifs</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Gestion des Formations &amp; Tarifs</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Consultez les 12 cursus officiels, leurs prix en FCFA et les frais d&apos;inscription.
               </p>
             </div>
@@ -2413,19 +1522,19 @@ export function AdminPortal({
               {formations.map((f) => (
                 <div
                   key={f.id}
-                  className={`bg-white p-5 rounded-2xl border shadow-xs space-y-3 ${
+                  className={`bg-white p-5 rounded-2xl border  space-y-3 ${
                     f.isActive === null || f.isActive === undefined || f.isActive === true
-                      ? "border-slate-200"
+                      ? "border-[var(--color-fc-gray-light)]"
                       : "border-rose-200 bg-rose-50/40"
                   }`}
                 >
                   <div className="flex items-start justify-between">
-                    <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase font-bold text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] px-2 py-0.5 rounded">
                       {f.category}
                     </span>
                     <span className="flex items-center gap-2">
                       {f.isPopular ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-100 text-violet-800">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)]">
                           Populaire
                         </span>
                       ) : null}
@@ -2441,29 +1550,29 @@ export function AdminPortal({
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 leading-snug">{f.title}</h3>
-                  <div className="text-xs text-slate-500">⏱️ {f.duration} — {f.mode || "Présentiel & Hybride"}</div>
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)] leading-snug">{f.title}</h3>
+                  <div className="text-xs text-[var(--color-fc-gray-mid)]">⏱️ {f.duration} — {f.mode || "Présentiel & Hybride"}</div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div className="pt-2 border-t border-[var(--color-fc-gray-light)] flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Frais totaux :</span>
-                      <strong className="text-sm font-black text-slate-900">
+                      <span className="text-[10px] text-[var(--color-fc-gray-mid)] block">Frais totaux :</span>
+                      <strong className="text-sm font-black text-[var(--color-fc-black)]">
                         {f.price.toLocaleString("fr-FR")} FCFA
                       </strong>
-                      <span className="text-[10px] text-slate-400 block">
+                      <span className="text-[10px] text-[var(--color-fc-gray-mid)] block">
                         + {f.registrationFee.toLocaleString("fr-FR")} FCFA dossier
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/formation/${f.slug}`}
-                        className="text-xs font-bold text-blue-600 hover:underline"
+                        className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                       >
                         Voir page →
                       </Link>
                       <button
                         onClick={() => openFormationEditor(f)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] px-2 py-1 rounded-lg transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                         Modifier
@@ -2481,24 +1590,24 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Blog &amp; Actualités</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Blog &amp; Actualités</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
                   Rédigez, modifiez ou supprimez les articles publiés sur la page Actualités.
                 </p>
               </div>
               <button
                 onClick={() => openArticleEditor(null)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-2 self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Nouvel article</span>
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Titre</th>
                       <th className="py-3 px-4">Catégorie</th>
@@ -2508,42 +1617,42 @@ export function AdminPortal({
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {articles.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-slate-400">
+                        <td colSpan={6} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
                           Aucun article publié pour le moment.
                         </td>
                       </tr>
                     )}
                     {articles.map((a) => (
-                      <tr key={a.id} className="hover:bg-slate-50/70 transition-colors align-top">
+                      <tr key={a.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors align-top">
                         <td className="py-3 px-4 max-w-[320px]">
-                          <strong className="text-slate-900 block truncate">{a.title}</strong>
-                          <span className="text-[10px] text-slate-400 font-mono truncate block">
+                          <strong className="text-[var(--color-fc-black)] block truncate">{a.title}</strong>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)] font-mono truncate block">
                             /actualites/{a.slug}
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold text-[10px]">
                             {a.category}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">{a.author}</td>
-                        <td className="py-3 px-4 text-slate-500">{a.readTime}</td>
-                        <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{a.publishedAt}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.author}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.readTime}</td>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] whitespace-nowrap">{a.publishedAt}</td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               href={`/actualites/${a.slug}`}
                               target="_blank"
-                              className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                             >
                               Voir
                             </Link>
                             <button
                               onClick={() => openArticleEditor(a)}
-                              className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition-colors"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] px-2 py-1 rounded-lg transition-colors"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                               Modifier
@@ -2566,20 +1675,106 @@ export function AdminPortal({
           </div>
         )}
 
+        {/* TAB PROJETS ÉTUDIANTS */}
+        {activeTab === "projects" && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Projets des étudiants validés</h2>
+                <p className="text-xs text-[var(--color-fc-gray-mid)]">
+                  Seuls les étudiants confirmés par l’administration peuvent être associés à un projet publié.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setProjectForm((current) => ({
+                    ...current,
+                    studentId: String(validatedStudents[0]?.id || ""),
+                  }));
+                  setProjectModalOpen(true);
+                }}
+                disabled={validatedStudents.length === 0}
+                className="flex items-center gap-2 self-start rounded-xl bg-[var(--color-fc-deep)] px-5 py-2.5 text-xs font-bold text-white  hover:bg-[var(--color-fc-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Nouveau projet</span>
+              </button>
+            </div>
+
+            {validatedStudents.length === 0 && (
+              <p className="rounded-xl border border-[var(--color-fc-primary)]/20 bg-[var(--color-fc-surface)] p-4 text-xs text-[var(--color-fc-black)]">
+                Validez d’abord un dossier étudiant pour pouvoir lui associer un projet.
+              </p>
+            )}
+
+            <div className="overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white ">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] text-[11px] font-bold uppercase tracking-wider text-[var(--color-fc-gray-mid)]">
+                    <tr>
+                      <th className="px-4 py-3">Projet</th>
+                      <th className="px-4 py-3">Étudiant</th>
+                      <th className="px-4 py-3">Formation</th>
+                      <th className="px-4 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
+                    {projects.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
+                          Aucun projet publié pour le moment.
+                        </td>
+                      </tr>
+                    )}
+                    {projects.map((project) => (
+                      <tr key={project.id} className="align-top hover:bg-[var(--color-fc-bg)]/70">
+                        <td className="max-w-[320px] px-4 py-3">
+                          <strong className="block truncate text-[var(--color-fc-black)]">{project.title}</strong>
+                          <span className="block truncate text-[10px] text-[var(--color-fc-gray-mid)]">{project.tagline}</span>
+                        </td>
+                        <td className="px-4 py-3 text-[var(--color-fc-black)]">
+                          {project.studentName || "Étudiant supprimé"}
+                          {project.studentNumber && (
+                            <span className="mt-1 block font-mono text-[10px] text-[var(--color-fc-gray-mid)]">
+                              {project.studentNumber}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-[var(--color-fc-gray-mid)]">{project.formationTitle}</td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProject(project)}
+                            className="inline-flex items-center gap-1 rounded-lg bg-rose-50 px-2 py-1 text-xs font-bold text-rose-600 hover:bg-rose-100"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Supprimer
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* TAB PARTENARIATS */}
         {activeTab === "partenariats" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Demandes de Partenariat Entreprises</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Demandes de Partenariat Entreprises</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Propositions de partenariat reçues depuis l&apos;espace entreprises : stages, recrutement, coaching, certification.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden ">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                  <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Entreprise</th>
                       <th className="py-3 px-4">Contact</th>
@@ -2589,34 +1784,34 @@ export function AdminPortal({
                       <th className="py-3 px-4">Statut</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
                     {partnerships.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-slate-400">
+                        <td colSpan={6} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
                           Aucune demande de partenariat pour le moment.
                         </td>
                       </tr>
                     )}
                     {partnerships.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50/70 transition-colors align-top">
+                      <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors align-top">
                         <td className="py-3 px-4">
-                          <strong className="text-slate-900 block">{p.companyName}</strong>
-                          <span className="text-[10px] text-slate-400">N° {p.id}</span>
+                          <strong className="text-[var(--color-fc-black)] block">{p.companyName}</strong>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)]">N° {p.id}</span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
-                          <div className="font-semibold text-slate-900">{p.contactName}</div>
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
+                          <div className="font-semibold text-[var(--color-fc-black)]">{p.contactName}</div>
                           <div className="text-[11px]">{p.email}</div>
                           <div className="text-[11px]">{p.phone}</div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] font-bold text-[10px]">
                             {p.partnershipType}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600 max-w-[260px]">
-                          {p.message || <span className="text-slate-300">—</span>}
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] max-w-[260px]">
+                          {p.message || <span className="text-white/60">—</span>}
                         </td>
-                        <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
+                        <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] whitespace-nowrap">
                           {new Date(p.createdAt).toLocaleDateString("fr-FR", {
                             day: "2-digit",
                             month: "short",
@@ -2629,9 +1824,9 @@ export function AdminPortal({
                             onChange={(e) => handlePartnerStatusChange(p.id, e.target.value)}
                             className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${
                               p.status === "nouveau"
-                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                ? "bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)] border-[var(--color-fc-primary)]/20"
                                 : p.status === "contacte"
-                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                ? "bg-[var(--color-fc-surface)] text-blue-700 border-[var(--color-fc-primary)]/20"
                                 : "bg-emerald-50 text-emerald-700 border-emerald-200"
                             }`}
                           >
@@ -2652,24 +1847,24 @@ export function AdminPortal({
         {/* 28. TAB ROLES ET ACCÈS */}
         {activeTab === "roles" && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-              <h2 className="text-xl font-bold text-slate-900">Matrice des Rôles et Autorisations</h2>
-              <p className="text-xs text-slate-500">
+            <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-4">
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Matrice des Rôles et Autorisations</h2>
+              <p className="text-xs text-[var(--color-fc-gray-mid)]">
                 Chaque profil administratif dispose de droits spécifiques pour garantir la sécurité et la traçabilité des opérations.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                <div className="p-5 rounded-2xl bg-violet-50/60 border border-violet-200 space-y-3">
+                <div className="space-y-3 rounded-2xl border border-[var(--color-fc-primary)]/15 bg-[var(--color-fc-primary)]/5 p-5">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-violet-600 text-white flex items-center justify-center font-bold text-xs">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-fc-primary)] text-xs font-bold text-white">
                       SA
                     </span>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Super Administrateur</h4>
-                      <span className="text-[10px] text-violet-700 font-semibold">Direction Générale</span>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Super Administrateur</h4>
+                      <span className="text-[10px] font-semibold text-[var(--color-fc-primary)]">Direction Générale</span>
                     </div>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
                     <li>✓ Accès total à la plateforme</li>
                     <li>✓ Gestion financière et audits</li>
                     <li>✓ Modification des formations et tarifs</li>
@@ -2683,11 +1878,11 @@ export function AdminPortal({
                       CF
                     </span>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Caissier / Financier</h4>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Caissier / Financier</h4>
                       <span className="text-[10px] text-emerald-700 font-semibold">Service Comptabilité</span>
                     </div>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
                     <li>✓ Enregistrement des paiements physiques</li>
                     <li>✓ Génération immédiate des reçus certifiés</li>
                     <li>✓ Suivi des retards d&apos;échéances</li>
@@ -2695,17 +1890,17 @@ export function AdminPortal({
                   </ul>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-blue-50/60 border border-blue-200 space-y-3">
+                <div className="p-5 rounded-2xl bg-[var(--color-fc-surface)]/60 border border-[var(--color-fc-primary)]/20 space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                    <span className="w-8 h-8 rounded-lg bg-[var(--color-fc-deep)] text-white flex items-center justify-center font-bold text-xs">
                       AG
                     </span>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Agent Administratif</h4>
+                      <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Agent Administratif</h4>
                       <span className="text-[10px] text-blue-700 font-semibold">Service Scolarité</span>
                     </div>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
                     <li>✓ Enregistrement des candidats physiques</li>
                     <li>✓ Édition des attestations de scolarité</li>
                     <li>✓ Mise à jour des coordonnées des étudiants</li>
@@ -2720,16 +1915,16 @@ export function AdminPortal({
 
       {/* MODAL: ENREGISTRER UN PAIEMENT PHYSIQUE (CAISSE) */}
       {showManualPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-md w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
                 <span>Encaisser un versement étudiant</span>
               </h3>
               <button
                 onClick={() => setShowManualPaymentModal(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -2737,11 +1932,11 @@ export function AdminPortal({
 
             <form onSubmit={handleRecordPayment} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Étudiant concerné *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Étudiant concerné *</label>
                 <select
                   value={manualPayStudentId}
                   onChange={(e) => setManualPayStudentId(Number(e.target.value))}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                 >
                   {students.map((st) => (
                     <option key={st.id} value={st.id}>
@@ -2752,21 +1947,21 @@ export function AdminPortal({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Montant encaissé (FCFA) *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Montant encaissé (FCFA) *</label>
                 <input
                   type="number"
                   value={manualPayAmount}
                   onChange={(e) => setManualPayAmount(Number(e.target.value))}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-sm"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] font-bold text-sm"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Mode de versement *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Mode de versement *</label>
                 <select
                   value={manualPayMethod}
                   onChange={(e) => setManualPayMethod(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                 >
                   <option value="Caisse / Espèces">Caisse / Espèces (Guichet)</option>
                   <option value="MTN Mobile Money">MTN Mobile Money (Direct marchand)</option>
@@ -2776,12 +1971,12 @@ export function AdminPortal({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Notes / Réf reçu physique</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Notes / Réf reçu physique</label>
                 <input
                   type="text"
                   value={manualPayNotes}
                   onChange={(e) => setManualPayNotes(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200"
+                  className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)]"
                 />
               </div>
 
@@ -2799,1100 +1994,103 @@ export function AdminPortal({
         </div>
       )}
 
-      {/* MODAL: CRÉER UN PROFIL ÉTUDIANT & TALENT ENTREPRISE */}
+      {/* MODAL: NOUVEL ÉTUDIANT MANUEL */}
       {showNewStudentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                    Nouveau Profil Étudiant &amp; Talent
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Renseignez les compétences, photo et CV pour alimenter le vivier de la page Entreprises.
-                  </p>
-                </div>
-              </div>
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-lg w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <Users className="w-4 h-4 text-[var(--color-fc-primary)]" />
+                <span>Inscrire un étudiant au guichet physique</span>
+              </h3>
               <button
                 onClick={() => setShowNewStudentModal(false)}
-                className="text-slate-400 hover:text-slate-700 font-bold p-1 rounded-lg hover:bg-slate-100"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
-                <X className="w-5 h-5" />
+                ✕
               </button>
             </div>
 
-            <form onSubmit={handleCreateStudent} className="space-y-5 text-xs">
-              {/* SECTION 1: IDENTITÉ & CONTACT */}
-              <div className="space-y-3">
-                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-blue-600" />
-                  <span>1. Identité &amp; Coordonnées</span>
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Nom de famille *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ex : DOSSOU"
-                      value={newStudentForm.lastName}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Prénom(s) *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ex : Arnaud"
-                      value={newStudentForm.firstName}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Téléphone *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="+229 97 00 00 00"
-                      value={newStudentForm.phone}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, phone: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Email *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="etudiant@futurcraft.bj"
-                      value={newStudentForm.email}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, email: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Ville / Campus</label>
-                    <input
-                      type="text"
-                      value={newStudentForm.city}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, city: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 2: FORMATION & STATUTS */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-blue-600" />
-                  <span>2. Formation &amp; Statut Professionnel</span>
-                </h4>
-
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center justify-between gap-1">
-                    <label className="block font-bold text-slate-800 text-xs">
-                      Intitulé de la Formation suivie à FuturCraft *
-                    </label>
-                    <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                      ✍️ Saisie libre ou sélection catalogue
-                    </span>
-                  </div>
-
+            <form onSubmit={handleCreateStudent} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nom *</label>
                   <input
                     type="text"
                     required
-                    placeholder="Ex : Développement Web Fullstack, Intelligence Artificielle & Robotique, Pilotage de Drone..."
-                    value={newStudentForm.customFormation}
+                    value={newStudentForm.lastName}
                     onChange={(e) =>
-                      setNewStudentForm((prev) => ({ ...prev, customFormation: e.target.value }))
+                      setNewStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
                     }
-                    className="w-full p-2.5 rounded-xl border-2 border-blue-200 bg-white font-bold text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs text-xs"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
-
-                  <div className="pt-1">
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                      Ou sélectionner parmi nos {formations.length} formations du catalogue pour pré-remplir :
-                    </label>
-                    <select
-                      value={newStudentForm.formationId}
-                      onChange={(e) => {
-                        const selId = Number(e.target.value);
-                        const selFormation = formations.find((f) => f.id === selId);
-                        setNewStudentForm((prev) => ({
-                          ...prev,
-                          formationId: selId,
-                          customFormation: selFormation ? selFormation.title : prev.customFormation,
-                        }));
-                      }}
-                      className="w-full p-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-700 hover:bg-white focus:bg-white transition-colors"
-                    >
-                      {Object.entries(formationsByCategory).map(([cat, items]) => (
-                        <optgroup key={cat} label={`📂 ${cat} (${items.length})`}>
-                          {items.map((f) => (
-                            <option key={f.id} value={f.id}>
-                              {f.title} — {f.duration} ({f.price.toLocaleString("fr-FR")} FCFA)
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Aperçu interactif du cursus sélectionné avec import de compétences */}
-                  {(() => {
-                    const selF = formations.find((f) => f.id === Number(newStudentForm.formationId));
-                    if (!selF) return null;
-                    let toolsList: string[] = [];
-                    if (selF.tools) {
-                      try {
-                        const parsed = JSON.parse(selF.tools);
-                        if (Array.isArray(parsed)) toolsList = parsed.map(String);
-                      } catch {}
-                    }
-                    return (
-                      <div className="mt-2 p-3 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
-                        <div className="flex flex-wrap items-center justify-between gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white">
-                              {selF.category}
-                            </span>
-                            <span className="font-bold text-slate-800 text-[11px]">{selF.title}</span>
-                          </div>
-                          <span className="text-[11px] font-semibold text-slate-500">
-                            Durée : <strong>{selF.duration}</strong> • {selF.campus}
-                          </span>
-                        </div>
-                        {toolsList.length > 0 && (
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-blue-100">
-                            <div className="flex flex-wrap items-center gap-1">
-                              <span className="text-[10px] font-bold text-slate-500">Compétences du cursus :</span>
-                              {toolsList.slice(0, 6).map((t, idx) => (
-                                <span key={idx} className="text-[10px] font-semibold text-blue-800 bg-white px-1.5 py-0.5 rounded border border-blue-200 shadow-2xs">
-                                  {t}
-                                </span>
-                              ))}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const merged = Array.from(new Set([...newStudentForm.skills, ...toolsList]));
-                                setNewStudentForm((prev) => ({ ...prev, skills: merged }));
-                              }}
-                              className="text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-300 transition-colors shrink-0 shadow-2xs"
-                              title="Ajouter automatiquement toutes les compétences de ce cursus"
-                            >
-                              + Importer ces compétences
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Statut administratif *</label>
-                    <select
-                      value={newStudentForm.status}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, status: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
-                    >
-                      <option value="actif">Étudiant Actif</option>
-                      <option value="inscrit">Inscrit (Validé)</option>
-                      <option value="termine">Formation terminée / Diplômé</option>
-                      <option value="alumni">Alumni</option>
-                      <option value="preinscrit">Préinscrit</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Disponibilité pour les Entreprises *</label>
-                    <select
-                      value={newStudentForm.professionalStatus}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, professionalStatus: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-semibold text-blue-700"
-                    >
-                      <option value="Disponible immédiatement">Disponible immédiatement</option>
-                      <option value="À la recherche d'un stage">À la recherche d&apos;un stage</option>
-                      <option value="À la recherche d'une alternance">À la recherche d&apos;une alternance</option>
-                      <option value="En poste / Freelance">En poste / Freelance</option>
-                      <option value="En formation active">En formation active</option>
-                      <option value="Diplômé disponible">Diplômé disponible</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 3: COMPÉTENCES DES ÉTUDIANTS */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                    <span>3. Compétences validées</span>
-                  </h4>
-                  <span className="text-[10px] text-slate-400">
-                    Ces compétences apparaîtront sur la fiche Entreprise
-                  </span>
-                </div>
-
-                {/* Tag Input */}
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                  <div className="flex flex-wrap gap-1.5">
-                    {newStudentForm.skills.length === 0 ? (
-                      <span className="text-slate-400 italic text-[11px]">
-                        Aucune compétence ajoutée. Choisissez parmi les suggestions ci-dessous ou tapez une compétence.
-                      </span>
-                    ) : (
-                      newStudentForm.skills.map((sk, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white text-slate-800 border border-slate-300 shadow-2xs"
-                        >
-                          {sk}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setNewStudentForm((prev) => ({
-                                ...prev,
-                                skills: prev.skills.filter((_, i) => i !== idx),
-                              }))
-                            }
-                            className="text-slate-400 hover:text-rose-600 ml-0.5"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Ajouter une compétence personnalisée (ex: React, Docker, Figma, Python...)"
-                      value={newStudentForm.newSkillInput}
-                      onChange={(e) =>
-                        setNewStudentForm((prev) => ({ ...prev, newSkillInput: e.target.value }))
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          const val = newStudentForm.newSkillInput.trim();
-                          if (val && !newStudentForm.skills.includes(val)) {
-                            setNewStudentForm((prev) => ({
-                              ...prev,
-                              skills: [...prev.skills, val],
-                              newSkillInput: "",
-                            }));
-                          }
-                        }
-                      }}
-                      className="flex-1 p-2 rounded-xl border border-slate-200 bg-white text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const val = newStudentForm.newSkillInput.trim();
-                        if (val && !newStudentForm.skills.includes(val)) {
-                          setNewStudentForm((prev) => ({
-                            ...prev,
-                            skills: [...prev.skills, val],
-                            newSkillInput: "",
-                          }));
-                        }
-                      }}
-                      className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shrink-0"
-                    >
-                      Ajouter
-                    </button>
-                  </div>
-
-                  {/* Suggestions rapides */}
-                  <div className="pt-1">
-                    <span className="text-[10px] font-bold text-slate-400 block mb-1">
-                      Suggestions rapides (cliquez pour ajouter) :
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {[
-                        "React",
-                        "Next.js",
-                        "TypeScript",
-                        "Node.js",
-                        "PostgreSQL",
-                        "Tailwind CSS",
-                        "Python",
-                        "Figma",
-                        "UI/UX Design",
-                        "Docker",
-                        "Git & GitHub",
-                        "Télépilotage Drone",
-                        "SEO & Ads",
-                        "API REST",
-                      ].map((tag) => (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => {
-                            if (!newStudentForm.skills.includes(tag)) {
-                              setNewStudentForm((prev) => ({
-                                ...prev,
-                                skills: [...prev.skills, tag],
-                              }));
-                            }
-                          }}
-                          disabled={newStudentForm.skills.includes(tag)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-medium border transition-colors ${
-                            newStudentForm.skills.includes(tag)
-                              ? "bg-slate-200 text-slate-400 border-slate-200 cursor-default"
-                              : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50 cursor-pointer"
-                          }`}
-                        >
-                          + {tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 4: PHOTO D'IDENTITÉ & CV */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-blue-600" />
-                  <span>4. Photo d&apos;identité &amp; CV (Documents)</span>
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Photo d'identité */}
-                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
-                    <label className="block font-bold text-slate-700">Photo d&apos;identité</label>
-                    <div className="flex items-center gap-3">
-                      {newStudentForm.avatarUrl ? (
-                        <div className="relative group shrink-0">
-                          <Image
-                            src={newStudentForm.avatarUrl}
-                            alt="Aperçu photo"
-                            width={52}
-                            height={52}
-                            unoptimized
-                            className="w-13 h-13 rounded-full object-cover border-2 border-blue-400 shadow-sm"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setNewStudentForm((p) => ({ ...p, avatarUrl: "" }))}
-                            className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] shadow"
-                            title="Supprimer la photo"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="w-13 h-13 rounded-full bg-slate-200 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0 text-xs">
-                          Photo
-                        </div>
-                      )}
-                      <div className="flex-1 space-y-1">
-                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors">
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>{isUploadingPhoto ? "Envoi..." : "Téléverser photo"}</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            disabled={isUploadingPhoto}
-                            onChange={(e) => {
-                              const f = e.target.files?.[0];
-                              if (f) handleUploadFile(f, "avatar", "new");
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Ou collez l'URL d'une image..."
-                          value={newStudentForm.avatarUrl}
-                          onChange={(e) =>
-                            setNewStudentForm((p) => ({ ...p, avatarUrl: e.target.value }))
-                          }
-                          className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* CV de l'étudiant */}
-                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
-                    <label className="block font-bold text-slate-700">Curriculum Vitae (CV PDF)</label>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>{isUploadingCv ? "Envoi..." : "Téléverser CV (PDF)"}</span>
-                          <input
-                            type="file"
-                            accept=".pdf,application/pdf"
-                            disabled={isUploadingCv}
-                            onChange={(e) => {
-                              const f = e.target.files?.[0];
-                              if (f) handleUploadFile(f, "cv", "new");
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                        {newStudentForm.cvUrl && (
-                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>PDF prêt</span>
-                            <button
-                              type="button"
-                              onClick={() => setNewStudentForm((p) => ({ ...p, cvUrl: "" }))}
-                              className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Ou collez l'URL d'un CV en ligne (PDF / Drive)..."
-                        value={newStudentForm.cvUrl}
-                        onChange={(e) =>
-                          setNewStudentForm((p) => ({ ...p, cvUrl: e.target.value }))
-                        }
-                        className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 5: VISIBILITÉ SUR LA PAGE ENTREPRISES */}
-              <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                    <Eye className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-slate-900 text-xs">
-                      Publier sur la page Entreprises (Recrutement)
-                    </h5>
-                    <p className="text-[11px] text-slate-500">
-                      Ce profil sera immédiatement visible par les recruteurs avec ses compétences, son CV et sa photo.
-                    </p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <div>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Prénom *</label>
                   <input
-                    type="checkbox"
-                    checked={newStudentForm.profileVisible}
+                    type="text"
+                    required
+                    value={newStudentForm.firstName}
                     onChange={(e) =>
-                      setNewStudentForm((p) => ({ ...p, profileVisible: e.target.checked }))
+                      setNewStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
                     }
-                    className="sr-only peer"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
-                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-2 flex gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Téléphone *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="+229 ..."
+                    value={newStudentForm.phone}
+                    onChange={(e) =>
+                      setNewStudentForm((prev) => ({ ...prev, phone: e.target.value }))
+                    }
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={newStudentForm.email}
+                    onChange={(e) =>
+                      setNewStudentForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Formation choisie *</label>
+                <select
+                  value={newStudentForm.formationId}
+                  onChange={(e) =>
+                    setNewStudentForm((prev) => ({ ...prev, formationId: Number(e.target.value) }))
+                  }
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
+                >
+                  {formations.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.title} ({f.price.toLocaleString("fr-FR")} FCFA)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isCreatingStudent}
-                  className="flex-1 py-3 rounded-2xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-md transition-all disabled:opacity-50"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span>
-                    {isCreatingStudent
-                      ? "Création et publication en cours..."
-                      : "Créer et enregistrer le profil étudiant"}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowNewStudentModal(false)}
-                  className="px-5 py-3 rounded-2xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
-                  Annuler
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: MODIFIER UN PROFIL ÉTUDIANT & TALENT */}
-      {editingStudent && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-blue-600 text-white flex items-center justify-center shadow-md">
-                  <Pencil className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                      Modifier le Profil de {editingStudent.firstName} {editingStudent.lastName}
-                    </h3>
-                    {editStudentForm.profileVisible ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        En ligne sur Entreprises
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                        Profil Masqué
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                    <span className="font-mono text-blue-600 font-bold">Matricule : {editingStudent.studentNumber}</span>
-                    <span>•</span>
-                    <span>Modifications synchronisées avec la page Entreprises</span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setEditingStudent(null)}
-                className="text-slate-400 hover:text-slate-700 font-bold p-1 rounded-lg hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEditStudent} className="space-y-5 text-xs">
-              {/* SECTION 1: IDENTITÉ & CONTACT */}
-              <div className="space-y-3">
-                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-blue-600" />
-                  <span>1. Identité &amp; Coordonnées</span>
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Nom de famille *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editStudentForm.lastName}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, lastName: e.target.value.toUpperCase() }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Prénom(s) *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editStudentForm.firstName}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, firstName: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Téléphone *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editStudentForm.phone}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, phone: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Email *</label>
-                    <input
-                      type="email"
-                      required
-                      value={editStudentForm.email}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, email: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Ville / Campus</label>
-                    <input
-                      type="text"
-                      value={editStudentForm.city}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, city: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 2: FORMATION & STATUTS */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-blue-600" />
-                  <span>2. Formation &amp; Statut Professionnel</span>
-                </h4>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block font-bold text-slate-800 text-xs">
-                      Intitulé de la Formation suivie à FuturCraft *
-                    </label>
-                    <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                      ✍️ Saisie libre ou sélection catalogue
-                    </span>
-                  </div>
-
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ex : Développement Web Fullstack, Intelligence Artificielle & Robotique, Pilotage de Drone..."
-                    value={editStudentForm.customFormation}
-                    onChange={(e) =>
-                      setEditStudentForm((prev) => ({ ...prev, customFormation: e.target.value }))
-                    }
-                    className="w-full p-2.5 rounded-xl border-2 border-blue-200 bg-white font-bold text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs text-xs"
-                  />
-
-                  <div className="pt-1">
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                      Ou sélectionner parmi nos {formations.length} formations du catalogue pour pré-remplir :
-                    </label>
-                    <select
-                      value={editStudentForm.formationId}
-                      onChange={(e) => {
-                        const selId = Number(e.target.value);
-                        const selFormation = formations.find((f) => f.id === selId);
-                        setEditStudentForm((prev) => ({
-                          ...prev,
-                          formationId: selId,
-                          customFormation: selFormation ? selFormation.title : prev.customFormation,
-                        }));
-                      }}
-                      className="w-full p-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-700 hover:bg-white focus:bg-white transition-colors"
-                    >
-                      {Object.entries(formationsByCategory).map(([cat, items]) => (
-                        <optgroup key={cat} label={`📂 ${cat} (${items.length})`}>
-                          {items.map((f) => (
-                            <option key={f.id} value={f.id}>
-                              {f.title} — {f.duration} ({f.price.toLocaleString("fr-FR")} FCFA)
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Aperçu interactif du cursus sélectionné avec import de compétences */}
-                  {(() => {
-                    const selF = formations.find((f) => f.id === Number(editStudentForm.formationId));
-                    if (!selF) return null;
-                    let toolsList: string[] = [];
-                    if (selF.tools) {
-                      try {
-                        const parsed = JSON.parse(selF.tools);
-                        if (Array.isArray(parsed)) toolsList = parsed.map(String);
-                      } catch {}
-                    }
-                    return (
-                      <div className="mt-2 p-3 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
-                        <div className="flex flex-wrap items-center justify-between gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white">
-                              {selF.category}
-                            </span>
-                            <span className="font-bold text-slate-800 text-[11px]">{selF.title}</span>
-                          </div>
-                          <span className="text-[11px] font-semibold text-slate-500">
-                            Durée : <strong>{selF.duration}</strong> • {selF.campus}
-                          </span>
-                        </div>
-                        {toolsList.length > 0 && (
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-blue-100">
-                            <div className="flex flex-wrap items-center gap-1">
-                              <span className="text-[10px] font-bold text-slate-500">Compétences du cursus :</span>
-                              {toolsList.slice(0, 6).map((t, idx) => (
-                                <span key={idx} className="text-[10px] font-semibold text-blue-800 bg-white px-1.5 py-0.5 rounded border border-blue-200 shadow-2xs">
-                                  {t}
-                                </span>
-                              ))}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const merged = Array.from(new Set([...editStudentForm.skills, ...toolsList]));
-                                setEditStudentForm((prev) => ({ ...prev, skills: merged }));
-                              }}
-                              className="text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-300 transition-colors shrink-0 shadow-2xs"
-                              title="Ajouter automatiquement toutes les compétences de ce cursus"
-                            >
-                              + Importer ces compétences
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Statut administratif *</label>
-                    <select
-                      value={editStudentForm.status}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, status: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white"
-                    >
-                      <option value="actif">Étudiant Actif</option>
-                      <option value="inscrit">Inscrit (Validé)</option>
-                      <option value="termine">Formation terminée / Diplômé</option>
-                      <option value="alumni">Alumni</option>
-                      <option value="preinscrit">Préinscrit</option>
-                      <option value="rejete">Rejeté</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Disponibilité pour les Entreprises *</label>
-                    <select
-                      value={editStudentForm.professionalStatus}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, professionalStatus: e.target.value }))
-                      }
-                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-semibold text-blue-700"
-                    >
-                      <option value="Disponible immédiatement">Disponible immédiatement</option>
-                      <option value="À la recherche d'un stage">À la recherche d&apos;un stage</option>
-                      <option value="À la recherche d'une alternance">À la recherche d&apos;une alternance</option>
-                      <option value="En poste / Freelance">En poste / Freelance</option>
-                      <option value="En formation active">En formation active</option>
-                      <option value="Diplômé disponible">Diplômé disponible</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 3: COMPÉTENCES */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                    <span>3. Compétences validées</span>
-                  </h4>
-                  <span className="text-[10px] text-slate-400">
-                    Affichées sur la fiche Entreprises
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                  <div className="flex flex-wrap gap-1.5">
-                    {editStudentForm.skills.length === 0 ? (
-                      <span className="text-slate-400 italic text-[11px]">
-                        Aucune compétence renseignée.
-                      </span>
-                    ) : (
-                      editStudentForm.skills.map((sk, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white text-slate-800 border border-slate-300 shadow-2xs"
-                        >
-                          {sk}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setEditStudentForm((prev) => ({
-                                ...prev,
-                                skills: prev.skills.filter((_, i) => i !== idx),
-                              }))
-                            }
-                            className="text-slate-400 hover:text-rose-600 ml-0.5"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Ajouter une compétence..."
-                      value={editStudentForm.newSkillInput}
-                      onChange={(e) =>
-                        setEditStudentForm((prev) => ({ ...prev, newSkillInput: e.target.value }))
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          const val = editStudentForm.newSkillInput.trim();
-                          if (val && !editStudentForm.skills.includes(val)) {
-                            setEditStudentForm((prev) => ({
-                              ...prev,
-                              skills: [...prev.skills, val],
-                              newSkillInput: "",
-                            }));
-                          }
-                        }
-                      }}
-                      className="flex-1 p-2 rounded-xl border border-slate-200 bg-white text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const val = editStudentForm.newSkillInput.trim();
-                        if (val && !editStudentForm.skills.includes(val)) {
-                          setEditStudentForm((prev) => ({
-                            ...prev,
-                            skills: [...prev.skills, val],
-                            newSkillInput: "",
-                          }));
-                        }
-                      }}
-                      className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shrink-0"
-                    >
-                      Ajouter
-                    </button>
-                  </div>
-
-                  {/* Suggestions rapides */}
-                  <div className="pt-1">
-                    <span className="text-[10px] font-bold text-slate-400 block mb-1">
-                      Suggestions rapides :
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {[
-                        "React",
-                        "Next.js",
-                        "TypeScript",
-                        "Node.js",
-                        "PostgreSQL",
-                        "Tailwind CSS",
-                        "Python",
-                        "Figma",
-                        "UI/UX Design",
-                        "Docker",
-                        "Git & GitHub",
-                        "Télépilotage Drone",
-                      ].map((tag) => (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => {
-                            if (!editStudentForm.skills.includes(tag)) {
-                              setEditStudentForm((prev) => ({
-                                ...prev,
-                                skills: [...prev.skills, tag],
-                              }));
-                            }
-                          }}
-                          disabled={editStudentForm.skills.includes(tag)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-medium border transition-colors ${
-                            editStudentForm.skills.includes(tag)
-                              ? "bg-slate-200 text-slate-400 border-slate-200 cursor-default"
-                              : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50 cursor-pointer"
-                          }`}
-                        >
-                          + {tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 4: PHOTO & CV */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-blue-600" />
-                  <span>4. Photo d&apos;identité &amp; CV (Documents)</span>
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Photo */}
-                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
-                    <label className="block font-bold text-slate-700">Photo d&apos;identité</label>
-                    <div className="flex items-center gap-3">
-                      {editStudentForm.avatarUrl ? (
-                        <div className="relative group shrink-0">
-                          <Image
-                            src={editStudentForm.avatarUrl}
-                            alt="Photo"
-                            width={52}
-                            height={52}
-                            unoptimized
-                            className="w-13 h-13 rounded-full object-cover border-2 border-blue-400 shadow-sm"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setEditStudentForm((p) => ({ ...p, avatarUrl: "" }))}
-                            className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] shadow"
-                            title="Supprimer la photo"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="w-13 h-13 rounded-full bg-slate-200 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0 text-xs">
-                          Photo
-                        </div>
-                      )}
-                      <div className="flex-1 space-y-1">
-                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors">
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>{isUploadingPhoto ? "Envoi..." : "Changer photo"}</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            disabled={isUploadingPhoto}
-                            onChange={(e) => {
-                              const f = e.target.files?.[0];
-                              if (f) handleUploadFile(f, "avatar", "edit");
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Ou collez l'URL d'une image..."
-                          value={editStudentForm.avatarUrl}
-                          onChange={(e) =>
-                            setEditStudentForm((p) => ({ ...p, avatarUrl: e.target.value }))
-                          }
-                          className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* CV */}
-                  <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
-                    <label className="block font-bold text-slate-700">Curriculum Vitae (PDF)</label>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>{isUploadingCv ? "Envoi..." : "Remplacer le CV (PDF)"}</span>
-                          <input
-                            type="file"
-                            accept=".pdf,application/pdf"
-                            disabled={isUploadingCv}
-                            onChange={(e) => {
-                              const f = e.target.files?.[0];
-                              if (f) handleUploadFile(f, "cv", "edit");
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                        {editStudentForm.cvUrl && (
-                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>PDF actif</span>
-                            <button
-                              type="button"
-                              onClick={() => setEditStudentForm((p) => ({ ...p, cvUrl: "" }))}
-                              className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Ou collez l'URL d'un CV en ligne (PDF / Drive)..."
-                        value={editStudentForm.cvUrl}
-                        onChange={(e) =>
-                          setEditStudentForm((p) => ({ ...p, cvUrl: e.target.value }))
-                        }
-                        className="w-full p-1.5 rounded-lg border border-slate-200 bg-white text-[11px]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 5: VISIBILITÉ ENTREPRISES */}
-              <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                    <Eye className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-slate-900 text-xs">
-                      Afficher ce profil sur la page Entreprises
-                    </h5>
-                    <p className="text-[11px] text-slate-500">
-                      Rend le profil immédiatement consultable par les recruteurs et entreprises partenaires.
-                    </p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={editStudentForm.profileVisible}
-                    onChange={(e) =>
-                      setEditStudentForm((p) => ({ ...p, profileVisible: e.target.checked }))
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-2 flex gap-3">
-                <button
-                  type="submit"
-                  disabled={isSavingStudent}
-                  className="flex-1 py-3 rounded-2xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all disabled:opacity-50"
-                >
-                  {isSavingStudent ? "Enregistrement..." : "Enregistrer les modifications"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditingStudent(null)}
-                  className="px-5 py-3 rounded-2xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
-                  Annuler
+                  {isCreatingStudent ? "Création en cours..." : "Créer le dossier et générer le matricule FC-2025-..."}
                 </button>
               </div>
             </form>
@@ -3902,18 +2100,18 @@ export function AdminPortal({
 
       {/* MODAL: CHANGER LE STATUT D'UN ÉTUDIANT */}
       {selectedStudentForStatus && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
-            <h3 className="text-base font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-sm w-full p-6  space-y-4 animate-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-[var(--color-fc-black)]">
               Modifier le statut de {selectedStudentForStatus.firstName} {selectedStudentForStatus.lastName}
             </h3>
 
             <div className="space-y-2 text-xs">
-              <label className="block font-semibold text-slate-600">Nouveau statut :</label>
+              <label className="block font-semibold text-[var(--color-fc-gray-mid)]">Nouveau statut :</label>
               <select
                 value={newStatusValue}
                 onChange={(e) => setNewStatusValue(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-medium"
+                className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white font-medium"
               >
                 <option value="preinscrit">Préinscrit (en attente de validation)</option>
                 <option value="rejete">Rejeté</option>
@@ -3927,13 +2125,13 @@ export function AdminPortal({
             <div className="pt-2 flex gap-2">
               <button
                 onClick={handleUpdateStatus}
-                className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700"
+                className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]"
               >
                 Mettre à jour
               </button>
               <button
                 onClick={() => setSelectedStudentForStatus(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
               >
                 Annuler
               </button>
@@ -3943,8 +2141,8 @@ export function AdminPortal({
       )}
 
       {validationTarget && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-sm w-full p-6  space-y-4 animate-in zoom-in-95 duration-200">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto ${
               validationAction === "validate" ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
             }`}>
@@ -3954,19 +2152,19 @@ export function AdminPortal({
                 <AlertTriangle className="w-6 h-6" />
               )}
             </div>
-            <h3 className="text-base font-bold text-slate-900 text-center">
+            <h3 className="text-base font-bold text-[var(--color-fc-black)] text-center">
               {validationAction === "validate"
                 ? `Valider ${validationTarget.firstName} ${validationTarget.lastName} ?`
                 : `Rejeter le dossier de ${validationTarget.firstName} ${validationTarget.lastName} ?`}
             </h3>
-            <p className="text-xs text-slate-500 text-center leading-relaxed">
+            <p className="text-xs text-[var(--color-fc-gray-mid)] text-center leading-relaxed">
               {validationAction === "validate"
                 ? "Le compte sera activé, une notification sera envoyée à l'étudiant et son profil apparaîtra sur la page Entreprises."
                 : "Le compte restera fermé et l'étudiant sera notifié de la décision."}
             </p>
 
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-slate-600">
+              <label className="block text-xs font-semibold text-[var(--color-fc-gray-mid)]">
                 Note pour l&apos;étudiant {validationAction === "validate" ? "(optionnel)" : ""}
               </label>
               <textarea
@@ -3974,7 +2172,7 @@ export function AdminPortal({
                 onChange={(e) => setValidationNote(e.target.value)}
                 rows={3}
                 placeholder={validationAction === "reject" ? "Précisez la raison du rejet (ex : dossier incomplet)..." : "Ajoutez un message de bienvenue..."}
-                className="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs"
+                className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs"
               />
             </div>
 
@@ -3990,7 +2188,7 @@ export function AdminPortal({
               </button>
               <button
                 onClick={() => setValidationTarget(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
               >
                 Annuler
               </button>
@@ -4001,16 +2199,16 @@ export function AdminPortal({
 
       {/* MODAL: MODIFIER UNE FORMATION */}
       {editingFormation && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-lg w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 <span>Modifier « {editingFormation.title} »</span>
               </h3>
               <button
                 onClick={() => setEditingFormation(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -4019,42 +2217,42 @@ export function AdminPortal({
             <form onSubmit={handleSaveFormation} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Titre *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Titre *</label>
                   <input
                     type="text"
                     required
                     value={formationForm.title}
                     onChange={(e) => setFormationForm((p) => ({ ...p, title: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Durée *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Durée *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ex : 9 mois"
                     value={formationForm.duration}
                     onChange={(e) => setFormationForm((p) => ({ ...p, duration: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Prix total (FCFA) *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Prix total (FCFA) *</label>
                   <input
                     type="number"
                     required
                     min={0}
                     value={formationForm.price}
                     onChange={(e) => setFormationForm((p) => ({ ...p, price: Number(e.target.value) }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Frais dossier (FCFA) *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Frais dossier (FCFA) *</label>
                   <input
                     type="number"
                     required
@@ -4063,14 +2261,14 @@ export function AdminPortal({
                     onChange={(e) =>
                       setFormationForm((p) => ({ ...p, registrationFee: Number(e.target.value) }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Nb mensualités</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nb mensualités</label>
                   <input
                     type="number"
                     min={1}
@@ -4078,15 +2276,15 @@ export function AdminPortal({
                     onChange={(e) =>
                       setFormationForm((p) => ({ ...p, installmentsCount: Number(e.target.value) }))
                     }
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Mode</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Mode</label>
                   <select
                     value={formationForm.mode}
                     onChange={(e) => setFormationForm((p) => ({ ...p, mode: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-white"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                   >
                     <option value="Présentiel & Hybride">Présentiel & Hybride</option>
                     <option value="En ligne">En ligne</option>
@@ -4096,31 +2294,31 @@ export function AdminPortal({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Campus</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Campus</label>
                 <input
                   type="text"
                   value={formationForm.campus}
                   onChange={(e) => setFormationForm((p) => ({ ...p, campus: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                 />
               </div>
 
               <div className="flex items-center gap-6 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[var(--color-fc-black)]">
                   <input
                     type="checkbox"
                     checked={formationForm.isActive}
                     onChange={(e) => setFormationForm((p) => ({ ...p, isActive: e.target.checked }))}
-                    className="w-4 h-4 rounded border-slate-300"
+                    className="w-4 h-4 rounded border-[var(--color-fc-gray-light)]"
                   />
                   Active
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[var(--color-fc-black)]">
                   <input
                     type="checkbox"
                     checked={formationForm.isPopular}
                     onChange={(e) => setFormationForm((p) => ({ ...p, isPopular: e.target.checked }))}
-                    className="w-4 h-4 rounded border-slate-300"
+                    className="w-4 h-4 rounded border-[var(--color-fc-gray-light)]"
                   />
                   Populaire
                 </label>
@@ -4130,14 +2328,145 @@ export function AdminPortal({
                 <button
                   type="submit"
                   disabled={isSavingFormation}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] disabled:opacity-50 transition-all"
                 >
                   {isSavingFormation ? "Enregistrement…" : "Enregistrer les modifications"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingFormation(null)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: NOUVEAU PROJET ÉTUDIANT */}
+      {projectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-fc-deep)]/60 p-4 backdrop-blur-xs">
+          <div className="max-h-[90vh] w-full max-w-2xl space-y-5 overflow-y-auto rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6  sm:p-8">
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-base font-bold text-[var(--color-fc-black)]">
+                <FolderGit2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
+                Nouveau projet étudiant
+              </h3>
+              <button
+                type="button"
+                onClick={() => setProjectModalOpen(false)}
+                className="font-bold text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)]"
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProject} className="space-y-3 text-xs">
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Étudiant confirmé *
+                <select
+                  required
+                  value={projectForm.studentId}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, studentId: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                >
+                  {validatedStudents.map((student) => (
+                    <option key={student.id} value={student.id}>
+                      {student.firstName} {student.lastName} — {student.studentNumber}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Titre du projet *
+                <input
+                  required
+                  value={projectForm.title}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, title: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Résumé *
+                <input
+                  required
+                  value={projectForm.tagline}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, tagline: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Description *
+                <textarea
+                  required
+                  rows={4}
+                  value={projectForm.description}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, description: e.target.value }))}
+                  className="mt-1 w-full resize-y rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Image (URL HTTPS ou chemin /images/) *
+                <input
+                  required
+                  value={projectForm.coverImage}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, coverImage: e.target.value }))}
+                  placeholder="https://… ou /images/…"
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2 font-mono"
+                />
+              </label>
+
+              <label className="block font-bold text-[var(--color-fc-black)]">
+                Technologies (séparées par des virgules) *
+                <input
+                  required
+                  value={projectForm.technologies}
+                  onChange={(e) => setProjectForm((current) => ({ ...current, technologies: e.target.value }))}
+                  placeholder="React, TypeScript, PostgreSQL"
+                  className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                />
+              </label>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block font-bold text-[var(--color-fc-black)]">
+                  Lien du projet
+                  <input
+                    type="url"
+                    value={projectForm.projectUrl}
+                    onChange={(e) => setProjectForm((current) => ({ ...current, projectUrl: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                  />
+                </label>
+                <label className="block font-bold text-[var(--color-fc-black)]">
+                  Lien GitHub
+                  <input
+                    type="url"
+                    value={projectForm.githubUrl}
+                    onChange={(e) => setProjectForm((current) => ({ ...current, githubUrl: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2"
+                  />
+                </label>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="submit"
+                  disabled={isSavingProject || validatedStudents.length === 0}
+                  className="flex-1 rounded-xl bg-[var(--color-fc-deep)] py-2.5 text-xs font-bold text-white transition-all hover:bg-[var(--color-fc-primary)] disabled:opacity-50"
+                >
+                  {isSavingProject ? "Enregistrement…" : "Publier le projet"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectModalOpen(false)}
+                  className="rounded-xl bg-[var(--color-fc-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--color-fc-gray-mid)] hover:bg-[var(--color-fc-gray-light)]"
                 >
                   Annuler
                 </button>
@@ -4149,16 +2478,16 @@ export function AdminPortal({
 
       {/* MODAL: CRÉER / MODIFIER UN ARTICLE */}
       {articleModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-2xl w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 <span>{editingArticle ? "Modifier l'article" : "Nouvel article de blog"}</span>
               </h3>
               <button
                 onClick={() => setArticleModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-gray-mid)] font-bold"
               >
                 ✕
               </button>
@@ -4167,89 +2496,89 @@ export function AdminPortal({
             <form onSubmit={handleSaveArticle} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block font-bold text-slate-700 mb-1">Titre *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Titre *</label>
                   <input
                     type="text"
                     required
                     value={articleForm.title}
                     onChange={(e) => setArticleForm((p) => ({ ...p, title: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Slug (URL)</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Slug (URL)</label>
                   <input
                     type="text"
                     placeholder="auto-généré depuis le titre si vide"
                     value={articleForm.slug}
                     onChange={(e) => setArticleForm((p) => ({ ...p, slug: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200 font-mono"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Catégorie *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Catégorie *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ex : Événements"
                     value={articleForm.category}
                     onChange={(e) => setArticleForm((p) => ({ ...p, category: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">Extrait court *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Extrait court *</label>
                 <textarea
                   required
                   rows={2}
                   value={articleForm.excerpt}
                   onChange={(e) => setArticleForm((p) => ({ ...p, excerpt: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200 resize-none"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] resize-none"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">Contenu complet (HTML/markdown libre) *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Contenu complet (HTML/markdown libre) *</label>
                 <textarea
                   required
                   rows={6}
                   value={articleForm.content}
                   onChange={(e) => setArticleForm((p) => ({ ...p, content: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200 resize-y font-mono text-[11px]"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] resize-y font-mono text-[11px]"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">URL image de couverture *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">URL image de couverture *</label>
                 <input
                   type="url"
                   required
                   placeholder="https://images.pexels.com/..."
                   value={articleForm.coverImage}
                   onChange={(e) => setArticleForm((p) => ({ ...p, coverImage: e.target.value }))}
-                  className="w-full p-2 rounded-xl border border-slate-200 font-mono text-[11px]"
+                  className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] font-mono text-[11px]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Auteur</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Auteur</label>
                   <input
                     type="text"
                     value={articleForm.author}
                     onChange={(e) => setArticleForm((p) => ({ ...p, author: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Temps de lecture</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Temps de lecture</label>
                   <input
                     type="text"
                     value={articleForm.readTime}
                     onChange={(e) => setArticleForm((p) => ({ ...p, readTime: e.target.value }))}
-                    className="w-full p-2 rounded-xl border border-slate-200"
+                    className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"
                   />
                 </div>
               </div>
@@ -4257,14 +2586,14 @@ export function AdminPortal({
               <div className="pt-2 flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] transition-all"
                 >
                   {editingArticle ? "Enregistrer les modifications" : "Publier l'article"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setArticleModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[var(--color-fc-gray-mid)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]"
                 >
                   Annuler
                 </button>

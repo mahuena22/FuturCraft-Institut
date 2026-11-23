@@ -1,7 +1,17 @@
 import { getEvents } from '@/lib/data-service';
-import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, MapPin } from 'lucide-react';
+import Image from 'next/image';
+import {
+    CalendarDays,
+    Users,
+    MapPin,
+    ArrowRight,
+    Camera,
+    Trophy,
+    Coffee,
+    Code2,
+} from 'lucide-react';
+import { PageIntro } from '@/components/PageIntro';
 
 export const revalidate = 3600;
 export const metadata = {
@@ -10,87 +20,65 @@ export const metadata = {
         "Découvrez l'ambiance, les hackathons, ateliers pratiques, sorties de promotion et moments de vie sur les campus de FuturCraft Institut.",
 };
 
-const lifeMoments = [
-    {
-        title: 'Ateliers Code & Développement',
-        desc: 'Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.',
-        image: '/images/CodingNight.jpg',
-        tag: 'Coding Night',
-    },
-    {
-        title: 'Sortie sur Ouidah',
-        desc: "Pratique en plein air à Ouidah : les étudiants en Audiovisuel de FuturCraft Institut ont mis leurs compétences en pratique en capturant des plans cinématiques au cœur de la richesse culturelle de la ville. Une immersion sur le terrain pour travailler cadrage, lumière et mouvements de caméra, tout en racontant une histoire à travers l'image.",
-        image: '/images/sortieSurOuidah.jpg',
-        tag: 'Pratique Terrain',
-    },
-    {
-        title: 'Du campus au terrain : place au professionnalisme !',
-        desc: 'En immersion professionnelle, les étudiants de FuturCraft Institut ont effectué une sortie professionnelle pour découvrir les réalités du terrain et mettre en pratique les attitudes et compétences acquises en formation.',
-        image: '/images/photoProfessionnelle.jpg',
-        tag: 'Immersion professionnelle',
-    },
-    {
-        title: 'Atelier en Maintenance Informatique',
-        desc: "Pratique en maintenance informatique : les étudiants de FuturCraft Institut passent à l'action pour découvrir les techniques de diagnostic et d'entretien des équipements informatiques. Une immersion pratique pour développer leur autonomie et apprendre à résoudre concrètement les problèmes techniques.",
-        image: '/images/maintenanceInformatique2.jpg',
-        tag: 'Maintenance Informatique',
-    },
-];
-
 export default async function ViePage() {
     const events = await getEvents();
 
+    const lifeMoments = [
+        {
+            title: 'Ateliers Code & Développement',
+            desc: 'Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.',
+            image: '/images/CodingNight.jpg',
+            tag: 'Coding Night',
+        },
+        {
+            title: 'Sortie sur Ouidah',
+            desc: "Pratique en plein air à Ouidah : les étudiants en Audiovisuel de FuturCraft Institut ont mis leurs compétences en pratique en capturant des plans cinématiques au cœur de la richesse culturelle de la ville. Une immersion sur le terrain pour travailler cadrage, lumière et mouvements de caméra, tout en racontant une histoire à travers l'image.",
+            image: '/images/sortieSurOuidah.jpg',
+            tag: 'Pratique Terrain',
+        },
+        {
+            title: 'Du campus au terrain : place au professionnalisme !',
+            desc: 'En immersion professionnelle. Les étudiants de FuturCraft Institut ont effectué une sortie professionnelle, vêtus de leur tenue professionnelle, pour découvrir les réalités du terrain et mettre en pratique les attitudes et compétences acquises en formation.',
+            image: '/images/photoProfessionnelle.jpg',
+            tag: 'Immersion professionnelle',
+        },
+        {
+            title: 'Atelier en Maintenance Informatique',
+            desc: "Pratique en maintenance informatique : les étudiants de FuturCraft Institut passent à l'action pour découvrir les techniques de diagnostic et d'entretien des équipements informatiques. Une immersion pratique pour développer leur autonomie et apprendre à résoudre concrètement les problèmes techniques.",
+            image: '/images/maintenanceInformatique2.jpg',
+            tag: 'Maintenance Informatique',
+        },
+    ];
+
     return (
-        <div className="min-h-screen bg-white">
-            <section className="relative overflow-hidden bg-[var(--color-fc-deep)] py-20 text-white lg:py-28">
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="/images/bg-banniere.jpeg"
-                        alt="FuturCraft Institut"
-                        fill
-                        priority
-                        sizes="100vw"
-                        className="object-cover object-center"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
-                    <div className="absolute inset-0 bg-black/40" />
-                </div>
+        <div className="min-h-screen bg-[var(--color-fc-bg)]">
+            <PageIntro
+                eyebrow="Immersion & communauté"
+                title="La vie sur le campus."
+                description="Découvrez la vie du campus, les ateliers pratiques, les hackathons et les moments partagés qui font grandir chaque talent."
+            />
 
-                <div className="relative z-10 mx-auto max-w-7xl space-y-4 px-4 text-center sm:px-6 lg:px-8">
-                    <h1 className="mx-auto max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
-                        La Vie à
-                        <span className="text-gradient-brand mt-1 block">
-                            FuturCraft Institut
-                        </span>
-                    </h1>
-                    <p className="mx-auto max-w-2xl text-base leading-relaxed text-blue-100/80 sm:text-lg">
-                        Plus qu&apos;une école, une communauté passionnée.
-                        Découvrez l&apos;ambiance sur nos campus, les hackathons
-                        effervescents et les moments inoubliables.
-                    </p>
-                </div>
-
-                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent" />
-            </section>
-
-            <div className="mx-auto max-w-7xl space-y-16 px-4 py-16 sm:px-6 lg:px-8">
+            <div className="page-container space-y-16 py-14 sm:py-20">
+                {/* Événements à venir */}
                 <section className="space-y-6">
-                    <div>
-                        <span className="rounded bg-blue-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-600">
-                            Agenda Officiel
-                        </span>
-                        <h2 className="mt-1 text-2xl font-extrabold text-slate-950 sm:text-3xl">
-                            Événements &amp; Hackathons à Venir
-                        </h2>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
+                                Agenda Officiel
+                            </span>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
+                                Événements &amp; Hackathons à Venir
+                            </h2>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {events.map((ev) => (
                             <div
                                 key={ev.id}
-                                className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition-all hover:border-blue-300 hover:shadow-xl"
+                                className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden shadow-xs hover:shadow-xl hover:border-[var(--color-fc-primary)]/40 transition-all flex flex-col"
                             >
-                                <div className="relative aspect-[16/10] bg-slate-100">
+                                <div className="relative aspect-[16/10] bg-[var(--color-fc-gray-light)]">
                                     <Image
                                         src={ev.imageUrl}
                                         alt={ev.title}
@@ -98,33 +86,35 @@ export default async function ViePage() {
                                         sizes="(max-width: 768px) 100vw, 33vw"
                                         className="object-cover"
                                     />
-                                    <div className="absolute left-3 top-3">
-                                        <span className="rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white">
+                                    <div className="absolute top-3 left-3">
+                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[var(--color-fc-deep)] text-white">
                                             {ev.category}
                                         </span>
                                     </div>
                                 </div>
-                                <div className="flex flex-1 flex-col justify-between space-y-3 p-5">
+
+                                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-3 text-xs text-slate-500">
-                                            <span className="flex items-center gap-1 font-semibold text-blue-600">
-                                                <CalendarDays className="h-3.5 w-3.5" />
+                                        <div className="flex items-center gap-3 text-xs text-[var(--color-fc-gray-mid)]">
+                                            <span className="flex items-center gap-1 font-semibold text-[var(--color-fc-primary)]">
+                                                <CalendarDays className="w-3.5 h-3.5" />{' '}
                                                 {ev.date}
                                             </span>
                                         </div>
-                                        <h3 className="text-base font-bold leading-snug text-slate-900">
+                                        <h3 className="font-bold text-[var(--color-fc-black)] text-base leading-snug">
                                             {ev.title}
                                         </h3>
-                                        <p className="line-clamp-3 text-xs leading-relaxed text-slate-600">
+                                        <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed line-clamp-3">
                                             {ev.description}
                                         </p>
                                     </div>
-                                    <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
+
+                                    <div className="pt-3 border-t border-[var(--color-fc-gray-light)] flex items-center justify-between text-xs text-[var(--color-fc-gray-mid)]">
                                         <span className="flex items-center gap-1 text-[11px]">
-                                            <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                                            <MapPin className="w-3.5 h-3.5 text-[var(--color-fc-gray-mid)]" />{' '}
                                             {ev.location}
                                         </span>
-                                        <span className="font-bold text-slate-800">
+                                        <span className="font-bold text-[var(--color-fc-black)]">
                                             {ev.attendeesCount} inscrits
                                         </span>
                                     </div>
@@ -134,65 +124,58 @@ export default async function ViePage() {
                     </div>
                 </section>
 
-                <section className="space-y-6 border-t border-slate-200 pt-6">
+                {/* Moments de vie grid */}
+                <section className="space-y-6 pt-6 border-t border-[var(--color-fc-gray-light)]">
                     <div>
-                        <span className="rounded bg-violet-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-violet-600">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
                             Magazine Campus
                         </span>
-                        <h2 className="mt-1 text-2xl font-extrabold text-slate-950 sm:text-3xl">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
                             Les Temps Forts de nos Promotions
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                        {lifeMoments.map((moment) => (
-                            <article
-                                key={moment.title}
-                                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition-all hover:shadow-lg"
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        {lifeMoments.map((m, i) => (
+                            <div
+                                key={i}
+                                className="bg-white rounded-2xl border border-[var(--color-fc-gray-light)] overflow-hidden shadow-xs hover:shadow-lg transition-all group"
                             >
-                                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                                <div className="aspect-[16/10] overflow-hidden bg-[var(--color-fc-gray-light)] relative">
                                     <Image
-                                        src={moment.image}
-                                        alt={moment.title}
+                                        src={m.image}
+                                        alt={m.title}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 50vw"
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    <div className="absolute left-3 top-3">
-                                        <span className="rounded-md bg-white/95 px-2.5 py-1 text-[11px] font-bold text-slate-900 shadow-xs backdrop-blur-xs">
-                                            {moment.tag}
+                                    <div className="absolute top-3 left-3">
+                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-white/95 text-[var(--color-fc-black)] backdrop-blur-xs shadow-xs">
+                                            {m.tag}
                                         </span>
                                     </div>
                                 </div>
-                                <div className="space-y-2 p-6">
-                                    <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-blue-600">
-                                        {moment.title}
+                                <div className="p-6 space-y-2">
+                                    <h3 className="text-lg font-bold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)] transition-colors">
+                                        {m.title}
                                     </h3>
-                                    <p className="text-xs leading-relaxed text-slate-600">
-                                        {moment.desc}
+                                    <p className="text-xs text-[var(--color-fc-gray-mid)] leading-relaxed">
+                                        {m.desc}
                                     </p>
                                 </div>
-                            </article>
+                            </div>
                         ))}
                     </div>
                 </section>
 
-                <section className="space-y-4 rounded-3xl border border-blue-100 bg-blue-50/70 p-8 text-center sm:p-12">
-                    <h3 className="text-2xl font-black text-slate-950">
-                        Envie de vivre l&apos;expérience FuturCraft ?
-                    </h3>
-                    <p className="mx-auto max-w-xl text-xs text-slate-600 sm:text-sm">
-                        Participez à la prochaine journée portes ouvertes ou
-                        postulez directement en ligne pour rejoindre la
-                        prochaine cohorte.
+                <section className="rounded-[2rem] bg-[var(--color-fc-deep)] px-8 py-12 text-center text-white sm:px-12">
+                    <h3 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">Envie de vivre l&apos;expérience FuturCraft ?</h3>
+                    <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/65">
+                        Participe à une journée portes ouvertes ou candidate directement pour rejoindre la prochaine cohorte.
                     </p>
-                    <div className="pt-2">
-                        <Link
-                            href="/inscription"
-                            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-blue-700"
-                        >
-                            <span>Rejoindre la promotion 2026</span>
-                            <ArrowRight className="h-4 w-4" />
+                    <div className="mt-8">
+                        <Link href="/inscription" className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-bold text-[#06122f] transition-colors hover:bg-white">
+                            Rejoindre la promotion 2026 <ArrowRight className="h-4 w-4" />
                         </Link>
                     </div>
                 </section>

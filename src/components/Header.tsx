@@ -80,30 +80,28 @@ export function Header() {
             : "bg-[var(--color-fc-bg)]/95 backdrop-blur-md border-b border-[var(--color-fc-gray-light)]/50"
         }`}
       >
-        {/* Top accent bar */}
-        <div className="h-0.5 bg-[var(--color-fc-primary)]" />
+        <div className="h-[2px] bg-[var(--color-fc-cyan)]" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[72px]">
+        <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
+          <div className="flex h-[72px] items-center justify-between gap-6">
 
             {/* ── Brand ── */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
-              <div className="relative h-9 w-auto overflow-hidden rounded-lg bg-white flex items-center justify-center border border-slate-200 px-2">
+            <Link href="/" className="group flex shrink-0 items-center gap-3">
+              <div className="relative flex h-10 items-center justify-center rounded-xl bg-white px-2">
                 <Image
                   src="/images/Logo-crop.png"
                   alt="Logo FuturCraft Institut"
                   width={507}
                   height={340}
-                  className="h-7 w-auto object-contain"
+                  className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="font-display font-extrabold text-[1.15rem] tracking-tight text-[var(--color-fc-black)] leading-none">
-                  FuturCraft
-                  <span className="text-[var(--color-fc-primary)]">.</span>
+              <div className="hidden sm:flex flex-col">
+                <span className="font-display text-[1.15rem] font-extrabold leading-none tracking-tight text-[var(--color-fc-black)]">
+                  FuturCraft<span className="text-[var(--color-fc-cyan)]">.</span>
                 </span>
-                <span className="text-[9px] font-semibold tracking-[0.15em] uppercase text-[var(--color-fc-gray-mid)] mt-0.5">
-                  Institut Numérique
+                <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-fc-gray-mid)]">
+                  Institut
                 </span>
               </div>
             </Link>
@@ -116,13 +114,19 @@ export function Header() {
                 if (link.hasMega) {
                   return (
                     <div
+                      id="formations-menu"
                       key={link.href}
                       className="relative"
                       onMouseEnter={() => setFormationsOpen(true)}
                       onMouseLeave={() => setFormationsOpen(false)}
                     >
                       <button
-                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        aria-expanded={formationsOpen}
+                        aria-haspopup="true"
+                        aria-controls="formations-panel"
+                        type="button"
+                        onClick={() => setFormationsOpen((open) => !open)}
+                        className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-semibold transition-all duration-200 ${
                           active
                             ? "text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 font-semibold"
                             : "text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)] hover:bg-[var(--color-fc-gray-light)]/30"
@@ -136,15 +140,16 @@ export function Header() {
 
                       {/* Mega dropdown */}
                       <div
+                        id="formations-panel"
                         className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 transition-all duration-200 ${
                           formationsOpen
                             ? "opacity-100 translate-y-0 pointer-events-auto"
                             : "opacity-0 -translate-y-2 pointer-events-none"
                         }`}
                       >
-                        <div className="bg-white rounded-2xl shadow-2xl shadow-slate-900/12 border border-slate-200/80 overflow-hidden">
+                        <div className="bg-white rounded-2xl shadow-2xl shadow-[var(--color-fc-deep)]/10 border border-[var(--color-fc-gray-light)] overflow-hidden">
                           <div className="px-4 pt-4 pb-2">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-fc-gray-mid)]">
                               Nos formations
                             </p>
                           </div>
@@ -183,7 +188,7 @@ return (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`rounded-xl px-3 py-2 text-[13px] font-semibold transition-all duration-200 ${
                         active
                           ? "text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 font-semibold"
                           : "text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)] hover:bg-[var(--color-fc-gray-light)]/30"
@@ -196,21 +201,19 @@ return (
             </nav>
 
 {/* ── Desktop Actions ── */}
-            <div className="hidden sm:flex items-center gap-2.5">
+            <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/espace-etudiant"
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-primary)] hover:bg-[var(--color-fc-primary)]/8 border border-[var(--color-fc-gray-light)]/50 transition-all duration-200"
+                className="rounded-xl px-4 py-2.5 text-[13px] font-semibold text-[var(--color-fc-gray-mid)] transition-colors hover:text-[var(--color-fc-primary)]"
               >
-                <UserCheck className="w-4 h-4 text-[var(--color-fc-primary)]" />
                 Mon Espace
               </Link>
-
               <Link
                 href="/inscription"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] transition-colors"
+                className="group inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-5 py-2.5 text-[13px] font-bold text-white transition-all hover:bg-[var(--color-fc-primary)] hover:shadow-lg hover:shadow-[var(--color-fc-primary)]/20"
               >
-                S&apos;inscrire
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 duration-200" />
+                Candidater
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
 
@@ -218,15 +221,17 @@ return (
             <div className="flex xl:hidden items-center gap-2">
               <Link
                 href="/espace-etudiant"
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/8 border border-[var(--color-fc-primary)]/20 flex items-center gap-1"
+                className="hidden items-center gap-1 rounded-lg border border-[var(--color-fc-primary)]/20 bg-[var(--color-fc-primary)]/8 px-3 py-1.5 text-xs font-semibold text-[var(--color-fc-primary)] sm:flex"
               >
                 <UserCheck className="w-3.5 h-3.5" />
                 Espace
               </Link>
               <button
+                type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-xl text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)] hover:bg-[var(--color-fc-gray-light)]/30 transition-colors focus:outline-none"
                 aria-label="Menu"
+                aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>

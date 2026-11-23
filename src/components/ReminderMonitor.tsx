@@ -116,10 +116,10 @@ export function ReminderMonitor() {
   const formatAmount = (amount: number) => amount.toLocaleString("fr-FR") + " FCFA";
 
   const getSeverityColor = (days: number) => {
-    if (days > 30) return "text-red-600 bg-red-50 border-red-200";
-    if (days > 15) return "text-orange-600 bg-orange-50 border-orange-200";
-    if (days > 7) return "text-yellow-600 bg-yellow-50 border-yellow-200";
-    return "text-blue-600 bg-blue-50 border-blue-200";
+    if (days > 30) return "text-red-700 bg-red-50 border-red-200";
+    if (days > 15) return "text-orange-700 bg-orange-50 border-orange-200";
+    if (days > 7) return "text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] border-[var(--color-fc-primary)]/20";
+    return "text-[var(--color-fc-primary)] bg-[var(--color-fc-surface)] border-[var(--color-fc-primary)]/20";
   };
 
   const renderTbody = () => {

@@ -32,6 +32,8 @@ function verify(token: string): boolean {
 }
 
 export async function isAuthenticated(): Promise<boolean> {
+  if (!secret()) return false;
+
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
   if (!token) return false;
@@ -43,7 +45,10 @@ export async function isAuthenticated(): Promise<boolean> {
 }
 
 export function authenticate(password: string): { ok: boolean; cookie: string | null } {
-  const expected = Buffer.from(secret());
+  const configuredSecret = secret();
+  if (!configuredSecret) return { ok: false, cookie: null };
+
+  const expected = Buffer.from(configuredSecret);
   const provided = Buffer.from(password);
   const valid =
     provided.length === expected.length &&

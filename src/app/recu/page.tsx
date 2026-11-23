@@ -16,56 +16,35 @@ export default function ReceiptSearchPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-16 px-4 bg-slate-50/50">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 p-8 shadow-xl space-y-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
-          <ShieldCheck className="w-9 h-9" />
+    <div className="flex min-h-[80vh] items-center justify-center bg-[var(--color-fc-bg)] px-4 py-16">
+      <div className="w-full max-w-md rounded-[2rem] border border-[var(--color-fc-gray-light)] bg-white p-8 text-center sm:p-10">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+          <ShieldCheck className="h-8 w-8" />
         </div>
 
-        <div className="space-y-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-            Authentification Numérique
-          </span>
-          <h1 className="text-2xl font-black text-slate-950">Vérifier un Reçu Officiel</h1>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Saisissez le numéro de reçu figurant sur la quittance (ex : REC-2025-01420) pour vérifier son authenticité et son statut d&apos;encaissement.
+        <div className="mt-6 space-y-3">
+          <span className="inline-flex rounded-full bg-[var(--color-fc-surface)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-fc-primary)]">Authentification</span>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)]">Vérifier un reçu</h1>
+          <p className="text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+            Saisissez le numéro de reçu (ex : REC-2025-01420) pour confirmer son authenticité.
           </p>
         </div>
 
-        <form onSubmit={handleVerify} className="space-y-4">
+        <form onSubmit={handleVerify} className="mt-8 space-y-4">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-fc-gray-mid)]" />
             <input
               type="text"
               placeholder="ex: REC-2025-01420"
               value={receiptNumber}
               onChange={(e) => setReceiptNumber(e.target.value.toUpperCase())}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm font-mono font-bold text-slate-900 uppercase focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] py-3.5 pl-11 pr-4 text-sm font-mono font-bold uppercase text-[var(--color-fc-black)] outline-none transition-colors focus:border-[var(--color-fc-primary)]"
             />
           </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all flex items-center justify-center gap-2"
-          >
-            <span>Vérifier l&apos;authenticité</span>
-            <ArrowRight className="w-4 h-4" />
+          <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
+            Vérifier l&apos;authenticité <ArrowRight className="h-4 w-4" />
           </button>
         </form>
-
-        {/* Quick Demo links */}
-        <div className="pt-4 border-t border-slate-100 text-xs text-slate-500 space-y-2">
-          <span className="block text-[11px] font-semibold text-slate-400">Exemples de reçus valides :</span>
-          <div className="flex justify-center gap-2 flex-wrap font-mono text-[11px]">
-            <Link href="/recu/REC-2025-01420" className="text-blue-600 hover:underline">
-              REC-2025-01420
-            </Link>
-            <span className="text-slate-300">•</span>
-            <Link href="/recu/REC-2025-01421" className="text-blue-600 hover:underline">
-              REC-2025-01421
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );

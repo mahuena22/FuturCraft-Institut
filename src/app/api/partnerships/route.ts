@@ -4,6 +4,7 @@ import { partnershipRequests } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 import { sendPartnershipEmail } from "@/lib/email";
+import { getClientIp, rateLimitKey, recordAttempt, resetAttempts, tooManyAttempts } from "@/lib/rate-limit";
 
 export async function GET() {
   const denied = await requireAuth();
@@ -21,24 +22,42 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const key = rateLimitKey(ip, "partnerships-post");
+  const limit = await tooManyAttempts(key);
+  if (limit.blocked) {
+    return NextResponse.json(
+      { error: "Trop de tentatives. Réessayez plus tard.", retryAfter: limit.retryAfterSeconds },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    );
+  }
   try {
-    const body = await req.json();
-    if (!body.companyName || !body.contactName || !body.email || !body.partnershipType) {
+    const body = await req.json().catch(() => ({}));
+    const companyName = String(body.companyName || "").trim();
+    const contactName = String(body.contactName || "").trim();
+    const email = String(body.email || "").trim().toLowerCase();
+    const partnershipType = String(body.partnershipType || "").trim();
+    if (!companyName || !contactName || !email || !partnershipType) {
+      await recordAttempt(key);
       return NextResponse.json(
         { error: "Champs requis manquants (companyName, contactName, email, partnershipType)" },
         { status: 400 }
       );
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      await recordAttempt(key);
+      return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
 
     const [request] = await db
       .insert(partnershipRequests)
       .values({
-        companyName: body.companyName,
-        contactName: body.contactName,
-        email: body.email,
-        phone: body.phone || "",
-        partnershipType: body.partnershipType,
-        message: body.message || "",
+        companyName,
+        contactName,
+        email,
+        phone: String(body.phone || "").trim(),
+        partnershipType,
+        message: String(body.message || "").trim(),
         status: "nouveau",
       })
       .returning();
@@ -52,7 +71,8 @@ export async function POST(req: NextRequest) {
       message: request.message || "",
     });
 
-    return NextResponse.json({ success: true, request });
+    await resetAttempts(key);
+    return NextResponse.json({ success: true, request }, { status: 201 });
   } catch (error) {
     console.error("POST /api/partnerships error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

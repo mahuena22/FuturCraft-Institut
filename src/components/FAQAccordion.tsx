@@ -27,7 +27,7 @@ export function FAQAccordion({
           <div
             key={i}
             className={`rounded-2xl bg-white border shadow-xs overflow-hidden transition-colors ${
-              isOpen ? "border-blue-300 ring-1 ring-blue-100" : "border-slate-200"
+              isOpen ? "border-[var(--color-fc-primary)]/30 ring-1 ring-[var(--color-fc-primary)]/15" : "border-[var(--color-fc-gray-light)]"
             }`}
           >
             <button
@@ -39,15 +39,15 @@ export function FAQAccordion({
             >
               <span className="flex items-center gap-3">
                 <HelpCircle
-                  className={`w-5 h-5 shrink-0 ${isOpen ? "text-blue-600" : "text-slate-400"}`}
+                  className={`w-5 h-5 shrink-0 ${isOpen ? "text-[var(--color-fc-primary)]" : "text-[var(--color-fc-gray-mid)]"}`}
                 />
-                <span className="text-sm font-bold text-slate-900">{faq.q}</span>
+                <span className="text-sm font-bold text-[var(--color-fc-black)]">{faq.q}</span>
               </span>
               <span
                 className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
                   isOpen
                     ? "bg-blue-600 text-white rotate-180"
-                    : "bg-slate-100 text-slate-500"
+                    : "bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)]"
                 }`}
               >
                 <ChevronDown className="w-4 h-4" />
@@ -61,7 +61,7 @@ export function FAQAccordion({
               }`}
             >
               <div className="overflow-hidden min-h-0">
-                <p className="pl-13 pr-5 pb-4 text-sm leading-relaxed text-slate-600">
+                <p className="pl-13 pr-5 pb-4 text-sm leading-relaxed text-[var(--color-fc-gray-mid)]">
                   {faq.a}
                 </p>
               </div>

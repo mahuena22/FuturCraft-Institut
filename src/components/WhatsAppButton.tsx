@@ -44,7 +44,7 @@ export function WhatsAppButton({
 
   const baseStyles = `
     inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200
-    bg-[var(--color-fc-cyan)] text-[var(--color-fc-bg)] hover:bg-[var(--color-fc-primary)]
+    bg-[var(--color-fc-cyan)] text-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] hover:text-[var(--color-fc-bg)]
     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-fc-cyan)] focus-visible:ring-offset-2
   `;
 
@@ -121,7 +121,7 @@ export function WhatsAppFloatButton({
     <button
       onClick={handleClick}
       disabled={isLoading}
-      className="fixed bottom-6 right-6 z-50 inline-flex items-center justify-center gap-2 p-4 rounded-full bg-[var(--color-fc-cyan)] text-[var(--color-fc-bg)] hover:bg-[var(--color-fc-primary)] shadow-xl shadow-[var(--color-fc-cyan)]/30 transition-all duration-200 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-fc-cyan)] focus-visible:ring-offset-2"
+      className="fixed bottom-6 right-6 z-50 inline-flex items-center justify-center gap-2 p-4 rounded-full bg-[var(--color-fc-cyan)] text-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] hover:text-[var(--color-fc-bg)] shadow-xl shadow-[var(--color-fc-cyan)]/30 transition-all duration-200 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-fc-cyan)] focus-visible:ring-offset-2"
       aria-label="Discuter sur WhatsApp"
     >
       <svg className={`w-6 h-6 ${isLoading ? "animate-spin" : ""}`} fill="currentColor" viewBox="0 0 24 24">

@@ -33,7 +33,7 @@ export default async function EspaceEtudiantPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-sm font-semibold text-slate-500">Chargement de votre espace étudiant...</div>
+          <div className="text-sm font-semibold text-[var(--color-fc-gray-mid)]">Chargement de votre espace étudiant...</div>
         </div>
       }
     >

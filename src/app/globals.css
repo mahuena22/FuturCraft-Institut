@@ -10,15 +10,18 @@
     Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: "Sora", "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  /* FuturCraft brand palette — deep navy to cyan */
-  --color-fc-deep: #051269;
-  --color-fc-primary: #125195;
-  --color-fc-cyan: #1898BA;
-  --color-fc-light: #8BB9CA;
-  --color-fc-bg: #FBFCFC;
-  --color-fc-gray-light: #FFFFFF;
-  --color-fc-gray-mid: #969493;
-  --color-fc-black: #141213;
+  /* FuturCraft brand palette — refined premium */
+  --color-fc-deep: #07163d;
+  --color-fc-primary: #0f4c8a;
+  --color-fc-cyan: #14a3c7;
+  --color-fc-light: #9cc5d3;
+  --color-fc-bg: #f7f8f5;
+  --color-fc-surface: #ffffff;
+  --color-fc-gray-light: #e6ebef;
+  --color-fc-gray-mid: #5f6f81;
+  --color-fc-black: #121826;
+  --color-fc-accent: #14a3c7;
+  --color-fc-accent-soft: #e8f6fb;
 
   /* Dark mode palette */
   --color-fc-deep-dark: #03083d;
@@ -27,23 +30,23 @@
   --color-fc-light-dark: #6a9cb5;
   --color-fc-bg-dark: #0a0f1e;
   --color-fc-gray-light-dark: #2a2f3a;
-  --color-fc-gray-mid-dark: #6b6e7a;
+  --color-fc-gray-mid-dark: #9CA3AF;
   --color-fc-black-dark: #f0f2f5;
 
   /* Derived palette for gradients and effects */
-  --color-brand-950: #051269;
-  --color-brand-900: #125195;
-  --color-brand-800: #1898BA;
-  --color-brand-700: #8BB9CA;
+  --color-brand-950: #07163d;
+  --color-brand-900: #0f4c8a;
+  --color-brand-800: #14a3c7;
+  --color-brand-700: #9cc5d3;
   --color-brand-600: #FFFFFF;
-  --color-brand-500: #969493;
-  --color-brand-400: #FBFCFC;
-  --color-brand-300: #141213;
+  --color-brand-500: #5f6f81;
+  --color-brand-400: #f7f8f5;
+  --color-brand-300: #121826;
 
-  /* Accent — cyan */
-  --color-accent-300: #1898BA;
-  --color-accent-400: #8BB9CA;
-  --color-accent-500: #051269;
+  /* Accent */
+  --color-accent-300: #14a3c7;
+  --color-accent-400: #9cc5d3;
+  --color-accent-500: #07163d;
 }
 
 /* Dark mode theme */
@@ -67,25 +70,30 @@
   --color-brand-300: var(--color-fc-black-dark);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not(.dark) {
-    color-scheme: light;
-  }
-}
-
 /* ───── Base ───── */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -104,6 +112,137 @@ h4,
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.025em;
+}
+
+.page-container {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+}
+
+.admin-portal button,
+.student-portal button {
+  transition-duration: 180ms;
+}
+
+.admin-portal input,
+.admin-portal select,
+.admin-portal textarea,
+.student-portal input,
+.student-portal select,
+.student-portal textarea {
+  border-color: #dce5ed;
+  border-radius: 0.75rem;
+}
+
+.admin-portal input:focus,
+.admin-portal select:focus,
+.admin-portal textarea:focus,
+.student-portal input:focus,
+.student-portal select:focus,
+.student-portal textarea:focus {
+  border-color: var(--color-fc-primary);
+  outline: 2px solid rgba(18, 81, 149, 0.14);
+  outline-offset: 0;
+}
+
+.admin-portal table,
+.student-portal table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-portal th,
+.student-portal th {
+  letter-spacing: 0.04em;
+}
+
+.page-intro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #07163d;
+  color: #fff;
+}
+
+.page-intro::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+  content: "";
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.page-intro-inner {
+  width: min(100% - 2rem, 84rem);
+  margin-inline: auto;
+  padding-block: clamp(4.5rem, 9vw, 7.5rem);
+}
+
+.page-intro-copy {
+  max-width: 52rem;
+}
+
+.page-intro-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-fc-cyan);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.page-intro-title {
+  max-width: 18ch;
+  margin-top: 1.25rem;
+  color: #fff;
+  font-size: clamp(2.4rem, 5.5vw, 4.75rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.page-intro-description {
+  max-width: 40rem;
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.8;
+}
+
+.section-heading {
+  max-width: 46rem;
+}
+
+.section-heading h2 {
+  margin-top: 0.75rem;
+  color: var(--color-fc-black);
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.section-heading p {
+  margin-top: 1rem;
+  color: var(--color-fc-gray-mid);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  .page-container,
+  .page-intro-inner {
+    width: min(100% - 2.5rem, 80rem);
+  }
 }
 
 /* ───── Scrollbars ───── */
@@ -220,11 +359,6 @@ textarea:focus-visible {
   50%       { transform: perspective(1200px) rotateY(-3deg) rotateX(0deg) translateY(-8px); }
 }
 
-@keyframes hero-tilt {
-  0%, 100% { transform: perspective(1200px) rotateY(-8deg) rotateX(3deg); }
-  50%       { transform: perspective(1200px) rotateY(-3deg) rotateX(0deg) translateY(-8px); }
-}
-
 @keyframes slide-in {
   from { opacity: 0; transform: translateX(100%); }
   to   { opacity: 1; transform: translateX(0); }
@@ -293,7 +427,6 @@ textarea:focus-visible {
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 .animate-spin-slow  { animation: spin-slow 20s linear infinite; }
 .animate-shimmer    { animation: shimmer 2.5s linear infinite; }
-.animate-gradient   { animation: gradient-shift 4s ease infinite; background-size: 200% 200%; }
 .hero-card-tilt     { animation: hero-tilt 7s ease-in-out infinite; }
 
 /* ───── Enter/Exit system (modals, panes) ───── */
@@ -360,36 +493,8 @@ textarea:focus-visible {
 .delay-1000 { animation-delay: 1s; }
 
 /* ============================================================
-   DECORATIVE BACKGROUNDS (Solid colors only)
+   SOLID COLOR UTILITIES
    ============================================================ */
-
-/* Fine grid */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(18, 81, 149, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(18, 81, 149, 0.07) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
-
-.bg-grid-dark {
-  background-image:
-    linear-gradient(to right, rgba(5, 18, 105, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(5, 18, 105, 0.05) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
-
-/* Dot pattern */
-.bg-dots {
-  background-image: radial-gradient(rgba(18, 81, 149, 0.15) 1.5px, transparent 1.5px);
-  background-size: 28px 28px;
-}
-
-.bg-dots-dark {
-  background-image: radial-gradient(rgba(5, 18, 105, 0.08) 1.5px, transparent 1.5px);
-  background-size: 28px 28px;
-}
-
-/* Solid color utilities */
 .bg-fc-deep { background-color: var(--color-fc-deep); }
 .bg-fc-primary { background-color: var(--color-fc-primary); }
 .bg-fc-cyan { background-color: var(--color-fc-cyan); }
@@ -487,18 +592,6 @@ textarea:focus-visible {
 /* ============================================================
    TEXT COLOR UTILITIES (Solid colors only)
    ============================================================ */
-
-.text-gradient-brand {
-  color: var(--color-fc-primary);
-}
-
-.text-gradient-gold {
-  color: var(--color-fc-cyan);
-}
-
-.text-shimmer {
-  color: var(--color-fc-cyan);
-}
 
 /* ============================================================
    CARD HOVER EFFECTS

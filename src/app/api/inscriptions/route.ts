@@ -1,23 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createStudentWithPlan, getFormations } from "@/lib/data-service";
 import { sendInscriptionEmails } from "@/lib/email";
+import { getClientIp, rateLimitKey, recordAttempt, resetAttempts, tooManyAttempts } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const key = rateLimitKey(ip, "inscription-post");
+  const limit = await tooManyAttempts(key);
+  if (limit.blocked) {
+    return NextResponse.json(
+      { error: "Trop de tentatives. Réessayez plus tard.", retryAfter: limit.retryAfterSeconds },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    );
+  }
   try {
-    const body = await req.json();
-    if (!body.firstName || !body.lastName || !body.email || !body.phone || !body.formationId) {
+    const body = await req.json().catch(() => ({}));
+    const email = String(body.email || "").trim().toLowerCase();
+    const phone = String(body.phone || "").trim();
+    if (!body.firstName || !body.lastName || !email || !phone || !body.formationId) {
+      await recordAttempt(key);
       return NextResponse.json(
         { error: "Veuillez renseigner tous les champs obligatoires (nom, prénom, email, téléphone, formation)" },
         { status: 400 }
       );
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      await recordAttempt(key);
+      return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
 
     const student = await createStudentWithPlan({
-      firstName: body.firstName,
-      lastName: body.lastName,
+      firstName: String(body.firstName).trim(),
+      lastName: String(body.lastName).trim(),
       gender: body.gender || "M",
-      email: body.email,
-      phone: body.phone,
+      email,
+      phone,
       whatsapp: body.whatsapp,
       city: body.city,
       formationId: Number(body.formationId),
@@ -31,12 +48,7 @@ export async function POST(req: NextRequest) {
       residenceCountry: body.residenceCountry,
     });
 
-    // No auto-authentication: the student must be validated by the admin first.
-
-    // Notification par email (Resend si configuré, sinon log)
-    const [formation] = await getFormations().then((rows) =>
-      rows.filter((f) => f.id === student.formationId)
-    );
+    const [formation] = await getFormations().then((rows) => rows.filter((f) => f.id === student.formationId));
     void sendInscriptionEmails({
       studentNumber: student.studentNumber,
       firstName: student.firstName,
@@ -47,6 +59,7 @@ export async function POST(req: NextRequest) {
       phone: student.phone,
     });
 
+    await resetAttempts(key);
     return NextResponse.json({
       success: true,
       message: "Préinscription enregistrée. Votre dossier est en attente de validation par l'administration.",

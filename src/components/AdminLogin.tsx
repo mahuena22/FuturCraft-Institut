@@ -35,25 +35,25 @@ export function AdminLogin() {
   }
 
   return (
-    <div className="min-h-[80vh] bg-slate-50/60 flex items-center justify-center px-4 relative overflow-hidden py-16">
-      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-[var(--color-fc-bg)] px-4 py-16">
+      <div className="pointer-events-none absolute inset-0 opacity-0" />
       <div className="relative w-full max-w-md">
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-8 py-8 text-white">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
-              <ShieldCheck className="w-7 h-7" />
+        <div className="overflow-hidden rounded-[2rem] border border-[var(--color-fc-gray-light)] bg-white">
+          <div className="bg-[var(--color-fc-deep)] px-8 py-8 text-white">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-[var(--color-fc-cyan)]">
+              <ShieldCheck className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-black tracking-tight">Console d&apos;Administration</h1>
-            <p className="text-sm text-slate-400 mt-1">Espace sécurisé — accès réservé au personnel autorisé.</p>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight">Console d&apos;administration</h1>
+            <p className="mt-1 text-sm text-white/65">Espace sécurisé — accès réservé au personnel autorisé.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 p-8">
             <div>
-              <label htmlFor="admin-password" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="admin-password" className="mb-1.5 block text-sm font-semibold text-[var(--color-fc-black)]">
                 Mot de passe administrateur
               </label>
               <div className="relative">
-                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-fc-gray-mid)]" />
                 <input
                   id="admin-password"
                   type={show ? "text" : "password"}
@@ -61,21 +61,21 @@ export function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] py-3 pl-10 pr-11 text-sm text-[var(--color-fc-black)] outline-none transition-colors focus:border-[var(--color-fc-primary)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShow(!show)}
                   aria-label={show ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-fc-gray-mid)] hover:text-[var(--color-fc-black)]"
                 >
-                  {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs font-semibold text-red-600">
+              <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-semibold text-red-600">
                 {error}
               </div>
             )}
@@ -83,21 +83,21 @@ export function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 disabled:opacity-60 shadow-lg shadow-blue-600/25 transition-all"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)] disabled:opacity-60"
             >
               {loading ? (
-                <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
               ) : (
-                <Lock className="w-4 h-4" />
+                <Lock className="h-4 w-4" />
               )}
               <span>{loading ? "Vérification..." : "Se connecter"}</span>
-              {!loading && <ArrowRight className="w-4 h-4" />}
+              {!loading && <ArrowRight className="h-4 w-4" />}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-[11px] text-slate-400 mt-4">
-          Connexion protégée par un accès sécurisé. Toute tentative non autorisée est journalisée.
+        <p className="mt-4 text-center text-[11px] text-[var(--color-fc-gray-mid)]">
+          Connexion protégée par un accès sécurisé.
         </p>
       </div>
     </div>

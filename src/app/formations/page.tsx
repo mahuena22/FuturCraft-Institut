@@ -1,181 +1,89 @@
-import { getFormations } from '@/lib/data-service';
-import { FormationsExplorer } from '@/components/FormationsExplorer';
-import { FormationsExplorerWrapper } from '@/components/FormationsExplorerWrapper';
-import Image from 'next/image';
+import { getFormations } from "@/lib/data-service";
+import { FormationsExplorer } from "@/components/FormationsExplorer";
+import { FormationsExplorerWrapper } from "@/components/FormationsExplorerWrapper";
 import {
-    Layers,
-    GraduationCap,
-    Phone,
-    ArrowRight,
-    Sparkles,
-    BookOpen,
-    Clock,
-    Users,
-} from 'lucide-react';
-import Link from 'next/link';
-import { Suspense } from 'react';
+  GraduationCap,
+  Phone,
+  ArrowRight,
+  Sparkles,
+  BookOpen,
+  Clock,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
+import { PageIntro } from "@/components/PageIntro";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const metadata = {
-    title: 'Toutes les Formations | FuturCraft Institut Bénin',
-    description:
-        'Découvrez nos 12 formations professionnelles aux métiers du numérique : Développement Web, IA, UI/UX Design, Drone, Graphisme, Audiovisuel à Godomey, Supermarché O Bénin Avant pk14.',
+  title: "Toutes les Formations | FuturCraft Institut Bénin",
+  description:
+    "Découvrez nos 12 formations professionnelles aux métiers du numérique : Développement Web, IA, UI/UX Design, Drone, Graphisme, Audiovisuel à Godomey, Supermarché O Bénin Avant pk14.",
 };
 
 export default async function FormationsPage() {
-    const formations = await getFormations();
+  const formations = await getFormations();
 
-    const highlights = [
-        {
-            icon: BookOpen,
-            label: `${formations.length}+ formations`,
-            sub: 'Catalogue complet',
-        },
-        { icon: Clock, label: '1 à 12 mois', sub: 'Durées flexibles' },
-        { icon: Users, label: 'Cohortes limitées', sub: 'Suivi personnalisé' },
-        {
-            icon: GraduationCap,
-            label: 'Diplômes certifiants',
-            sub: 'Reconnus partout',
-        },
-    ];
+  const highlights = [
+    { icon: BookOpen, label: `${formations.length}+ formations`, sub: "Catalogue complet" },
+    { icon: Clock, label: "1 à 12 mois", sub: "Durées flexibles" },
+    { icon: Users, label: "Cohortes limitées", sub: "Suivi personnalisé" },
+    { icon: GraduationCap, label: "Diplômes certifiants", sub: "Reconnus partout" },
+  ];
 
-    return (
-        <div className="min-h-screen bg-[var(--color-fc-bg)]">
-            {/* ── Hero Header ── */}
-            <section className="relative bg-[var(--color-fc-deep)] text-white overflow-hidden">
-                {/* Background photo */}
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="/images/bg-banniere.jpeg"
-                        alt="FuturCraft Institut"
-                        fill
-                        priority
-                        sizes="100vw"
-                        className="object-cover object-center"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
-                    <div className="absolute inset-0 bg-black/40" />
-                </div>
+  return (
+    <div className="min-h-screen bg-[var(--color-fc-bg)]">
 
-                <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none z-[1]" />
-                <div className="absolute inset-0 bg-grid-dark opacity-10 pointer-events-none z-[1]" />
+      <PageIntro
+        eyebrow="Catalogue officiel · Admissions ouvertes"
+        title="Des formations pour les métiers qui transforment le numérique."
+        description="Du développement logiciel à l’intelligence artificielle, apprends en pratiquant sur des projets concrets, accompagné par des professionnels."
+      />
 
-                {/* Orbs */}
-                <div className="absolute right-0 top-0 w-96 h-96 rounded-full bg-[var(--color-fc-primary)]/20 blur-[100px] pointer-events-none z-[1]" />
-                <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-[var(--color-fc-cyan)]/15 blur-[80px] pointer-events-none z-[1]" />
+      {/* ── Main Content ── */}
+      <div className="page-container py-14 sm:py-20">
 
-                {/* Top line */}
-                <div className="h-0.5 bg-[var(--color-fc-primary)]/50 relative z-10" />
-
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-                    <div className="text-center max-w-4xl mx-auto">
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-[var(--color-fc-primary)]/30 bg-[var(--color-fc-primary)]/10 text-[var(--color-fc-light)] text-xs font-bold mb-8 animate-fade-up">
-                            <Layers className="w-3.5 h-3.5 text-[var(--color-fc-cyan)]" />
-                            Catalogue Officiel 2026 — Admissions Ouvertes
-                        </div>
-
-                        <h1 className="animate-fade-up delay-100 font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-                            <span className="text-white">
-                                Formations d&apos;avenir
-                            </span>
-                            <br />
-                            <span className="text-[var(--color-fc-cyan)]">
-                                aux métiers du numérique
-                            </span>
-                        </h1>
-
-                        <p className="animate-fade-up delay-200 text-[var(--color-fc-light)]/70 text-base sm:text-lg leading-relaxed mt-6 max-w-2xl mx-auto">
-                            De la maîtrise accélérée des outils IA en 1 mois aux
-                            filières complètes de développement logiciel.
-                            Pratique intensive, projets réels, diplômes
-                            certifiants.
-                        </p>
-
-                        {/* Highlights row */}
-                        <div className="animate-fade-up delay-300 mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                            {highlights.map(({ icon: Icon, label, sub }) => (
-                                <div
-                                    key={label}
-                                    className="glass rounded-2xl px-4 py-4 text-center hover:-translate-y-1 transition-transform duration-300"
-                                >
-                                    <div className="w-9 h-9 rounded-xl bg-[var(--color-fc-primary)]/20 flex items-center justify-center mx-auto mb-2">
-                                        <Icon className="w-4.5 h-4.5 text-[var(--color-fc-deep)]" />
-                                    </div>
-                                    <p className="font-display font-bold text-white text-sm">
-                                        {label}
-                                    </p>
-                                    <p className="text-blue-700 text-[11px] mt-0.5">
-                                        {sub}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Wave bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-[var(--color-fc-bg)] pointer-events-none" />
-            </section>
-
-            {/* ── Main Content ── */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
-                {/* Live Filterable Component */}
-                <Suspense
-                    fallback={
-                        <div className="space-y-8">
-                            <div className="h-64 bg-[var(--color-fc-gray-light)]/30 rounded-2xl animate-pulse" />
-                        </div>
-                    }
-                >
-                    <FormationsExplorerWrapper formations={formations} />
-                </Suspense>
-
-                {/* Bottom Banner — Full width */}
-                <div className="relative overflow-hidden rounded-3xl bg-[var(--color-fc-deep)] p-px shadow-2xl">
-                    {/* Inner content */}
-                    <div className="relative rounded-[calc(1.5rem-1px)] bg-[var(--color-fc-deep)] px-8 py-12 sm:px-12 lg:px-16">
-                        <div className="absolute inset-0 bg-dots-dark opacity-20 pointer-events-none rounded-[calc(1.5rem-1px)]" />
-                        <div className="absolute right-8 top-8 w-48 h-48 rounded-full bg-[var(--color-fc-primary)]/10 blur-3xl pointer-events-none" />
-
-                        <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="space-y-3 max-w-xl text-center md:text-left">
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-fc-primary)]/20 border border-[var(--color-fc-primary)]/30 text-[var(--color-fc-deep)] text-xs font-bold">
-                                    <Sparkles className="w-3 h-3 text-[var(--color-fc-deep)]" />
-                                    Orientation personnalisée gratuite
-                                </div>
-                                <h3 className="font-display text-2xl sm:text-3xl font-black text-white">
-                                    Besoin d&apos;aide pour choisir ?
-                                </h3>
-                                <p className="text-sm text-[var(--color-fc-light)]/60 leading-7">
-                                    Nos conseillers pédagogiques vous aident à
-                                    identifier la formation la plus adaptée à
-                                    votre profil et vos ambitions
-                                    professionnelles.
-                                </p>
-                            </div>
-
-                            <div className="flex flex-col gap-3 shrink-0">
-                                <Link
-                                    href="/contact"
-                                    className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[var(--color-fc-bg)] text-[var(--color-fc-deep)] text-sm font-extrabold hover:bg-[var(--color-fc-light)]/30 transition-all hover:-translate-y-0.5 shadow-lg"
-                                >
-                                    <Phone className="w-4 h-4" />
-                                    Prendre rendez-vous
-                                </Link>
-                                <Link
-                                    href="/inscription"
-                                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[var(--color-fc-primary)] hover:bg-[var(--color-fc-deep)] text-[var(--color-fc-bg)] text-sm font-bold transition-all shadow-md"
-                                >
-                                    Candidater directement
-                                    <ArrowRight className="w-4 h-4" />
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {highlights.map(({ icon: Icon, label, sub }) => (
+            <div key={label} className="rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-5">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                <Icon className="h-5 w-5" />
+              </div>
+              <p className="font-display text-sm font-bold text-[var(--color-fc-black)] sm:text-base">{label}</p>
+              <p className="mt-1 text-xs text-[var(--color-fc-gray-mid)]">{sub}</p>
             </div>
+          ))}
         </div>
-    );
+
+        {/* Live Filterable Component */}
+        <Suspense fallback={<div className="space-y-8"><div className="h-64 bg-[var(--color-fc-gray-light)]/30 rounded-2xl animate-pulse" /></div>}>
+          <FormationsExplorerWrapper formations={formations} />
+        </Suspense>
+
+        <div className="mt-16 overflow-hidden rounded-[2rem] bg-[var(--color-fc-deep)] px-8 py-12 sm:px-12 lg:px-16">
+          <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+            <div className="max-w-xl">
+              <p className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
+                <Sparkles className="h-3.5 w-3.5" /> Orientation personnalisée
+              </p>
+              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                Besoin d&apos;aide pour choisir ?
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-white/65">
+                Nos conseillers t&apos;aident à identifier la formation adaptée à ton profil, ton rythme et tes objectifs.
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[var(--color-fc-deep)] transition-colors hover:bg-[var(--color-fc-bg)]">
+                <Phone className="h-4 w-4" /> Parler à un conseiller
+              </Link>
+              <Link href="/inscription" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-cyan)] px-6 py-3.5 text-sm font-bold text-[#06122f] transition-colors hover:bg-white">
+                Candidater <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

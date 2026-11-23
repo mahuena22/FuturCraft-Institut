@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import {
     GraduationCap,
     CreditCard,
@@ -7,7 +6,6 @@ import {
     ArrowRight,
     ShieldCheck,
     Smartphone,
-    BadgeCheck,
     Sparkles,
     Clock,
     MapPin,
@@ -16,6 +14,7 @@ import {
 } from 'lucide-react';
 import { getFormations } from '@/lib/data-service';
 import { FAQAccordion } from '@/components/FAQAccordion';
+import { PageIntro } from '@/components/PageIntro';
 
 export const revalidate = 3600;
 export const metadata = {
@@ -27,40 +26,40 @@ export const metadata = {
 export default async function AdmissionsPage() {
     const formations = await getFormations();
 
-    const steps = [
-        {
-            num: "01",
-            title: "Exploration & Choix",
-            desc: "Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.",
-            icon: GraduationCap,
-            color: "var(--color-fc-primary)",
-            highlight: "Catalogue gratuit",
-        },
-        {
-            num: "02",
-            title: "Candidature en ligne",
-            desc: "Remplissez le formulaire en quelques minutes et obtenez instantanément votre numéro de dossier unique.",
-            icon: CheckCircle2,
-            color: "var(--color-fc-cyan)",
-            highlight: "Réponse instantanée",
-        },
-        {
-            num: "03",
-            title: "Validation & Paiement",
-            desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
-            icon: CreditCard,
-            color: "var(--color-fc-light)",
-            highlight: "Paiement sécurisé",
-        },
-        {
-            num: "04",
-            title: "Accès & Rentrée",
-            desc: "Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.",
-            icon: Star,
-            color: "var(--color-fc-cyan)",
-            highlight: "Accès immédiat",
-        },
-    ];
+  const steps = [
+    {
+      num: "01",
+      title: "Exploration & Choix",
+      desc: "Découvrez notre catalogue de 12 formations. Contactez un conseiller si vous hésitez sur votre orientation.",
+      icon: GraduationCap,
+      color: "var(--color-fc-primary)",
+      highlight: "Catalogue gratuit",
+    },
+    {
+      num: "02",
+      title: "Candidature en ligne",
+      desc: "Remplissez le formulaire et récupérez votre numéro de dossier.",
+      icon: CheckCircle2,
+      color: "var(--color-fc-cyan)",
+      highlight: "Réponse instantanée",
+    },
+    {
+      num: "03",
+      title: "Validation & Paiement",
+      desc: "Réglez vos frais d'inscription (25 000 FCFA) par MoMo, Moov Money ou au guichet pour réserver votre place.",
+      icon: CreditCard,
+      color: "var(--color-fc-light)",
+      highlight: "Paiement sécurisé",
+    },
+    {
+      num: "04",
+      title: "Accès & Rentrée",
+      desc: "Téléchargez votre reçu certifié, votre attestation et intégrez le groupe de promotion pour démarrer.",
+      icon: Star,
+      color: "var(--color-fc-cyan)",
+      highlight: "Accès immédiat",
+    },
+  ];
 
     const faqs = [
         {
@@ -69,7 +68,7 @@ export default async function AdmissionsPage() {
         },
         {
             q: 'Peut-on payer la scolarité en plusieurs fois ?',
-            a: "Absolument. Chaque cursus dispose d'un échéancier en 3 à 5 mensualités personnalisées. Le premier versement correspond aux frais d'inscription de 25 000 FCFA.",
+            a: "Oui. Chaque cursus dispose d'un échéancier en 3 à 5 mensualités. Le premier versement correspond aux frais d'inscription de 25 000 FCFA.",
         },
         {
             q: 'Quels moyens de paiement sont acceptés au Bénin ?',
@@ -77,7 +76,7 @@ export default async function AdmissionsPage() {
         },
         {
             q: 'Faut-il obligatoirement son propre ordinateur ?',
-            a: 'Un ordinateur personnel est fortement recommandé pour pratiquer chez vous. Cependant, nos laboratoires informatiques sont entièrement équipés et en libre accès pour nos étudiants inscrits.',
+            a: 'Un ordinateur personnel est recommandé pour pratiquer chez soi. Les ordinateurs du campus sont disponibles pour les étudiants inscrits.',
         },
     ];
 
@@ -96,223 +95,115 @@ export default async function AdmissionsPage() {
 
     return (
         <div className="min-h-screen bg-[var(--color-fc-bg)]">
-            {/* Hero */}
-            <section className="relative bg-[var(--color-fc-deep)] text-white overflow-hidden">
-                {/* Background photo */}
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="/images/bg-banniere.jpeg"
-                        alt="FuturCraft Institut"
-                        fill
-                        priority
-                        sizes="100vw"
-                        className="object-cover object-center"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#051269]/90 via-[#051269]/85 to-[#051269]/95" />
-                    <div className="absolute inset-0 bg-black/40" />
-                </div>
+            <PageIntro
+                eyebrow="Admissions ouvertes · Session 2026"
+                title="Un parcours clair pour donner vie à ton projet."
+                description="Découvre les étapes d’admission, compare les tarifs en FCFA et choisis le mode de paiement qui te convient."
+            />
 
-                <div className="absolute inset-0 bg-grid-dark opacity-15 pointer-events-none z-[1]" />
-                <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] pointer-events-none z-[1]" />
-                <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent relative z-10" />
+            <div className="page-container -mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                {[
+                    { icon: Clock, text: 'Inscription rapide' },
+                    { icon: MapPin, text: 'Campus Godomey' },
+                    { icon: Smartphone, text: 'Paiement mobile accepté' },
+                    { icon: ShieldCheck, text: 'Reçu numérique sécurisé' },
+                ].map(({ icon: Icon, text }) => (
+                    <div key={text} className="relative z-10 flex min-h-20 items-center gap-3 rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-4 text-sm font-semibold text-[var(--color-fc-black)]">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                            <Icon className="h-4 w-4" />
+                        </div>
+                        {text}
+                    </div>
+                ))}
+            </div>
 
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
-
-
-                    <h1 className="animate-fade-up delay-100 font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight">
-                        Admissions &
-                        <span className="block text-gradient-brand mt-1">
-                            Modalités Financières
-                        </span>
-                    </h1>
-
-                    <p className="animate-fade-up delay-200 mt-6 text-blue-200/70 text-lg max-w-2xl mx-auto leading-8">
-                        Une formation d&apos;excellence accessible à tous, avec
-                        des tarifs transparents en FCFA et des facilités de
-                        paiement échelonné.
+            <section className="page-container py-16 sm:py-20 lg:py-24">
+                <div className="mx-auto mb-14 max-w-3xl text-center">
+                    <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                        Parcours d&apos;admission
                     </p>
-
-                    {/* Quick info pills */}
-                    <div className="animate-fade-up delay-300 mt-10 flex flex-wrap justify-center gap-3">
-                        {[
-                            { icon: Clock, text: 'Inscription en 5 min' },
-                            { icon: MapPin, text: 'Campus Godomey, Cotonou' },
-                            { icon: Smartphone, text: 'Paiement MoMo accepté' },
-                            {
-                                icon: ShieldCheck,
-                                text: 'Reçu numérique sécurisé',
-                            },
-                        ].map(({ icon: Icon, text }) => (
-                            <span
-                                key={text}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl glass border-white/10 text-sm text-white font-medium"
-                            >
-                                <Icon className="w-4 h-4 text-blue-400 shrink-0" />
-                                {text}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#f8faff] to-transparent pointer-events-none" />
-            </section>
-
-            {/* ── 4 Steps ── */}
-            <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-2xl mx-auto mb-14">
-                    <div className="badge-brand mb-5 mx-auto w-fit">
-                        <Sparkles className="w-3 h-3" />
-                        Parcours d&apos;Admission
-                    </div>
-                    <h2 className="font-display text-3xl sm:text-4xl font-black text-slate-950">
-                        Comment rejoindre FuturCraft
-                        <span className="block text-gradient-brand">
-                            en 4 étapes ?
-                        </span>
+                    <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
+                        Rejoindre FuturCraft en <span className="text-[var(--color-fc-primary)]">4 étapes simples</span>
                     </h2>
-                    <p className="mt-4 text-slate-500 text-base leading-7">
-                        Un processus simple, rapide et entièrement digitalisé.
+                    <p className="mt-4 text-base leading-8 text-[var(--color-fc-gray-mid)]">
+                        Un parcours clair, de la découverte à la rentrée en cohorte.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {steps.map((st, i) => {
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                    {steps.map((st) => {
                         const Icon = st.icon;
                         return (
-                            <div
-                                key={i}
-                                className="relative p-7 rounded-3xl bg-white border border-slate-200 shadow-sm card-hover group hover:border-blue-300 transition-all"
-                            >
-                                {/* Connector line */}
-                                {i < steps.length - 1 && (
-                                    <div className="hidden lg:block absolute top-10 right-0 translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-blue-200 to-slate-100 z-10" />
-                                )}
-
-                                {/* Step number */}
-                                <span className="font-display text-5xl font-black text-slate-100 group-hover:text-blue-100 transition-colors absolute top-5 right-5 leading-none pointer-events-none">
-                                    {st.num}
-                                </span>
-
-                                {/* Icon in blue */}
-                                <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-5 shadow-xs group-hover:scale-110 group-hover:bg-blue-100 transition-all duration-300">
-                                    <Icon className="w-7 h-7 text-blue-600" />
+                            <div key={st.num} className="relative rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-6 transition-colors hover:border-[var(--color-fc-primary)]/25">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
+                                        <Icon className="h-5 w-5" />
+                                    </div>
+                                    <span className="font-display text-3xl font-extrabold text-[var(--color-fc-gray-light)]">{st.num}</span>
                                 </div>
-
-                                {/* Badge */}
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wide mb-3">
+                                <p className="mt-5 inline-flex rounded-full bg-[var(--color-fc-bg)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-fc-gray-mid)]">
                                     {st.highlight}
-                                </span>
-
-                                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">
-                                    {st.title}
-                                </h3>
-                                <p className="text-sm text-slate-500 leading-7">
-                                    {st.desc}
                                 </p>
+                                <h3 className="mt-3 font-display text-lg font-bold text-[var(--color-fc-black)]">{st.title}</h3>
+                                <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">{st.desc}</p>
                             </div>
                         );
                     })}
                 </div>
 
-                {/* CTA under steps */}
                 <div className="mt-12 flex justify-center">
-                    <Link href="/inscription" className="btn-primary">
-                        Démarrer mon inscription
-                        <ArrowRight className="w-4 h-4 text-white" />
+                    <Link href="/inscription" className="inline-flex items-center gap-2 rounded-2xl bg-[var(--color-fc-deep)] px-7 py-4 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
+                        Démarrer ma candidature
+                        <ArrowRight className="h-4 w-4" />
                     </Link>
                 </div>
             </section>
 
-            {/* ── Pricing Table ── */}
-            <section className="py-20 bg-white border-y border-slate-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-                    <div className="text-center max-w-2xl mx-auto">
-                        <div className="badge-brand mb-5 mx-auto w-fit text-blue-700 bg-blue-50 border border-blue-200">
-                            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                            Transparence totale
-                        </div>
-                        <h2 className="font-display text-3xl sm:text-4xl font-black text-[var(--color-fc-black)]">
-                            Grille Tarifaire Officielle
-                            <span className="block text-gradient-brand">
-                                Frais & Échéanciers
-                            </span>
+            <section className="border-y border-[var(--color-fc-gray-light)] bg-white py-20 lg:py-24">
+                <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
+                    <div className="mx-auto mb-12 max-w-3xl text-center">
+                        <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                            Tarifs & facilités
+                        </p>
+                        <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">
+                            Une grille tarifaire claire, <span className="text-[var(--color-fc-primary)]">sans surprise</span>
                         </h2>
-                        <p className="mt-4 text-slate-500 text-sm leading-7">
-                            Tous nos tarifs sont fermes, transparents et sans
-                            frais cachés. Paiement échelonné disponible pour
-                            chaque formation.
+                        <p className="mt-4 text-base leading-8 text-[var(--color-fc-gray-mid)]">
+                            Tous les tarifs sont en FCFA. Le paiement échelonné est possible selon la formation.
                         </p>
                     </div>
 
-                    {/* Table card */}
-                    <div className="rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 overflow-hidden">
+                    <div className="overflow-hidden rounded-[1.75rem] border border-[var(--color-fc-gray-light)]">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
+                            <table className="w-full min-w-[760px] text-left text-sm">
                                 <thead>
                                     <tr className="bg-[var(--color-fc-deep)] text-white">
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70">
-                                            Formation
-                                        </th>
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70">
-                                            Filière
-                                        </th>
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70">
-                                            Durée
-                                        </th>
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70">
-                                            Dossier
-                                        </th>
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70">
-                                            Total (FCFA)
-                                        </th>
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70">
-                                            Facilité
-                                        </th>
-                                        <th className="py-4 px-5 font-semibold text-[11px] uppercase tracking-widest text-white/70 text-right">
-                                            Action
-                                        </th>
+                                        <th className="px-5 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Formation</th>
+                                        <th className="px-5 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Durée</th>
+                                        <th className="px-5 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Dossier</th>
+                                        <th className="px-5 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Total</th>
+                                        <th className="px-5 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Facilité</th>
+                                        <th className="px-5 py-4 text-right text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-[var(--color-fc-gray-light)]/50 pricing-table">
-                                    {formations.map((f, i) => (
-                                        <tr
-                                            key={f.id}
-                                            className="hover:bg-[var(--color-fc-primary)]/5 transition-colors group"
-                                        >
-                                            <td className="py-4 px-5 font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                                                {f.title}
+                                <tbody className="divide-y divide-[var(--color-fc-gray-light)]">
+                                    {formations.map((f) => (
+                                        <tr key={f.id} className="transition-colors hover:bg-[var(--color-fc-bg)]">
+                                            <td className="px-5 py-4">
+                                                <p className="font-semibold text-[var(--color-fc-black)]">{f.title}</p>
+                                                <p className="mt-0.5 text-xs text-[var(--color-fc-gray-mid)]">{f.category}</p>
                                             </td>
-                                            <td className="py-4 px-5">
-                                                <span className="px-2.5 py-1 rounded-lg bg-[var(--color-fc-gray-light)]/50 text-[var(--color-fc-gray-mid)] font-medium text-[11px]">
-                                                    {f.category}
+                                            <td className="px-5 py-4 text-[var(--color-fc-gray-mid)]">{f.duration}</td>
+                                            <td className="px-5 py-4 text-[var(--color-fc-gray-mid)]">{formatPrice(f.registrationFee)} F</td>
+                                            <td className="px-5 py-4 font-display font-bold text-[var(--color-fc-black)]">{formatPrice(f.price)} FCFA</td>
+                                            <td className="px-5 py-4">
+                                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-fc-surface)] px-3 py-1 text-xs font-semibold text-[var(--color-fc-primary)]">
+                                                    <CheckCircle2 className="h-3.5 w-3.5" /> {f.installmentsCount} tranches
                                                 </span>
                                             </td>
-                                            <td className="py-4 px-5 text-slate-600">
-                                                {f.duration}
-                                            </td>
-                                            <td className="py-4 px-5 text-slate-600 font-medium">
-                                                {formatPrice(f.registrationFee)}{' '}
-                                                F
-                                            </td>
-                                            <td className="py-4 px-5">
-                                                <span className="font-black text-slate-950 text-sm">
-                                                    {formatPrice(f.price)} FCFA
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-5">
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-[11px] border border-blue-200">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-                                                    {f.installmentsCount}{' '}
-                                                    tranches
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-5 text-right">
-                                                <Link
-                                                    href={`/inscription?formationId=${f.id}`}
-                                                    className="inline-flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold text-[var(--color-fc-bg)] bg-[var(--color-fc-primary)] hover:bg-[var(--color-fc-deep)] transition-colors shadow-sm hover:shadow-md hover:shadow-[var(--color-fc-primary)]/20"
-                                                >
-                                                    Candidater
-                                                    <ChevronRight className="w-3.5 h-3.5" />
+                                            <td className="px-5 py-4 text-right">
+                                                <Link href={`/inscription?formationId=${f.id}`} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-fc-deep)] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
+                                                    Candidater <ChevronRight className="h-3.5 w-3.5" />
                                                 </Link>
                                             </td>
                                         </tr>
@@ -320,69 +211,38 @@ export default async function AdmissionsPage() {
                                 </tbody>
                             </table>
                         </div>
-
-                        {/* Table footer */}
-                        <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <div className="flex flex-wrap gap-4 text-xs text-slate-600">
-                                <span className="flex items-center gap-1.5 font-medium">
-                                    <Smartphone className="w-4 h-4 text-blue-600" />
-                                    MTN MoMo accepté
-                                </span>
-                                <span className="flex items-center gap-1.5 font-medium">
-                                    <Smartphone className="w-4 h-4 text-blue-600" />
-                                    Moov Money accepté
-                                </span>
-                                <span className="flex items-center gap-1.5 font-medium">
-                                    <CreditCard className="w-4 h-4 text-blue-600" />
-                                    Carte Visa/Mastercard
-                                </span>
+                        <div className="flex flex-col gap-3 border-t border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-5 py-4 text-xs text-[var(--color-fc-gray-mid)] sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-wrap gap-4">
+                                <span className="inline-flex items-center gap-1.5"><Smartphone className="h-3.5 w-3.5 text-[var(--color-fc-primary)]" /> MTN MoMo</span>
+                                <span className="inline-flex items-center gap-1.5"><Smartphone className="h-3.5 w-3.5 text-[var(--color-fc-primary)]" /> Moov Money</span>
+                                <span className="inline-flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5 text-[var(--color-fc-primary)]" /> Carte bancaire</span>
                             </div>
-                            <Link
-                                href="/inscription"
-                                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                            >
-                                S&apos;inscrire maintenant{' '}
-                                <ArrowRight className="w-3 h-3 text-blue-600" />
-                            </Link>
+                            <Link href="/inscription" className="font-bold text-[var(--color-fc-primary)] hover:underline">Démarrer ma candidature →</Link>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── FAQ ── */}
-            <section className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-14">
-                    <div className="badge-brand mb-5 mx-auto w-fit text-blue-700 bg-blue-50 border border-blue-200">
-                        <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                        FAQ
+            <section className="py-20 lg:py-24">
+                <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10">
+                    <div className="mb-12 text-center">
+                        <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
+                            FAQ
+                        </p>
+                        <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">Questions fréquentes</h2>
+                        <p className="mt-4 text-base leading-8 text-[var(--color-fc-gray-mid)]">
+                            Les réponses aux questions les plus courantes avant l&apos;inscription.
+                        </p>
                     </div>
-                    <h2 className="font-display text-3xl sm:text-4xl font-black text-slate-950">
-                        Questions Fréquentes
-                    </h2>
-                    <p className="mt-4 text-[var(--color-fc-gray-mid)] max-w-xl mx-auto text-sm leading-7">
-                        Tout ce que les futurs étudiants et parents souhaitent
-                        savoir avant de s&apos;inscrire à FuturCraft Institut.
-                    </p>
-                </div>
 
-                <div className="space-y-3">
                     <FAQAccordion faqs={faqs} />
-                </div>
 
-                <div className="text-center mt-14 space-y-4">
-                    <p className="text-[var(--color-fc-gray-mid)] text-sm">
-                        Une question non listée ici ?
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Link
-                            href="/contact"
-                            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-[var(--color-fc-gray-light)] text-sm font-semibold text-[var(--color-fc-gray-mid)] hover:bg-[var(--color-fc-gray-light)]/30 hover:border-[var(--color-fc-primary)] transition-all"
-                        >
+                    <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                        <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white px-6 py-3.5 text-sm font-semibold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]">
                             Contacter un conseiller
                         </Link>
-                        <Link href="/inscription" className="btn-primary">
-                            Démarrer mon inscription
-                            <ArrowRight className="w-4 h-4" />
+                        <Link href="/inscription" className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
+                            Démarrer ma candidature <ArrowRight className="h-4 w-4" />
                         </Link>
                     </div>
                 </div>

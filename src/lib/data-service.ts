@@ -15,7 +15,7 @@ import {
   paymentRequests,
 } from "@/db/schema";
 import { ensureDatabaseSeeded } from "@/db/ensure-seed";
-import { eq, desc, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { sendValidationEmail } from "@/lib/email";
 
@@ -60,41 +60,7 @@ export async function getPromotions(formationId?: number) {
 
 export async function getAllStudents() {
   await ensureDatabaseSeeded();
-  const rows = await db
-    .select({
-      id: students.id,
-      studentNumber: students.studentNumber,
-      firstName: students.firstName,
-      lastName: students.lastName,
-      email: students.email,
-      phone: students.phone,
-      whatsapp: students.whatsapp,
-      city: students.city,
-      status: students.status,
-      professionalStatus: students.professionalStatus,
-      skills: students.skills,
-      avatarUrl: students.avatarUrl,
-      cvUrl: students.cvUrl,
-      profileVisible: students.profileVisible,
-      validationNote: students.validationNote,
-      validatedBy: students.validatedBy,
-      validatedAt: students.validatedAt,
-      totalAmount: students.totalAmount,
-      paidAmount: students.paidAmount,
-      remainingAmount: students.remainingAmount,
-      formationId: students.formationId,
-      customFormation: students.customFormation,
-      formationTitle: formations.title,
-      createdAt: students.createdAt,
-    })
-    .from(students)
-    .leftJoin(formations, eq(students.formationId, formations.id))
-    .orderBy(desc(students.createdAt));
-
-  return rows.map((r) => ({
-    ...r,
-    formationTitle: r.customFormation || r.formationTitle || "Formation générale",
-  }));
+  return await db.select().from(students).orderBy(desc(students.createdAt));
 }
 
 export async function getStudentById(id: number) {
@@ -154,7 +120,7 @@ export async function getStudentByNumber(studentNumber: string) {
 export async function createStudentWithPlan(data: {
   firstName: string;
   lastName: string;
-  gender?: string;
+  gender: string;
   email: string;
   phone: string;
   whatsapp?: string;
@@ -168,23 +134,11 @@ export async function createStudentWithPlan(data: {
   guardianPhone?: string;
   guardianRelation?: string;
   residenceCountry?: string;
-  status?: string;
-  professionalStatus?: string;
-  skills?: string[] | string;
-  avatarUrl?: string;
-  cvUrl?: string;
-  profileVisible?: boolean;
-  validatedBy?: string;
-  customFormation?: string;
 }) {
   await ensureDatabaseSeeded();
 
-  let [formation] = await db.select().from(formations).where(eq(formations.id, data.formationId));
-  if (!formation) {
-    const allF = await db.select().from(formations).limit(1);
-    formation = allF[0];
-    if (!formation) throw new Error("Aucune formation disponible dans le système");
-  }
+  const [formation] = await db.select().from(formations).where(eq(formations.id, data.formationId));
+  if (!formation) throw new Error("Formation introuvable");
 
   const countStudents = await db.select({ maxId: sql<number>`coalesce(max(${students.id}), 0)` }).from(students);
   const nextNum = String(countStudents[0].maxId + 1).padStart(4, "0");
@@ -192,36 +146,18 @@ export async function createStudentWithPlan(data: {
 
   const total = formation.price + (formation.registrationFee || 0);
 
-  let formattedSkills: string | null = null;
-  if (data.skills) {
-    if (Array.isArray(data.skills)) {
-      formattedSkills = JSON.stringify(data.skills.map(String).map((s) => s.trim()).filter(Boolean));
-    } else if (typeof data.skills === "string") {
-      const trimmed = data.skills.trim();
-      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-        formattedSkills = trimmed;
-      } else {
-        formattedSkills = JSON.stringify(trimmed.split(",").map((s) => s.trim()).filter(Boolean));
-      }
-    }
-  }
-
-  const isVisible = data.profileVisible === true;
-  const initialStatus = data.status || (isVisible ? "actif" : "preinscrit");
-
   const [newStudent] = await db
     .insert(students)
     .values({
       studentNumber,
-      firstName: data.firstName.trim(),
-      lastName: data.lastName.trim(),
+      firstName: data.firstName,
+      lastName: data.lastName,
       gender: data.gender || "M",
-      email: data.email.trim(),
-      phone: data.phone.trim(),
-      whatsapp: data.whatsapp?.trim() || data.phone.trim(),
-      city: data.city?.trim() || "Cotonou",
-      formationId: formation.id,
-      customFormation: data.customFormation?.trim() || null,
+      email: data.email,
+      phone: data.phone,
+      whatsapp: data.whatsapp || data.phone,
+      city: data.city || "Cotonou",
+      formationId: data.formationId,
       promotionId: data.promotionId || null,
       previousDiploma: data.previousDiploma || "BAC",
       studyLevel: data.studyLevel || "BAC",
@@ -230,17 +166,10 @@ export async function createStudentWithPlan(data: {
       guardianPhone: data.guardianPhone || "",
       guardianRelation: data.guardianRelation || "",
       residenceCountry: data.residenceCountry || "Bénin",
-      status: initialStatus,
-      professionalStatus: data.professionalStatus?.trim() || (isVisible ? "Disponible immédiatement" : null),
-      skills: formattedSkills,
-      avatarUrl: data.avatarUrl || null,
-      cvUrl: data.cvUrl || null,
-      profileVisible: isVisible,
-      validatedBy: isVisible ? (data.validatedBy || "Administration") : null,
-      validatedAt: isVisible ? new Date() : null,
+      status: "preinscrit",
       totalAmount: total,
-      paidAmount: isVisible ? total : 0,
-      remainingAmount: isVisible ? 0 : total,
+      paidAmount: 0,
+      remainingAmount: total,
     })
     .returning();
 
@@ -365,207 +294,98 @@ export async function rejectStudent(id: number, adminName?: string, note?: strin
 }
 
 export async function getValidatedStudentTalents() {
-  try {
-    await ensureDatabaseSeeded();
-    const rows = await db
-      .select({
-        id: students.id,
-        studentNumber: students.studentNumber,
-        firstName: students.firstName,
-        lastName: students.lastName,
-        email: students.email,
-        phone: students.phone,
-        city: students.city,
-        avatarUrl: students.avatarUrl,
-        cvUrl: students.cvUrl,
-        status: students.status,
-        professionalStatus: students.professionalStatus,
-        skills: students.skills,
-        customFormation: students.customFormation,
-        formationTitle: formations.title,
-        formationTools: formations.tools,
-        validatedAt: students.validatedAt,
-      })
-      .from(students)
-      .leftJoin(formations, eq(students.formationId, formations.id))
-      .where(eq(students.profileVisible, true))
-      .orderBy(desc(students.validatedAt), desc(students.createdAt));
-
-    return rows.map((r) => {
-      let talentSkills: string[] = [];
-
-      // 1. Custom skills specified for the student
-      if (r.skills) {
-        try {
-          const parsed = JSON.parse(r.skills);
-          if (Array.isArray(parsed)) {
-            talentSkills = parsed.map(String).map((s) => s.trim()).filter(Boolean);
-          }
-        } catch {
-          talentSkills = r.skills.split(",").map((s) => s.trim()).filter(Boolean);
-        }
-      }
-
-      // 2. Fallback to formation tools if no custom skills provided
-      if (talentSkills.length === 0 && r.formationTools) {
-        try {
-          const parsed = JSON.parse(r.formationTools || "[]");
-          if (Array.isArray(parsed)) {
-            talentSkills = parsed.slice(0, 6).map(String);
-          }
-        } catch {
-          talentSkills = [];
-        }
-      }
-
-      if (talentSkills.length === 0) {
-        talentSkills = ["Génie Logiciel", "Pratique Terrain"];
-      }
-
-      const displayStatus =
-        r.professionalStatus ||
-        (r.status === "actif"
-          ? "Disponible immédiatement"
-          : r.status === "termine" || r.status === "alumni"
-          ? "Diplômé / En poste"
-          : "Recherche de stage");
-
-      return {
-        id: r.id,
-        name: `${r.firstName} ${r.lastName}`,
-        firstName: r.firstName,
-        lastName: r.lastName,
-        formation: r.customFormation || r.formationTitle || "Formation Numérique",
-        skills: talentSkills,
-        status: displayStatus,
-        campus: r.city || "Cotonou, Bénin",
-        matricule: r.studentNumber,
-        photoUrl: r.avatarUrl || undefined,
-        cvUrl: r.cvUrl || undefined,
-        email: r.email,
-        phone: r.phone,
-      };
-    });
-  } catch (error) {
-    console.error("Error in getValidatedStudentTalents:", error);
-    return [];
-  }
-}
-
-export async function recordPayment(data: {
-  studentId: number;
-  scheduleId?: number;
-  amount: number;
-  paymentMethod: string;
-  recordedBy?: string;
-  notes?: string;
-  transactionRef?: string;
-}) {
   await ensureDatabaseSeeded();
-
-  const [student] = await db.select().from(students).where(eq(students.id, data.studentId));
-  if (!student) throw new Error("Étudiant introuvable");
-
-  const countPayments = await db.select({ maxId: sql<number>`coalesce(max(${payments.id}), 0)` }).from(payments);
-  const recIndex = String(countPayments[0].maxId + 1).padStart(5, "0");
-  const receiptNumber = `REC-2026-${recIndex}`;
-  const verificationCode = `FC-SEC-${randomBytes(4).toString("hex").toUpperCase()}-${Date.now().toString().slice(-4)}`;
-  const trxRef = data.transactionRef || `TRX-${data.paymentMethod.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-6)}`;
-  const nowStr = new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date());
-
-  const [paymentRecord] = await db
-    .insert(payments)
-    .values({
-      receiptNumber,
-      studentId: data.studentId,
-      scheduleId: data.scheduleId || null,
-      amount: data.amount,
-      paymentMethod: data.paymentMethod,
-      transactionRef: trxRef,
-      status: "valide",
-      notes: data.notes || `Paiement pour ${student.firstName} ${student.lastName}`,
-      recordedBy: data.recordedBy || "Portail en ligne (MTN/Moov)",
-      paidAt: nowStr,
+  const rows = await db
+    .select({
+      id: students.id,
+      studentNumber: students.studentNumber,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      city: students.city,
+      avatarUrl: students.avatarUrl,
+      cvUrl: students.cvUrl,
+      status: students.status,
+      formationTitle: formations.title,
+      formationTools: formations.tools,
+      validatedAt: students.validatedAt,
     })
-    .returning();
+    .from(students)
+    .innerJoin(formations, eq(students.formationId, formations.id))
+    .where(
+      and(
+        eq(students.profileVisible, true),
+        isNotNull(students.validatedAt),
+        inArray(students.status, ["inscrit", "actif", "termine", "alumni"])
+      )
+    );
 
-  // If schedule is linked, update it
-  if (data.scheduleId) {
-    await db
-      .update(paymentSchedules)
-      .set({
-        status: "paye",
-        paidAt: nowStr,
-        transactionRef: trxRef,
-      })
-      .where(eq(paymentSchedules.id, data.scheduleId));
-  }
-
-  // Create receipt
-  const [receiptRecord] = await db
-    .insert(receipts)
-    .values({
-      receiptNumber,
-      paymentId: paymentRecord.id,
-      studentId: student.id,
-      verificationCode,
-      qrData: `https://futurcraft.bj/recu/${receiptNumber}?code=${verificationCode}&matricule=${student.studentNumber}`,
-      issuedAt: nowStr,
-    })
-    .returning();
-
-  // Update student amounts and status if needed
-  const newPaid = student.paidAmount + data.amount;
-  const newRemaining = Math.max(0, student.totalAmount - newPaid);
-  const newStatus = student.status === "preinscrit" || student.status === "inscrit" ? "actif" : student.status;
-
-  await db
-    .update(students)
-    .set({
-      paidAmount: newPaid,
-      remainingAmount: newRemaining,
-      status: newStatus,
-    })
-    .where(eq(students.id, student.id));
-
-  // Add notification
-  await db.insert(notifications).values({
-    studentId: student.id,
-    title: "Nouveau reçu de paiement généré",
-    message: `Votre versement de ${data.amount.toLocaleString("fr-FR")} FCFA a été validé. Reçu N° ${receiptNumber} disponible.`,
-    type: "payment",
+  return rows.map((r) => {
+    let tools: string[] = [];
+    try {
+      const parsed = JSON.parse(r.formationTools || "[]");
+      if (Array.isArray(parsed)) tools = parsed.slice(0, 6).map(String);
+    } catch {
+      tools = [];
+    }
+    return {
+      name: `${r.firstName} ${r.lastName}`,
+      formation: r.formationTitle,
+      skills: tools.length ? tools : ["—"],
+      status: r.status === "actif" ? "Disponible immédiatement" : "Recherche de stage",
+      campus: r.city || "Cotonou, Bénin",
+      matricule: r.studentNumber,
+      photoUrl: r.avatarUrl || undefined,
+      cvUrl: r.cvUrl || undefined,
+    };
   });
-
-  return {
-    payment: paymentRecord,
-    receipt: receiptRecord,
-  };
 }
 
-export async function getReceiptDetails(receiptNumber: string) {
+function formatPaymentDate(date: Date) { return new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date); }
+function nextReceiptRef(id: number, prefix: "REC" | "TRX") { return `${prefix}-2026-${String(id).padStart(5, "0")}`; }
+export async function recordPayment(data: { studentId: number; scheduleId?: number; amount: number; paymentMethod: string; recordedBy?: string; notes?: string; transactionRef?: string; }) {
+  await ensureDatabaseSeeded();
+  if (!Number.isInteger(data.amount) || data.amount <= 0) throw new Error("Montant invalide");
+  return await db.transaction(async (tx) => {
+    const [student] = await tx.select().from(students).where(eq(students.id, data.studentId)).for("update");
+    if (!student) throw new Error("Étudiant introuvable");
+    let schedule: typeof paymentSchedules.$inferSelect | null = null;
+    if (data.scheduleId) {
+      const [s] = await tx.select().from(paymentSchedules).where(eq(paymentSchedules.id, data.scheduleId)).for("update");
+      if (!s || s.studentId !== student.id) throw new Error("Échéance introuvable pour cet étudiant");
+      if (s.status === "paye") throw new Error("Cette échéance est déjà payée");
+      if (data.amount > s.amount) throw new Error("Le montant dépasse l'échéance sélectionnée");
+      schedule = s;
+    }
+    if (data.amount > student.remainingAmount) throw new Error("Le montant dépasse le solde restant");
+    const [paymentInsert] = await tx.insert(payments).values({ receiptNumber: `TMP-REC-${randomBytes(8).toString("hex").toUpperCase()}`, studentId: student.id, scheduleId: schedule?.id || null, amount: data.amount, paymentMethod: data.paymentMethod, transactionRef: data.transactionRef || `TMP-TRX-${randomBytes(8).toString("hex").toUpperCase()}`, status: "valide", notes: data.notes || `Paiement pour ${student.firstName} ${student.lastName}`, recordedBy: data.recordedBy || "Portail en ligne (MTN/Moov)", paidAt: formatPaymentDate(new Date()) }).returning();
+    const receiptNumber = nextReceiptRef(paymentInsert.id, "REC");
+    const trxRef = data.transactionRef || nextReceiptRef(paymentInsert.id, "TRX");
+    const verificationCode = `FC-SEC-${randomBytes(4).toString("hex").toUpperCase()}-${String(paymentInsert.id).padStart(4, "0")}`;
+    const [paymentRecord] = await tx.update(payments).set({ receiptNumber, transactionRef: trxRef }).where(eq(payments.id, paymentInsert.id)).returning();
+    if (schedule) await tx.update(paymentSchedules).set({ status: "paye", paidAt: paymentRecord.paidAt, transactionRef: trxRef }).where(eq(paymentSchedules.id, schedule.id));
+    const [receiptRecord] = await tx.insert(receipts).values({ receiptNumber, paymentId: paymentRecord.id, studentId: student.id, verificationCode, qrData: `https://futurcraft.bj/recu/${receiptNumber}?code=${verificationCode}`, issuedAt: paymentRecord.paidAt }).returning();
+    const newPaid = student.paidAmount + data.amount;
+    const newRemaining = Math.max(0, student.totalAmount - newPaid);
+    const newStatus = student.status === "preinscrit" || student.status === "inscrit" ? "actif" : student.status;
+    await tx.update(students).set({ paidAmount: newPaid, remainingAmount: newRemaining, status: newStatus }).where(eq(students.id, student.id));
+    await tx.insert(notifications).values({ studentId: student.id, title: "Nouveau reçu de paiement généré", message: `Votre versement de ${data.amount.toLocaleString("fr-FR")} FCFA a été validé. Reçu N° ${receiptNumber} disponible.`, type: "payment" });
+    return { payment: paymentRecord, receipt: receiptRecord };
+  });
+}
+
+export async function getReceiptDetails(receiptNumber: string, options?: { verificationCode?: string; studentId?: number; includeSensitive?: boolean }) {
   await ensureDatabaseSeeded();
   const receiptRows = await db.select().from(receipts).where(eq(receipts.receiptNumber, receiptNumber));
   if (!receiptRows.length) return null;
   const receipt = receiptRows[0];
-
+  if (options?.verificationCode && options.verificationCode !== receipt.verificationCode) return null;
+  if (options?.studentId && options.studentId !== receipt.studentId) return null;
   const [payment] = await db.select().from(payments).where(eq(payments.id, receipt.paymentId));
   const [student] = await db.select().from(students).where(eq(students.id, receipt.studentId));
-  const [formation] = student
-    ? await db.select().from(formations).where(eq(formations.id, student.formationId))
-    : [null];
-
-  return {
-    receipt,
-    payment,
-    student,
-    formation,
-  };
+  const [formation] = student ? await db.select().from(formations).where(eq(formations.id, student.formationId)) : [null];
+  if (!student) return null;
+  const safeStudent = options?.includeSensitive ? student : { id: student.id, studentNumber: student.studentNumber, firstName: student.firstName, lastName: student.lastName };
+  return { receipt, payment, student: safeStudent, formation };
 }
 
 export async function getAdminStats() {
@@ -599,7 +419,115 @@ export async function getAdminStats() {
 
 export async function getProjects() {
   await ensureDatabaseSeeded();
-  return await db.select().from(studentProjects).orderBy(desc(studentProjects.isFeatured));
+  const rows = await db
+    .select({ project: studentProjects })
+    .from(studentProjects)
+    .innerJoin(students, eq(studentProjects.studentId, students.id))
+    .where(
+      and(
+        eq(students.profileVisible, true),
+        isNotNull(students.validatedAt),
+        inArray(students.status, ["inscrit", "actif", "termine", "alumni"])
+      )
+    )
+    .orderBy(desc(studentProjects.isFeatured));
+  return rows.map(({ project }) => project);
+}
+
+export async function getAdminStudentProjects() {
+  await ensureDatabaseSeeded();
+  return await db
+    .select({
+      id: studentProjects.id,
+      studentId: studentProjects.studentId,
+      studentNumber: students.studentNumber,
+      studentName: sql<string>`concat(${students.firstName}, ' ', ${students.lastName})`,
+      slug: studentProjects.slug,
+      title: studentProjects.title,
+      tagline: studentProjects.tagline,
+      description: studentProjects.description,
+      coverImage: studentProjects.coverImage,
+      formationTitle: studentProjects.formationTitle,
+      technologies: studentProjects.technologies,
+      teamMembers: studentProjects.teamMembers,
+      projectUrl: studentProjects.projectUrl,
+      githubUrl: studentProjects.githubUrl,
+      isFeatured: studentProjects.isFeatured,
+    })
+    .from(studentProjects)
+    .leftJoin(students, eq(studentProjects.studentId, students.id))
+    .orderBy(desc(studentProjects.createdAt));
+}
+
+export async function createStudentProject(data: {
+  studentId: number;
+  title: string;
+  tagline: string;
+  description: string;
+  coverImage: string;
+  technologies: string[];
+  projectUrl?: string;
+  githubUrl?: string;
+}) {
+  await ensureDatabaseSeeded();
+  const [student] = await db
+    .select({
+      id: students.id,
+      studentNumber: students.studentNumber,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      status: students.status,
+      profileVisible: students.profileVisible,
+      validatedAt: students.validatedAt,
+      formationTitle: formations.title,
+    })
+    .from(students)
+    .innerJoin(formations, eq(students.formationId, formations.id))
+    .where(eq(students.id, data.studentId));
+
+  if (
+    !student ||
+    !student.profileVisible ||
+    !student.validatedAt ||
+    !["inscrit", "actif", "termine", "alumni"].includes(student.status)
+  ) {
+    throw new Error("Seuls les étudiants validés peuvent avoir un projet publié");
+  }
+
+  const [project] = await db
+    .insert(studentProjects)
+    .values({
+      studentId: student.id,
+      slug: `${slugify(data.title, "projet")}-${randomBytes(3).toString("hex")}`,
+      title: data.title,
+      tagline: data.tagline,
+      description: data.description,
+      coverImage: data.coverImage,
+      formationTitle: student.formationTitle,
+      technologies: JSON.stringify(data.technologies),
+      teamMembers: JSON.stringify([
+        { name: `${student.firstName} ${student.lastName}`, role: "Étudiant" },
+      ]),
+      projectUrl: data.projectUrl || null,
+      githubUrl: data.githubUrl || null,
+      isFeatured: true,
+    })
+    .returning();
+
+  return {
+    ...project,
+    studentNumber: student.studentNumber,
+    studentName: `${student.firstName} ${student.lastName}`,
+  };
+}
+
+export async function deleteStudentProject(id: number) {
+  await ensureDatabaseSeeded();
+  const [project] = await db
+    .delete(studentProjects)
+    .where(eq(studentProjects.id, id))
+    .returning({ id: studentProjects.id });
+  return project || null;
 }
 
 export async function getEvents() {
@@ -619,27 +547,17 @@ export async function getBlogArticleBySlug(slug: string) {
 }
 
 export async function getCompanyOffers() {
-  try {
-    await ensureDatabaseSeeded();
-    return await db.select().from(companyOffers).orderBy(desc(companyOffers.createdAt));
-  } catch (error) {
-    console.error("Error in getCompanyOffers:", error);
-    return [];
-  }
+  await ensureDatabaseSeeded();
+  return await db.select().from(companyOffers).orderBy(desc(companyOffers.createdAt));
 }
 
 export async function getPartnershipRequests() {
-  try {
-    await ensureDatabaseSeeded();
-    const rows = await db.select().from(partnershipRequests).orderBy(desc(partnershipRequests.createdAt));
-    return rows.map((r) => ({
-      ...r,
-      createdAt: new Date(r.createdAt).toISOString(),
-    }));
-  } catch (error) {
-    console.error("Error in getPartnershipRequests:", error);
-    return [];
-  }
+  await ensureDatabaseSeeded();
+  const rows = await db.select().from(partnershipRequests).orderBy(desc(partnershipRequests.createdAt));
+  return rows.map((r) => ({
+    ...r,
+    createdAt: new Date(r.createdAt).toISOString(),
+  }));
 }
 
 export async function createPaymentRequest(data: {
@@ -665,30 +583,25 @@ export async function createPaymentRequest(data: {
 }
 
 export async function getPaymentRequests() {
-  try {
-    await ensureDatabaseSeeded();
-    const rows = await db
-      .select({
-        id: paymentRequests.id,
-        studentId: paymentRequests.studentId,
-        amount: paymentRequests.amount,
-        method: paymentRequests.method,
-        phone: paymentRequests.phone,
-        status: paymentRequests.status,
-        reference: paymentRequests.reference,
-        createdAt: paymentRequests.createdAt,
-        studentFirstName: students.firstName,
-        studentLastName: students.lastName,
-        studentNumber: students.studentNumber,
-      })
-      .from(paymentRequests)
-      .leftJoin(students, eq(paymentRequests.studentId, students.id))
-      .orderBy(desc(paymentRequests.createdAt));
-    return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt).toISOString() }));
-  } catch (error) {
-    console.error("Error in getPaymentRequests:", error);
-    return [];
-  }
+  await ensureDatabaseSeeded();
+  const rows = await db
+    .select({
+      id: paymentRequests.id,
+      studentId: paymentRequests.studentId,
+      amount: paymentRequests.amount,
+      method: paymentRequests.method,
+      phone: paymentRequests.phone,
+      status: paymentRequests.status,
+      reference: paymentRequests.reference,
+      createdAt: paymentRequests.createdAt,
+      studentFirstName: students.firstName,
+      studentLastName: students.lastName,
+      studentNumber: students.studentNumber,
+    })
+    .from(paymentRequests)
+    .leftJoin(students, eq(paymentRequests.studentId, students.id))
+    .orderBy(desc(paymentRequests.createdAt));
+  return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt).toISOString() }));
 }
 
 export async function getStudentPaymentRequests(studentId: number) {
@@ -754,7 +667,7 @@ export async function updateFormation(
   return row || null;
 }
 
-function slugify(value: string): string {
+function slugify(value: string, fallbackPrefix = "article"): string {
   const normalized = value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -763,7 +676,7 @@ function slugify(value: string): string {
     .trim()
     .replace(/[\s]+/g, "-")
     .replace(/-+/g, "-");
-  return normalized || `article-${randomBytes(3).toString("hex")}`;
+  return normalized || `${fallbackPrefix}-${randomBytes(3).toString("hex")}`;
 }
 
 export async function createBlogArticle(data: {

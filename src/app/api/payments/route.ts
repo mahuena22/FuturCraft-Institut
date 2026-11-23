@@ -46,21 +46,29 @@ export async function POST(req: NextRequest) {
   const denied = await requireAuth();
   if (denied) return denied;
   try {
-    const body = await req.json();
-    if (!body.studentId || !body.amount || !body.paymentMethod) {
+    const body = await req.json().catch(() => ({}));
+    const studentId = Number(body.studentId);
+    const amount = Number(body.amount);
+    const paymentMethod = String(body.paymentMethod || "").trim();
+    const scheduleId = body.scheduleId !== undefined && body.scheduleId !== null ? Number(body.scheduleId) : undefined;
+
+    if (!Number.isInteger(studentId) || studentId <= 0 || !Number.isInteger(amount) || amount <= 0 || !paymentMethod) {
       return NextResponse.json(
-        { error: "Paramètres manquants (studentId, amount, paymentMethod requis)" },
+        { error: "Paramètres invalides (studentId, amount > 0, paymentMethod requis)" },
         { status: 400 }
       );
     }
+    if (scheduleId !== undefined && (!Number.isInteger(scheduleId) || scheduleId <= 0)) {
+      return NextResponse.json({ error: "scheduleId invalide" }, { status: 400 });
+    }
 
     const result = await recordPayment({
-      studentId: Number(body.studentId),
-      scheduleId: body.scheduleId ? Number(body.scheduleId) : undefined,
-      amount: Number(body.amount),
-      paymentMethod: body.paymentMethod,
-      recordedBy: body.recordedBy,
-      notes: body.notes,
+      studentId,
+      scheduleId,
+      amount,
+      paymentMethod,
+      recordedBy: typeof body.recordedBy === "string" ? body.recordedBy : undefined,
+      notes: typeof body.notes === "string" ? body.notes : undefined,
     });
 
     return NextResponse.json({

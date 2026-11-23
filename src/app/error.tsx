@@ -16,39 +16,20 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-[70vh] bg-slate-50/60 flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
-      <div className="relative max-w-lg w-full mx-auto text-center space-y-6 py-20">
-        <div className="mx-auto w-20 h-20 rounded-3xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-lg">
-          <AlertTriangle className="w-9 h-9" />
+    <div className="flex min-h-[70vh] items-center justify-center bg-[var(--color-fc-bg)] px-4">
+      <div className="mx-auto w-full max-w-lg py-20 text-center">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--color-fc-surface)] text-[var(--color-fc-primary)]">
+          <AlertTriangle className="h-9 w-9" />
         </div>
-
-        <div className="space-y-2">
-          <p className="text-sm font-bold uppercase tracking-widest text-amber-600">
-            Une erreur est survenue
-          </p>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
-            Oups, quelque chose s&apos;est mal passé.
-          </h1>
-          <p className="text-slate-600 text-base">
-            Un problème technique a interrompu l&apos;affichage de cette page. Réessayez ou revenez à l&apos;accueil.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <button
-            onClick={reset}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 shadow-lg shadow-blue-600/25 transition-all"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Réessayer</span>
+        <p className="mt-8 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">Erreur</p>
+        <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-4xl">Quelque chose s&apos;est mal passé.</h1>
+        <p className="mt-4 text-base leading-8 text-[var(--color-fc-gray-mid)]">Un problème technique a interrompu l&apos;affichage de cette page.</p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <button onClick={reset} className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
+            <RefreshCw className="h-4 w-4" /> Réessayer
           </button>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-xs transition-all"
-          >
-            <Home className="w-4 h-4 text-blue-600" />
-            <span>Accueil</span>
+          <Link href="/" className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white px-6 py-3 text-sm font-bold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30">
+            <Home className="h-4 w-4 text-[var(--color-fc-primary)]" /> Accueil
           </Link>
         </div>
       </div>
