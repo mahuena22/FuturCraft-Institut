@@ -27,13 +27,13 @@ import {
 } from "lucide-react";
 
 const formations = [
-  { label: "Développement Web Fullstack", href: "/formation/developpement-web-fullstack", icon: Code2 },
-  { label: "IA & Machine Learning", href: "/formation/developpement-intelligence-artificielle", icon: Cpu },
-  { label: "Web Design UI/UX", href: "/formation/web-design-ui-ux", icon: Palette },
-  { label: "Pilotage de Drone", href: "/formation/pilotage-de-drone", icon: Wind },
-  { label: "Marketing Digital", href: "/formation/marketing-digital", icon: TrendingUp },
-  { label: "Graphisme & Sérigraphie", href: "/formation/graphisme-et-serigraphie", icon: Pen },
-  { label: "Audiovisuel & Montage", href: "/formation/photographie-cadrage-et-montage-video", icon: Camera },
+  { label: "Développement Web Fullstack", short: "Web", href: "/formation/developpement-web-fullstack", icon: Code2 },
+  { label: "IA & Machine Learning", short: "IA", href: "/formation/developpement-intelligence-artificielle", icon: Cpu },
+  { label: "Web Design UI/UX", short: "Design", href: "/formation/web-design-ui-ux", icon: Palette },
+  { label: "Pilotage de Drone", short: "Drone", href: "/formation/pilotage-de-drone", icon: Wind },
+  { label: "Marketing Digital", short: "Marketing", href: "/formation/marketing-digital", icon: TrendingUp },
+  { label: "Graphisme & Sérigraphie", short: "Graphisme", href: "/formation/graphisme-et-serigraphie", icon: Pen },
+  { label: "Audiovisuel & Montage", short: "Audiovisuel", href: "/formation/photographie-cadrage-et-montage-video", icon: Camera },
 ];
 
 export function Header() {
@@ -141,32 +141,37 @@ export function Header() {
                       {/* Mega dropdown */}
                       <div
                         id="formations-panel"
-                        className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 transition-all duration-200 ${
+                        className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[22rem] transition-all duration-250 ${
                           formationsOpen
                             ? "opacity-100 translate-y-0 pointer-events-auto"
                             : "opacity-0 -translate-y-2 pointer-events-none"
                         }`}
                       >
                         <div className="bg-white rounded-2xl shadow-2xl shadow-[var(--color-fc-deep)]/10 border border-[var(--color-fc-gray-light)] overflow-hidden">
-                          <div className="px-4 pt-4 pb-2">
+                          <div className="px-4 pt-4 pb-2 flex items-center justify-between">
                             <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-fc-gray-mid)]">
                               Nos formations
                             </p>
+                            <span className="text-[10px] font-semibold text-[var(--color-fc-cyan)]">{formations.length} parcours</span>
                           </div>
-                          <div className="p-2 space-y-0.5">
-                            {formations.map(({ label, href, icon: Icon }) => (
-<Link
-                            key={href}
-                            href={href}
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--color-fc-primary)]/8 group/item transition-colors"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-[var(--color-fc-primary)]/12 flex items-center justify-center shrink-0 group-hover/item:bg-[var(--color-fc-primary)] transition-colors">
-                              <Icon className="w-4 h-4 text-[var(--color-fc-primary)] group-hover/item:text-white transition-colors" />
-                            </div>
-                            <span className="text-sm text-[var(--color-fc-gray-mid)] font-medium group-hover/item:text-[var(--color-fc-primary)] transition-colors">
-                              {label}
-                            </span>
-                          </Link>
+                          <div className="p-2 grid gap-1">
+                            {formations.map(({ label, short, href, icon: Icon }) => (
+                              <Link
+                                key={href}
+                                href={href}
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--color-fc-primary)]/8 group/item transition-all duration-200"
+                              >
+                                <div className="w-9 h-9 rounded-xl bg-[var(--color-fc-primary)]/10 flex items-center justify-center shrink-0 group-hover/item:bg-[var(--color-fc-primary)] group-hover/item:scale-105 transition-all duration-200">
+                                  <Icon className="w-4 h-4 text-[var(--color-fc-primary)] group-hover/item:text-white transition-colors" />
+                                </div>
+                                <div className="min-w-0">
+                                  <span className="block text-sm text-[var(--color-fc-black)] font-semibold group-hover/item:text-[var(--color-fc-primary)] transition-colors truncate">
+                                    {label}
+                                  </span>
+                                  <span className="block text-[11px] text-[var(--color-fc-gray-mid)]">{short}</span>
+                                </div>
+                                <ArrowRight className="w-3.5 h-3.5 ml-auto text-[var(--color-fc-gray-light)] opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 group-hover/item:text-[var(--color-fc-primary)] transition-all duration-200" />
+                              </Link>
                             ))}
                           </div>
                           <div className="border-t border-[var(--color-fc-gray-light)] p-3">
@@ -219,13 +224,6 @@ return (
 
             {/* ── Mobile toggle ── */}
             <div className="flex xl:hidden items-center gap-2">
-              <Link
-                href="/espace-etudiant"
-                className="hidden items-center gap-1 rounded-lg border border-[var(--color-fc-primary)]/20 bg-[var(--color-fc-primary)]/8 px-3 py-1.5 text-xs font-semibold text-[var(--color-fc-primary)] sm:flex"
-              >
-                <UserCheck className="w-3.5 h-3.5" />
-                Espace
-              </Link>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
