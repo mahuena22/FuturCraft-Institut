@@ -103,7 +103,7 @@ export async function seedDatabase() {
             "Intégrateur Web & API",
             "Consultant Tech Junior",
           ]),
-          imageUrl: "https://images.pexels.com/photos/33920044/pexels-photo-33920044.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/developpement-web-fullstack.jpg",
         },
         {
           slug: "developpement-intelligence-artificielle",
@@ -178,7 +178,7 @@ export async function seedDatabase() {
             "Prompt Engineer & Spécialiste LLM",
             "Consultant Automatisation IA",
           ]),
-          imageUrl: "https://images.pexels.com/photos/9159042/pexels-photo-9159042.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/developpement-intelligence-artificielle.jpg",
         },
         {
           slug: "maitrise-outils-intelligence-artificielle",
@@ -245,7 +245,7 @@ export async function seedDatabase() {
             "Spécialiste de la productivité opérationnelle",
             "Freelance multi-compétences",
           ]),
-          imageUrl: "https://images.pexels.com/photos/8199137/pexels-photo-8199137.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/maitrise-outils-intelligence-artificielle.jpg",
         },
         {
           slug: "web-design-ui-ux",
@@ -300,7 +300,7 @@ export async function seedDatabase() {
             },
           ]),
           jobs: JSON.stringify(["UI/UX Designer", "Product Designer Junior", "Designer Web & Mobile", "Consultant Ergonomie Digitale"]),
-          imageUrl: "https://images.pexels.com/photos/7014919/pexels-photo-7014919.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/web-design-ui-ux.jpg",
         },
         {
           slug: "webmaster",
@@ -332,7 +332,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Sécurité, SEO & Maintenance Pro", description: "Audit de sécurité, sauvegardes cloud et optimisation des performances.", duration: "4 semaines" },
           ]),
           jobs: JSON.stringify(["Webmaster", "Gestionnaire de site internet", "Intégrateur CMS WordPress", "Technicien Web Support"]),
-          imageUrl: "https://images.pexels.com/photos/8197499/pexels-photo-8197499.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/webmaster.jpg",
         },
         {
           slug: "graphisme-et-serigraphie",
@@ -364,7 +364,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Atelier Pratique de Sérigraphie", description: "Typons, insolation des cadres, dosage des encres et tirage en série.", duration: "8 semaines" },
           ]),
           jobs: JSON.stringify(["Graphiste Designer", "Sérigraphe d'Atelier", "Responsable Pré-Presse", "Créateur de Marque Textile"]),
-          imageUrl: "https://images.pexels.com/photos/7172650/pexels-photo-7172650.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/graphisme-et-serigraphie.jpg",
         },
         {
           slug: "marketing-digital",
@@ -398,7 +398,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 04", title: "Campagne Réelle pour une Entreprise Partenaire", description: "Mise en œuvre d'un budget réel avec objectifs de vente mesurables.", duration: "4 semaines" },
           ]),
           jobs: JSON.stringify(["Traffic Manager", "Community Manager", "Responsable Marketing Digital", "Growth Marketer"]),
-          imageUrl: "https://images.pexels.com/photos/12662811/pexels-photo-12662811.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/marketing-digital.jpg",
         },
         {
           slug: "maintenance-informatique-et-reseau",
@@ -431,7 +431,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Réseaux d'Entreprise & Routage", description: "Adressage IP, sous-réseaux, DHCP, VLANs, Wi-Fi d'entreprise et firewall.", duration: "8 semaines" },
           ]),
           jobs: JSON.stringify(["Technicien de Maintenance Informatique", "Administrateur Réseau Junior", "Gestionnaire de Parc IT", "Support Technique N1/N2"]),
-          imageUrl: "https://images.pexels.com/photos/1181571/pexels-photo-1181571.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/maintenance-informatique-et-reseau.jpg",
         },
         {
           slug: "photographie-cadrage-et-montage-video",
@@ -464,7 +464,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Montage & Post-Production Vidéo", description: "Dérushage, rythme, sound design, transitions percutantes et sous-titrage.", duration: "8 semaines" },
           ]),
           jobs: JSON.stringify(["Vidéaste / Cadreur", "Monteur Vidéo Professionnel", "Photographe Commercial", "Créateur de Contenu Audiovisuel"]),
-          imageUrl: "https://images.pexels.com/photos/8100067/pexels-photo-8100067.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/photographie-cadrage-et-montage-video.jpg",
         },
         {
           slug: "copywriting",
@@ -496,7 +496,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Emailing, Scripts Publicitaires & Portfolio", description: "Création de séquences réelles et construction de votre book client.", duration: "4 semaines" },
           ]),
           jobs: JSON.stringify(["Copywriter Freelance", "Concepteur Rédacteur Publicitaire", "Email Marketer", "Créateur de Contenu Vendeur"]),
-          imageUrl: "https://images.pexels.com/photos/8197509/pexels-photo-8197509.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/copywriting.jpg",
         },
         {
           slug: "e-commerce",
@@ -528,7 +528,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Logistique Locale & Gestion Financière", description: "Partenariats livreurs, gestion des stocks et calcul de la rentabilité nette.", duration: "4 semaines" },
           ]),
           jobs: JSON.stringify(["E-commerçant indépendant", "Responsable E-commerce d'entreprise", "Consultant en Vente en Ligne", "Gestionnaire de Boutique Digitale"]),
-          imageUrl: "https://images.pexels.com/photos/12662811/pexels-photo-12662811.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/e-commerce.jpg",
         },
         {
           slug: "pilotage-de-drone",
@@ -561,7 +561,7 @@ export async function seedDatabase() {
             { moduleNumber: "Module 03", title: "Prise de Vue Cinématique & Photogrammétrie", description: "Mouvements de caméra complexes, plans de vol automatisés et traitement d'images.", duration: "4 semaines" },
           ]),
           jobs: JSON.stringify(["Télépilote Professionnel de Drone", "Opérateur Aérien Audiovisuel", "Technicien en Photogrammétrie & Inspection", "Consultant Drone BTP & Agriculture"]),
-          imageUrl: "https://images.pexels.com/photos/14484029/pexels-photo-14484029.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+          imageUrl: "/images/formations/pilotage-de-drone.jpg",
         },
       ])
       .returning();
@@ -680,7 +680,7 @@ export async function seedDatabase() {
         category: "Hackathon",
         description:
           "48 heures de code non-stop pour concevoir des solutions IA concrètes répondant aux défis de l'agriculture, de la santé et de l'éducation en Afrique.",
-        imageUrl: "https://images.pexels.com/photos/33920044/pexels-photo-33920044.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        imageUrl: "/images/formations/developpement-web-fullstack.jpg",
         attendeesCount: 150,
       },
       {
@@ -690,7 +690,7 @@ export async function seedDatabase() {
         category: "Masterclass",
         description:
           "Démonstration en direct d'acquisition photogrammétrique par drone et reconstruction de nuages de points 3D pour le génie civil.",
-        imageUrl: "https://images.pexels.com/photos/14484029/pexels-photo-14484029.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        imageUrl: "/images/formations/pilotage-de-drone.jpg",
         attendeesCount: 85,
       },
       {
@@ -700,7 +700,7 @@ export async function seedDatabase() {
         category: "Portes Ouvertes",
         description:
           "Venez découvrir nos campus, échanger avec nos formateurs et rencontrer les entreprises partenaires qui recrutent nos étudiants.",
-        imageUrl: "https://images.pexels.com/photos/9159042/pexels-photo-9159042.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        imageUrl: "/images/formations/developpement-intelligence-artificielle.jpg",
         attendeesCount: 220,
       },
     ]);
@@ -717,7 +717,7 @@ export async function seedDatabase() {
 À FuturCraft Institut, on a choisi de former sur le terrain : environ 80 % des heures de cours se font sur des projets réels, avec un mentor qui suit l'étudiant du début à la fin. Pas de cours magistraux interminables, on code, on monte, on filme, on pilote.
 
 Le but n'est pas de collectionner des certificats, mais de sortir avec un portfolio et des réflexes de travail en équipe. Les anciens étudiants le disent souvent : c'est la pratique qui a fait la différence lors des entretiens.`,
-        coverImage: "https://images.pexels.com/photos/33920044/pexels-photo-33920044.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        coverImage: "/images/formations/developpement-web-fullstack.jpg",
         author: "Gauthier I. ORE, Co-Fondateur",
         readTime: "4 min",
         category: "Orientation & Carrière",
@@ -731,7 +731,7 @@ Le but n'est pas de collectionner des certificats, mais de sortir avec un portfo
         content: `Ce samedi, la cohorte TechCraft a présenté ses projets de fin de formation devant un jury composé de directeurs techniques, de fondateurs de startups et de responsables d'agences digitales de Cotonou. Quinze équipes ont défendu leurs applications en conditions réelles.
 
 Les projets étaient variés : gestion RH, cartographie agricole par drone, plateformes e-commerce. Le jury a souligné la qualité du code et la capacité des étudiants à expliquer leurs choix techniques. Quelques-uns sont repartis avec des propositions de stage ou d'embauche.`,
-        coverImage: "https://images.pexels.com/photos/9159042/pexels-photo-9159042.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        coverImage: "/images/formations/developpement-intelligence-artificielle.jpg",
         author: "Équipe Pédagogique FuturCraft",
         readTime: "3 min",
         category: "Vie à FuturCraft",
@@ -745,7 +745,7 @@ Les projets étaient variés : gestion RH, cartographie agricole par drone, plat
         content: `L'intelligence artificielle change la façon de travailler des créatifs, mais elle ne les remplace pas. Les marketeurs et designers qui apprennent à utiliser Midjourney, Claude ou ChatGPT dans leur quotidien gagnent du temps sur les tâches répétitives et peuvent se concentrer sur l'idée et la stratégie.
 
 Dans notre formation courte « Maîtrise des outils d'IA », on montre aux professionnels comment intégrer ces outils dans leur workflow sans perdre leur style. Le but est de rester aux commandes, pas de déléguer la réflexion à la machine.`,
-        coverImage: "https://images.pexels.com/photos/8199137/pexels-photo-8199137.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        coverImage: "/images/formations/maitrise-outils-intelligence-artificielle.jpg",
         author: "Marcelle Agossou",
         readTime: "5 min",
         category: "Intelligence Artificielle",
