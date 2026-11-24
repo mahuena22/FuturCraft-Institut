@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageCircle, Loader2 } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useToast } from "./Toast";
 import { openWhatsAppChat, whatsappTemplates } from "@/lib/whatsapp";
+import { analytics } from "@/lib/analytics";
 
 interface WhatsAppButtonProps {
   phoneNumber?: string;
@@ -32,6 +33,7 @@ export function WhatsAppButton({
     // Small delay for UX feedback
     setTimeout(() => {
       openWhatsAppChat(phoneNumber, message);
+      analytics.trackWhatsAppClick("button");
       showToast({
         type: "success",
         title: "WhatsApp ouvert",
@@ -50,7 +52,7 @@ export function WhatsAppButton({
 
   const variants = {
     default: "px-5 py-3 text-sm shadow-lg shadow-[var(--color-fc-cyan)]/25",
-    floating: "fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-xl shadow-[var(--color-fc-cyan)]/30",
+    floating: "fixed bottom-24 right-4 z-40 sm:bottom-6 sm:right-6 sm:z-50 p-4 rounded-full shadow-xl shadow-[var(--color-fc-cyan)]/30",
     inline: "px-4 py-2 text-sm",
   };
 
@@ -111,6 +113,7 @@ export function WhatsAppFloatButton({
           "noopener,noreferrer"
         );
       }
+      analytics.trackWhatsAppClick("float");
       setIsLoading(false);
     }, 300);
   };

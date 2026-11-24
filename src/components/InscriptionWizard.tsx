@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,6 +18,7 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 interface FormationOption {
   id: number;
@@ -55,7 +56,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     // Step 1: Choix formation
     formationId: preselectedFormationId ? Number(preselectedFormationId) : formations[0]?.id || 1,
     campus: "Godomey (Cotonou)",
-    mode: "Présentiel & Hybride",
+    mode: "PrÃ©sentiel & Hybride",
     session: "Session Mars 2026",
 
     // Step 2: Informations personnelles
@@ -64,16 +65,16 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     gender: "M",
     birthDate: "",
     birthPlace: "",
-    nationality: "Béninoise",
-    residenceCountry: "Bénin",
+    nationality: "BÃ©ninoise",
+    residenceCountry: "BÃ©nin",
     city: "Cotonou",
     address: "",
     phone: "",
     whatsapp: "",
     email: "",
 
-    // Step 3: Informations académiques
-    previousDiploma: "Baccalauréat",
+    // Step 3: Informations acadÃ©miques
+    previousDiploma: "BaccalaurÃ©at",
     studyLevel: "BAC",
     previousSchool: "",
     studyField: "",
@@ -81,7 +82,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
     // Step 4: Parent / Responsable
     guardianName: "",
-    guardianRelation: "Père",
+    guardianRelation: "PÃ¨re",
     guardianPhone: "",
     guardianEmail: "",
 
@@ -114,21 +115,21 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
     if (step === 1) {
       if (!formData.formationId) {
-        errs.formationId = "Veuillez sélectionner une formation.";
+        errs.formationId = "Veuillez sÃ©lectionner une formation.";
       }
     } else if (step === 2) {
       if (!formData.lastName.trim()) errs.lastName = "Le nom est obligatoire.";
-      if (!formData.firstName.trim()) errs.firstName = "Le prénom est obligatoire.";
+      if (!formData.firstName.trim()) errs.firstName = "Le prÃ©nom est obligatoire.";
       if (!formData.city.trim()) errs.city = "La ville est obligatoire.";
       if (!formData.phone.trim()) {
-        errs.phone = "Le téléphone est obligatoire.";
+        errs.phone = "Le tÃ©lÃ©phone est obligatoire.";
       } else if (formData.phone.replace(/\D/g, "").length < 8) {
-        errs.phone = "Numéro invalide (8 chiffres minimum).";
+        errs.phone = "NumÃ©ro invalide (8 chiffres minimum).";
       }
       if (!formData.whatsapp.trim()) {
         errs.whatsapp = "Le WhatsApp est obligatoire.";
       } else if (formData.whatsapp.replace(/\D/g, "").length < 8) {
-        errs.whatsapp = "Numéro invalide (8 chiffres minimum).";
+        errs.whatsapp = "NumÃ©ro invalide (8 chiffres minimum).";
       }
       if (!formData.email.trim()) {
         errs.email = "L'email est obligatoire.";
@@ -136,16 +137,17 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
         errs.email = "Adresse email invalide.";
       }
     } else if (step === 3) {
-      if (!formData.previousDiploma) errs.previousDiploma = "Veuillez sélectionner votre dernier diplôme.";
-      if (!formData.studyLevel) errs.studyLevel = "Veuillez sélectionner votre niveau d'étude.";
+      if (!formData.previousDiploma) errs.previousDiploma = "Veuillez sÃ©lectionner votre dernier diplÃ´me.";
+      if (!formData.studyLevel) errs.studyLevel = "Veuillez sÃ©lectionner votre niveau d'Ã©tude.";
     }
 
     setFieldErrors(errs);
     if (Object.keys(errs).length > 0) {
-      setErrorMsg("Veuillez corriger les champs signalés.");
+      setErrorMsg("Veuillez corriger les champs signalÃ©s.");
       return;
     }
 
+    if (step === 1) analytics.trackInscriptionStart(String(formData.formationId || ""));
     setStep((s) => s + 1);
   };
 
@@ -154,15 +156,15 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     setStep((s) => s - 1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async () => { analytics.trackInscriptionSubmit(String(formData.formationId || ""));
     setErrorMsg("");
     setFieldErrors({});
     if (!formData.agreeTerms || !formData.agreePrivacy) {
       setFieldErrors({
-        agreeTerms: formData.agreeTerms ? "" : "Veuillez accepter le règlement pédagogique.",
-        agreePrivacy: formData.agreePrivacy ? "" : "Veuillez accepter la politique de confidentialité.",
+        agreeTerms: formData.agreeTerms ? "" : "Veuillez accepter le rÃ¨glement pÃ©dagogique.",
+        agreePrivacy: formData.agreePrivacy ? "" : "Veuillez accepter la politique de confidentialitÃ©.",
       });
-      setErrorMsg("Veuillez accepter le règlement et la politique de confidentialité pour valider votre inscription.");
+      setErrorMsg("Veuillez accepter le rÃ¨glement et la politique de confidentialitÃ© pour valider votre inscription.");
       return;
     }
 
@@ -211,13 +213,13 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
         <div className="mt-6 space-y-3">
           <span className="inline-flex rounded-full bg-[var(--color-fc-surface)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-fc-primary)]">
-            Préinscription enregistrée
+            PrÃ©inscription enregistrÃ©e
           </span>
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-[var(--color-fc-black)]">
             Merci {successData.studentName}
           </h2>
           <p className="mx-auto max-w-md text-sm leading-7 text-[var(--color-fc-gray-mid)]">
-            Votre dossier pour <strong className="text-[var(--color-fc-black)]">{selectedFormation?.title}</strong> a bien été transmis à l&apos;administration.
+            Votre dossier pour <strong className="text-[var(--color-fc-black)]">{selectedFormation?.title}</strong> a bien Ã©tÃ© transmis Ã  l&apos;administration.
           </p>
         </div>
 
@@ -227,29 +229,29 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
             <span className="text-sm font-bold text-[var(--color-fc-black)]">Compte en attente de validation</span>
           </div>
           <p className="mt-2 text-sm leading-7 text-[var(--color-fc-gray-mid)]">
-            Un administrateur validera votre dossier. Vous serez notifié dès l&apos;activation de votre compte.
+            Un administrateur validera votre dossier. Vous serez notifiÃ© dÃ¨s l&apos;activation de votre compte.
           </p>
         </div>
 
         <div className="mt-5 rounded-2xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-5 text-left">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-fc-gray-mid)]">Matricule étudiant</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-fc-gray-mid)]">Matricule Ã©tudiant</span>
             <button onClick={copyMatricule} className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-primary)] hover:underline">
               {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copié" : "Copier"}
+              {copied ? "CopiÃ©" : "Copier"}
             </button>
           </div>
           <div className="mt-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-white p-4 text-center font-mono text-2xl font-black tracking-widest text-[var(--color-fc-primary)]">
             {successData.studentNumber}
           </div>
           <p className="mt-3 text-center text-xs leading-6 text-[var(--color-fc-gray-mid)]">
-            Conservez ce matricule pour accéder à votre espace étudiant après validation.
+            Conservez ce matricule pour accÃ©der Ã  votre espace Ã©tudiant aprÃ¨s validation.
           </p>
         </div>
 
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href="/" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)]">
-            Retour à l&apos;accueil <ArrowRight className="h-4 w-4" />
+            Retour Ã  l&apos;accueil <ArrowRight className="h-4 w-4" />
           </Link>
           <a href="mailto:info@futurcraft.bj" className="inline-flex items-center justify-center rounded-xl border border-[var(--color-fc-gray-light)] px-6 py-3.5 text-sm font-semibold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]">
             Contacter l&apos;administration
@@ -264,20 +266,20 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     <div className="mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-[var(--color-fc-gray-light)] bg-white">
       <div className="border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] p-5 sm:p-6">
         <div className="mb-3 flex items-center justify-between text-xs font-bold text-[var(--color-fc-gray-mid)]">
-          <span>Étape {step} sur 5</span>
+          <span>Ã‰tape {step} sur 5</span>
           <span className="text-[var(--color-fc-primary)]">
             {step === 1 && "Choix du cursus"}
             {step === 2 && "Informations personnelles"}
-            {step === 3 && "Parcours académique"}
+            {step === 3 && "Parcours acadÃ©mique"}
             {step === 4 && "Responsable / Tuteur"}
-            {step === 5 && "Récapitulatif & validation"}
+            {step === 5 && "RÃ©capitulatif & validation"}
           </span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--color-fc-gray-light)]/60">
           <div className="h-full rounded-full bg-[var(--color-fc-primary)] transition-all duration-300" style={{ width: `${(step / 5) * 100}%` }} />
         </div>
         <div className="mt-4 hidden grid-cols-5 gap-2 text-center text-[11px] font-semibold text-[var(--color-fc-gray-mid)] sm:grid">
-          {["Formation", "Identité", "Diplômes", "Tuteur", "Confirmation"].map((label, i) => (
+          {["Formation", "IdentitÃ©", "DiplÃ´mes", "Tuteur", "Confirmation"].map((label, i) => (
             <div key={label} className={step >= i + 1 ? "text-[var(--color-fc-primary)]" : ""}>{i + 1}. {label}</div>
           ))}
         </div>
@@ -296,16 +298,16 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
         {step === 1 && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Étape 1 — Choisissez votre formation</h2>
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Ã‰tape 1 â€” Choisissez votre formation</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Sélectionnez le cursus que vous souhaitez intégrer à FuturCraft Institut.
+                SÃ©lectionnez le cursus que vous souhaitez intÃ©grer Ã  FuturCraft Institut.
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1.5">
-                  Formation souhaitée *
+                  Formation souhaitÃ©e *
                 </label>
                 <select
                   value={formData.formationId}
@@ -314,7 +316,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                 >
                   {formations.map((f) => (
                     <option key={f.id} value={f.id}>
-                      {f.title} ({f.duration} — {f.price.toLocaleString("fr-FR")} FCFA)
+                      {f.title} ({f.duration} â€” {f.price.toLocaleString("fr-FR")} FCFA)
                     </option>
                   ))}
                 </select>
@@ -341,7 +343,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   >
                     <option value="Session Mars 2026">Session Mars 2026</option>
                     <option value="Session Mai 2026">Session Mai 2026</option>
-                    <option value="Session Cohorte Été 2026">Session Cohorte Été 2026</option>
+                    <option value="Session Cohorte Ã‰tÃ© 2026">Session Cohorte Ã‰tÃ© 2026</option>
                   </select>
                 </div>
 
@@ -352,8 +354,8 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                     onChange={(e) => updateField("mode", e.target.value)}
                     className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-sm text-[var(--color-fc-black)]"
                   >
-                    <option value="Présentiel & Hybride">Présentiel & Hybride</option>
-                    <option value="Présentiel 100%">Présentiel 100%</option>
+                    <option value="PrÃ©sentiel & Hybride">PrÃ©sentiel & Hybride</option>
+                    <option value="PrÃ©sentiel 100%">PrÃ©sentiel 100%</option>
                     <option value="Cours du soir / Weekend">Cours du soir / Weekend</option>
                   </select>
                 </div>
@@ -364,7 +366,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                 <div className="p-5 rounded-2xl bg-[var(--color-fc-surface)] border border-[var(--color-fc-primary)]/15 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[var(--color-fc-primary)] uppercase tracking-wider">
-                      Récapitulatif de la filière
+                      RÃ©capitulatif de la filiÃ¨re
                     </span>
                     <span className="text-xs font-extrabold text-[var(--color-fc-black)]">
                       {selectedFormation.price.toLocaleString("fr-FR")} FCFA
@@ -373,7 +375,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   <h4 className="font-bold text-[var(--color-fc-black)] text-sm">{selectedFormation.title}</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-[var(--color-fc-gray-mid)] pt-1">
                     <div>
-                      <span className="text-[var(--color-fc-gray-mid)] block">Durée :</span>
+                      <span className="text-[var(--color-fc-gray-mid)] block">DurÃ©e :</span>
                       <strong className="text-[var(--color-fc-black)]">{selectedFormation.duration}</strong>
                     </div>
                     <div>
@@ -387,8 +389,8 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                       <strong className="text-[var(--color-fc-black)]">{selectedFormation.level}</strong>
                     </div>
                     <div>
-                      <span className="text-[var(--color-fc-gray-mid)] block">Échéancier :</span>
-                      <strong className="text-[var(--color-fc-black)]">Mensualités possibles</strong>
+                      <span className="text-[var(--color-fc-gray-mid)] block">Ã‰chÃ©ancier :</span>
+                      <strong className="text-[var(--color-fc-black)]">MensualitÃ©s possibles</strong>
                     </div>
                   </div>
                 </div>
@@ -401,9 +403,9 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
         {step === 2 && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Étape 2 — Informations personnelles</h2>
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Ã‰tape 2 â€” Informations personnelles</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Vos coordonnées serviront à créer votre profil étudiant et éditer vos attestations officielles.
+                Vos coordonnÃ©es serviront Ã  crÃ©er votre profil Ã©tudiant et Ã©diter vos attestations officielles.
               </p>
             </div>
 
@@ -421,7 +423,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Prénom(s) *</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">PrÃ©nom(s) *</label>
                 <input
                   type="text"
                   placeholder="ex: Onesim"
@@ -440,7 +442,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-sm"
                 >
                   <option value="M">Masculin</option>
-                  <option value="F">Féminin</option>
+                  <option value="F">FÃ©minin</option>
                 </select>
               </div>
 
@@ -455,10 +457,10 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Nationalité</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">NationalitÃ©</label>
                 <input
                   type="text"
-                  placeholder="ex: Béninoise"
+                  placeholder="ex: BÃ©ninoise"
                   value={formData.nationality}
                   onChange={(e) => updateField("nationality", e.target.value)}
                   className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] text-sm"
@@ -466,7 +468,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Ville de résidence *</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Ville de rÃ©sidence *</label>
                 <input
                   type="text"
                   placeholder="ex: Cotonou, Calavi, Porto-Novo, Parakou..."
@@ -478,7 +480,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Téléphone d&apos;appel *</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">TÃ©lÃ©phone d&apos;appel *</label>
                 <input
                   type="tel"
                   placeholder="ex: +229 97 00 00 00"
@@ -490,7 +492,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Numéro WhatsApp *</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">NumÃ©ro WhatsApp *</label>
                 <input
                   type="tel"
                   placeholder="ex: +229 97 00 00 00"
@@ -516,36 +518,36 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
           </div>
         )}
 
-        {/* STEP 3: INFORMATIONS ACADÉMIQUES */}
+        {/* STEP 3: INFORMATIONS ACADÃ‰MIQUES */}
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Étape 3 — Parcours académique et scolaire</h2>
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Ã‰tape 3 â€” Parcours acadÃ©mique et scolaire</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Ces éléments permettent aux formateurs d&apos;adapter la pédagogie à votre profil.
+                Ces Ã©lÃ©ments permettent aux formateurs d&apos;adapter la pÃ©dagogie Ã  votre profil.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Dernier diplôme obtenu *</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Dernier diplÃ´me obtenu *</label>
                 <select
                   value={formData.previousDiploma}
                   onChange={(e) => updateField("previousDiploma", e.target.value)}
                   className={`${fieldCls("previousDiploma")} bg-white`}
                 >
                   <option value="BEPC">BEPC</option>
-                  <option value="Baccalauréat">Baccalauréat (BAC)</option>
+                  <option value="BaccalaurÃ©at">BaccalaurÃ©at (BAC)</option>
                   <option value="Licence (BAC+3)">Licence (BAC+3)</option>
                   <option value="Master (BAC+5)">Master (BAC+5)</option>
                   <option value="Formation professionnelle">Formation professionnelle / CAP</option>
-                  <option value="Autre">Autre diplôme</option>
+                  <option value="Autre">Autre diplÃ´me</option>
                 </select>
                 {renderFieldError("previousDiploma")}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Niveau d&apos;étude actuel *</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Niveau d&apos;Ã©tude actuel *</label>
                 <select
                   value={formData.studyLevel}
                   onChange={(e) => updateField("studyLevel", e.target.value)}
@@ -556,16 +558,16 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   <option value="BAC">Bachelier</option>
                   <option value="BAC+1 / BAC+2">BAC+1 / BAC+2</option>
                   <option value="BAC+3 et plus">BAC+3 et plus</option>
-                  <option value="Professionnel en reconversion">Professionnel en activité / Reconversion</option>
+                  <option value="Professionnel en reconversion">Professionnel en activitÃ© / Reconversion</option>
                 </select>
                 {renderFieldError("studyLevel")}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Dernier établissement fréquenté</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Dernier Ã©tablissement frÃ©quentÃ©</label>
                 <input
                   type="text"
-                  placeholder="ex: Lycée Béhanzin, UAC, etc."
+                  placeholder="ex: LycÃ©e BÃ©hanzin, UAC, etc."
                   value={formData.previousSchool}
                   onChange={(e) => updateField("previousSchool", e.target.value)}
                   className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] text-sm"
@@ -573,10 +575,10 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Série ou Domaine d&apos;étude</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">SÃ©rie ou Domaine d&apos;Ã©tude</label>
                 <input
                   type="text"
-                  placeholder="ex: Série C / D / B, Lettres, Économie..."
+                  placeholder="ex: SÃ©rie C / D / B, Lettres, Ã‰conomie..."
                   value={formData.studyField}
                   onChange={(e) => updateField("studyField", e.target.value)}
                   className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] text-sm"
@@ -585,11 +587,11 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">
-                  Expérience préalable éventuelle (facultatif)
+                  ExpÃ©rience prÃ©alable Ã©ventuelle (facultatif)
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Avez-vous déjà manipulé des outils informatiques, fait des stages ou des projets personnels ?"
+                  placeholder="Avez-vous dÃ©jÃ  manipulÃ© des outils informatiques, fait des stages ou des projets personnels ?"
                   value={formData.previousExperience}
                   onChange={(e) => updateField("previousExperience", e.target.value)}
                   className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] text-sm"
@@ -603,15 +605,15 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
         {step === 4 && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Étape 4 — Contact du Responsable ou Tuteur</h2>
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Ã‰tape 4 â€” Contact du Responsable ou Tuteur</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Personne à contacter en cas d&apos;urgence ou pour le suivi administratif et financier.
+                Personne Ã  contacter en cas d&apos;urgence ou pour le suivi administratif et financier.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Nom et Prénom du Responsable</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Nom et PrÃ©nom du Responsable</label>
                 <input
                   type="text"
                   placeholder="ex: M. Paul TOKPO"
@@ -622,22 +624,22 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Lien avec l&apos;étudiant</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Lien avec l&apos;Ã©tudiant</label>
                 <select
                   value={formData.guardianRelation}
                   onChange={(e) => updateField("guardianRelation", e.target.value)}
                   className="w-full p-3 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-sm"
                 >
-                  <option value="Père">Père</option>
-                  <option value="Mère">Mère</option>
-                  <option value="Tuteur légal">Tuteur légal</option>
+                  <option value="PÃ¨re">PÃ¨re</option>
+                  <option value="MÃ¨re">MÃ¨re</option>
+                  <option value="Tuteur lÃ©gal">Tuteur lÃ©gal</option>
                   <option value="Conjoint">Conjoint(e)</option>
                   <option value="Autre">Autre proche</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">Téléphone du Responsable</label>
+                <label className="block text-xs font-bold text-[var(--color-fc-black)] mb-1">TÃ©lÃ©phone du Responsable</label>
                 <input
                   type="tel"
                   placeholder="ex: +229 95 00 00 00"
@@ -661,13 +663,13 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
           </div>
         )}
 
-        {/* STEP 5: RÉCAPITULATIF & VALIDATION */}
+        {/* STEP 5: RÃ‰CAPITULATIF & VALIDATION */}
         {step === 5 && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Étape 5 — Récapitulatif et Confirmation</h2>
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Ã‰tape 5 â€” RÃ©capitulatif et Confirmation</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Vérifiez attentivement vos informations avant de confirmer votre demande d&apos;inscription.
+                VÃ©rifiez attentivement vos informations avant de confirmer votre demande d&apos;inscription.
               </p>
             </div>
 
@@ -678,7 +680,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   <span className="text-[var(--color-fc-gray-mid)] block mb-0.5">Formation choisie :</span>
                   <span className="font-bold text-[var(--color-fc-black)] text-sm">{selectedFormation?.title}</span>
                   <span className="text-[var(--color-fc-gray-mid)] block text-[11px] mt-0.5">
-                    {formData.campus} • {formData.session}
+                    {formData.campus} â€¢ {formData.session}
                   </span>
                 </div>
 
@@ -695,13 +697,13 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <span className="text-[var(--color-fc-gray-mid)] block">Nom &amp; Prénom :</span>
+                  <span className="text-[var(--color-fc-gray-mid)] block">Nom &amp; PrÃ©nom :</span>
                   <span className="font-bold text-[var(--color-fc-black)]">
                     {formData.firstName} {formData.lastName}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[var(--color-fc-gray-mid)] block">Téléphone :</span>
+                  <span className="text-[var(--color-fc-gray-mid)] block">TÃ©lÃ©phone :</span>
                   <span className="font-bold text-[var(--color-fc-black)]">{formData.phone}</span>
                 </div>
                 <div>
@@ -719,7 +721,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   <span>
                     Responsable : <strong>{formData.guardianName}</strong> ({formData.guardianRelation})
                   </span>
-                  <span>Tél : {formData.guardianPhone || "N/A"}</span>
+                  <span>TÃ©l : {formData.guardianPhone || "N/A"}</span>
                 </div>
               )}
             </div>
@@ -734,7 +736,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   className="mt-0.5 w-4 h-4 text-[var(--color-fc-primary)] rounded border-[var(--color-fc-gray-light)] focus:ring-[var(--color-fc-primary)]/15"
                 />
                 <span>
-                  J&apos;atteste de l&apos;exactitude des renseignements fournis et j&apos;accepte les conditions d&apos;admission et le règlement pédagogique de FuturCraft Institut.
+                  J&apos;atteste de l&apos;exactitude des renseignements fournis et j&apos;accepte les conditions d&apos;admission et le rÃ¨glement pÃ©dagogique de FuturCraft Institut.
                 </span>
               </label>
               {fieldErrors.agreeTerms && (
@@ -749,7 +751,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
                   className="mt-0.5 w-4 h-4 text-[var(--color-fc-primary)] rounded border-[var(--color-fc-gray-light)] focus:ring-[var(--color-fc-primary)]/15"
                 />
                 <span>
-                  J&apos;accepte la politique de confidentialité relative au traitement de mes données personnelles dans le cadre de ma scolarité.
+                  J&apos;accepte la politique de confidentialitÃ© relative au traitement de mes donnÃ©es personnelles dans le cadre de ma scolaritÃ©.
                 </span>
               </label>
               {fieldErrors.agreePrivacy && (
@@ -768,7 +770,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               className="px-5 py-2.5 rounded-xl text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)]/60 transition-colors flex items-center gap-1.5"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Précédent</span>
+              <span>PrÃ©cÃ©dent</span>
             </button>
           ) : (
             <div />
@@ -793,7 +795,7 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                  Génération du dossier...
+                  GÃ©nÃ©ration du dossier...
                 </span>
               ) : (
                 <>
@@ -808,3 +810,8 @@ export function InscriptionWizard({ formations }: { formations: FormationOption[
     </div>
   );
 }
+
+
+
+
+

@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile, unlink } from "node:fs/promises";
-import { join } from "node:path";
 import { getStudentSession } from "@/lib/student-auth";
 import { db } from "@/db";
 import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sendAdminDocumentUploadEmail } from "@/lib/email";
-
-async function removeFile(url: string | null | undefined) {
-  if (!url || !url.startsWith("/uploads/students/")) return;
-  try {
-    await unlink(join(process.cwd(), "public", url));
-  } catch {
-    // ignore missing file
-  }
-}
+import { deleteUpload, storeUpload } from "@/lib/uploads";
 
 export async function POST(req: NextRequest) {
   const studentId = await getStudentSession();
@@ -41,13 +31,13 @@ export async function POST(req: NextRequest) {
           .update(students)
           .set(kind === "avatar" ? { avatarUrl: null } : { cvUrl: null })
           .where(eq(students.id, studentId));
-        await removeFile(previousUrl);
+        await deleteUpload(previousUrl);
         return NextResponse.json({ success: true, removed: true });
       }
       return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
     }
 
-    const ext = kind === "cv" ? "pdf" : (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const allowedImageExt = ["jpg", "jpeg", "png", "webp", "gif"];
     if (kind === "avatar" && !allowedImageExt.includes(ext)) {
       return NextResponse.json({ error: "Format de photo non supporté (jpg, png, webp attendus)" }, { status: 400 });
@@ -60,12 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     const safeKey = existing.studentNumber.replace(/[^a-zA-Z0-9-]/g, "").toLowerCase();
-    const filename = `${safeKey}-${kind}-${Date.now()}.${ext}`;
-    const uploadDir = join(process.cwd(), "public", "uploads", "students");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
-
-    const publicUrl = `/uploads/students/${filename}`;
+    const publicUrl = await storeUpload(file, "students", `${safeKey}-${kind}`);
 
     // Replace the previous file then persist the new URL
     const previousUrl = kind === "avatar" ? existing.avatarUrl : existing.cvUrl;
@@ -73,7 +58,7 @@ export async function POST(req: NextRequest) {
       .update(students)
       .set(kind === "avatar" ? { avatarUrl: publicUrl } : { cvUrl: publicUrl })
       .where(eq(students.id, studentId));
-    await removeFile(previousUrl);
+    await deleteUpload(previousUrl);
 
     void sendAdminDocumentUploadEmail({
       firstName: existing.firstName,

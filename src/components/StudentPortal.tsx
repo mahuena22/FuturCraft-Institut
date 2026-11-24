@@ -888,7 +888,7 @@ setProfileSaveSuccess(true);
                       </button>
 
                       <Link
-                        href={`/recu/${rec.receiptNumber}`}
+                        href={`/recu/${rec.receiptNumber}?code=${encodeURIComponent(rec.verificationCode)}`}
                         target="_blank"
                         className="px-3.5 py-2 rounded-xl text-xs font-bold text-[var(--color-fc-black)] bg-[var(--color-fc-bg)] hover:bg-[var(--color-fc-gray-light)] flex items-center gap-1"
                       >
@@ -1538,7 +1538,7 @@ setProfileSaveSuccess(true);
                     {viewingReceipt.verificationCode}
                   </span>
                   <span className="text-[10px] text-[var(--color-fc-gray-mid)] block pt-0.5">
-                    Vérifiable sur : futurcraft.bj/recu/{viewingReceipt.receiptNumber}
+                    Vérifiable sur : futurcraft.bj/recu/{viewingReceipt.receiptNumber}?code={viewingReceipt.verificationCode}
                   </span>
                 </div>
 

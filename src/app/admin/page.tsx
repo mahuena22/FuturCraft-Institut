@@ -1,4 +1,4 @@
-import {
+﻿import {
   getAdminStats,
   getAdminStudentProjects,
   getAllStudents,
@@ -10,13 +10,13 @@ import { AdminPortal } from "@/components/AdminPortal";
 import { AdminLogin } from "@/components/AdminLogin";
 import { isAuthenticated } from "@/lib/auth";
 import { db } from "@/db";
-import { payments, students, formations } from "@/db/schema";
+import { payments, students, formations, receipts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Console d'Administration | FuturCraft Institut",
-  description: "Gestion des étudiants, encaissements, cursus, rôles et statistiques administratives.",
+  description: "Gestion des Ã©tudiants, encaissements, cursus, rÃ´les et statistiques administratives.",
 };
 
 export default async function AdminPage() {
@@ -48,10 +48,12 @@ export default async function AdminPage() {
       studentLastName: students.lastName,
       studentNumber: students.studentNumber,
       formationTitle: formations.title,
+      verificationCode: receipts.verificationCode,
     })
     .from(payments)
     .leftJoin(students, eq(payments.studentId, students.id))
     .leftJoin(formations, eq(students.formationId, formations.id))
+    .leftJoin(receipts, eq(receipts.paymentId, payments.id))
     .orderBy(desc(payments.createdAt));
 
   return (
@@ -66,3 +68,4 @@ export default async function AdminPage() {
     />
   );
 }
+

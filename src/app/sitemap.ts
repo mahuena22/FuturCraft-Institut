@@ -27,15 +27,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: route === "" || route === "/formations" ? 1 : 0.8,
     })),
-    ...formations.map((f) => ({
+    ...formations.map((f: any) => ({
       url: `${BASE_URL}/formation/${f.slug}`,
-      lastModified: new Date(),
+      lastModified: new Date((f as any).updatedAt || Date.now()),
       changeFrequency: "weekly" as const,
       priority: 0.9,
     })),
-    ...articles.map((a) => ({
+    ...articles.map((a: any) => ({
       url: `${BASE_URL}/actualites/${a.slug}`,
-      lastModified: new Date(),
+      lastModified: new Date((a as any).date || (a as any).updatedAt || Date.now()),
       changeFrequency: "monthly" as const,
       priority: 0.6,
     })),

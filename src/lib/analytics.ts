@@ -101,6 +101,10 @@ export const analytics = {
   trackFilterChange: (filterType: string, filterValue: string) =>
     trackEvent("filter_change", { filterType, filterValue }),
 
-  trackSearch: (query: string, resultsCount: number) =>
+trackSearch: (query: string, resultsCount: number) =>
     trackEvent("search", { query, resultsCount }),
+
+  trackCtaClick: (cta: string, location: string) => trackEvent("cta_click", { cta, location }),
+  trackInscriptionStart: (formationId?: string) => trackEvent("inscription_start", { formationId }),
+  trackInscriptionSubmit: (formationId?: string) => trackEvent("inscription_submit", { formationId }),
 };

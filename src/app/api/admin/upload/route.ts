@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { requireAuth } from "@/lib/auth";
+import { storeUpload } from "@/lib/uploads";
 
 export async function POST(req: NextRequest) {
   const denied = await requireAuth();
@@ -41,18 +40,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cleanBase = file.name
-      .replace(/\.[^/.]+$/, "")
-      .replace(/[^a-zA-Z0-9_-]/g, "_")
-      .slice(0, 30);
     const subFolder = kind === "cv" ? "cvs" : "students";
-    const filename = `${kind}_${cleanBase}_${Date.now()}.${ext}`;
-    const uploadDir = join(process.cwd(), "public", "uploads", subFolder);
-
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
-
-    const publicUrl = `/uploads/${subFolder}/${filename}`;
+    const publicUrl = await storeUpload(file, subFolder, kind);
+    const filename = publicUrl.split("/").pop() || "upload";
     return NextResponse.json({ success: true, url: publicUrl, filename });
   } catch (error) {
     console.error("POST /api/admin/upload error:", error);

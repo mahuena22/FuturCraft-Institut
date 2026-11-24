@@ -17,11 +17,14 @@ export function Reveal({
   as?: keyof React.JSX.IntrinsicElements;
 }) {
   const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   useEffect(() => {
     const node = ref.current;
-    if (!node) return;
+    if (!node || visible) return;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -35,14 +38,14 @@ export function Reveal({
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [visible]);
 
   const Comp = Tag as any;
 
   return (
     <Comp
       ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{ transitionDelay: visible ? `${delay}ms` : undefined }}
       className={`transition-all duration-700 ease-out will-change-transform ${
         visible ? visibleClass : hiddenClass
       } ${className}`}

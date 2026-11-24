@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+﻿import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -8,14 +8,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.pexels.com",
+        hostname: "**.futurcraft.bj",
       },
       {
         protocol: "https",
-        hostname: "**.futurcraft.bj",
+        hostname: "*.public.blob.vercel-storage.com",
       },
     ],
   },
 };
 
 export default nextConfig;
+

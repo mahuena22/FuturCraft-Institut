@@ -29,7 +29,15 @@ export async function PATCH(req: NextRequest) {
   }
   try {
     const body = await req.json().catch(() => ({}));
-    const isSafeStudentFileUrl = (url: string) => /^\/uploads\/students\/[a-zA-Z0-9._-]+$/.test(url);
+    const isSafeStudentFileUrl = (url: string) => {
+      if (/^\/uploads\/students\/[a-zA-Z0-9._-]+$/.test(url)) return true;
+      try {
+        const host = new URL(url).hostname;
+        return host.endsWith(".public.blob.vercel-storage.com") || host.endsWith(".blob.vercel-storage.com");
+      } catch {
+        return false;
+      }
+    };
     const patch: Record<string, unknown> = {};
     if (body.phone !== undefined) patch.phone = String(body.phone || "").trim();
     if (body.whatsapp !== undefined) patch.whatsapp = String(body.whatsapp || "").trim();

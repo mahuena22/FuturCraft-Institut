@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { Inter, Sora } from "next/font/google";
@@ -25,63 +25,62 @@ const sora = Sora({
 export const metadata: Metadata = {
   metadataBase: new URL("https://futurcraft.bj"),
   title: {
-    default: "FuturCraft Institut | Centre de formation aux métiers du numérique au Bénin",
+    default: "FuturCraft Institut | Centre de formation aux mÃ©tiers du numÃ©rique au BÃ©nin",
     template: "%s | FuturCraft Institut",
   },
   description:
-    "Construisez les compétences de demain : Développement Web Fullstack, Intelligence Artificielle, Web Design, Pilotage de Drone, Marketing Digital, Sérigraphie et Audiovisuel à Godomey, Supermarché O Bénin Avant pk14.",
+    "Construisez les compÃ©tences de demain : DÃ©veloppement Web Fullstack, Intelligence Artificielle, Web Design, Pilotage de Drone, Marketing Digital, SÃ©rigraphie et Audiovisuel Ã  Godomey, SupermarchÃ© O BÃ©nin Avant pk14.",
   keywords: [
     "FuturCraft Institut",
-    "Formation informatique Bénin",
-    "Développement Web Cotonou",
-    "Intelligence Artificielle Bénin",
-    "Pilotage Drone Bénin",
+    "Formation informatique BÃ©nin",
+    "DÃ©veloppement Web Cotonou",
+    "Intelligence Artificielle BÃ©nin",
+    "Pilotage Drone BÃ©nin",
     "UI/UX Design Cotonou",
-    "École du numérique Afrique",
+    "Ã‰cole du numÃ©rique Afrique",
   ],
   openGraph: {
     type: "website",
     locale: "fr_BJ",
     url: "https://futurcraft.bj",
     siteName: "FuturCraft Institut",
-    title: "FuturCraft Institut | Centre de formation aux métiers du numérique au Bénin",
+    title: "FuturCraft Institut | Centre de formation aux mÃ©tiers du numÃ©rique au BÃ©nin",
     description:
-      "Développement Web, Intelligence Artificielle, UI/UX Design, Drone, Marketing Digital & plus encore à Godomey, Supermarché O Bénin Avant pk14.",
+      "DÃ©veloppement Web, Intelligence Artificielle, UI/UX Design, Drone, Marketing Digital & plus encore Ã  Godomey, SupermarchÃ© O BÃ©nin Avant pk14.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FuturCraft Institut | Centre de formation aux métiers du numérique au Bénin",
+    title: "FuturCraft Institut | Centre de formation aux mÃ©tiers du numÃ©rique au BÃ©nin",
     description:
-      "Apprends. Crée. Innove. Transforme ton avenir — le campus numérique de référence au Bénin.",
+      "Apprends. CrÃ©e. Innove. Transforme ton avenir â€” le campus numÃ©rique de rÃ©fÃ©rence au BÃ©nin.",
   },
   applicationName: "FuturCraft Institut",
   category: "education",
   robots: { index: true, follow: true },
   other: {
-    "script:ld+json": JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "FuturCraft Institut",
-      url: "https://futurcraft.bj",
-      logo: "https://futurcraft.bj/images/Logo-crop.png",
-      description:
-        "Centre de formation aux métiers du numérique au Bénin : Développement Web, IA, Design, Drone, Marketing, Audiovisuel.",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "Supermarché O Bénin, avant pk14",
-        addressLocality: "Godomey",
-        addressRegion: "Cotonou",
-        addressCountry: "BJ",
+    "script:ld+json": JSON.stringify([
+      {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        name: "FuturCraft Institut",
+        url: "https://futurcraft.bj",
+        logo: "https://futurcraft.bj/images/Logo-crop.png",
+        description: "Centre de formation aux métiers du numérique au Bénin.",
+        address: { "@type": "PostalAddress", streetAddress: "Supermarché O Bénin, avant pk14", addressLocality: "Godomey", addressRegion: "Cotonou", addressCountry: "BJ" },
+        telephone: "+229 43 32 78 32",
+        email: "contact@futurcraftinstitut.com",
+        sameAs: ["https://facebook.com/futurcraftinstitut","https://instagram.com/futurcraft_institut","https://linkedin.com/company/futurcraft-institut","https://tiktok.com/@futurcraft_institut"],
       },
-      telephone: "+229 43 32 78 32",
-      email: "contact@futurcraftinstitut.com",
-      sameAs: [
-        "https://facebook.com/futurcraftinstitut",
-        "https://instagram.com/futurcraft_institut",
-        "https://linkedin.com/company/futurcraft-institut",
-        "https://tiktok.com/@futurcraft_institut",
-      ],
-    }),
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        name: "FuturCraft Institut",
+        url: "https://futurcraft.bj",
+        image: "https://futurcraft.bj/images/Logo-crop.png",
+        telephone: "+229 43 32 78 32",
+        address: { "@type": "PostalAddress", streetAddress: "Supermarché O Bénin, avant pk14", addressLocality: "Godomey", addressRegion: "Cotonou", addressCountry: "BJ" },
+      }
+    ]),
   },
 };
 
@@ -142,13 +141,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             Aller au contenu principal
           </a>
           <Header />
-          <main id="contenu" className="flex-1">{children}</main>
+          <main id="contenu" className="flex-1 pb-20 sm:pb-0">{children}</main>
           <Footer />
           <WhatsAppFloatButton
             phoneNumber="22943327832"
             defaultMessage="Bonjour, je souhaite des informations sur les formations FuturCraft"
             showAfterScroll={200}
           />
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-fc-gray-light)] bg-white/95 p-3 backdrop-blur sm:hidden">
+            <div className="mx-auto flex max-w-[84rem] gap-2">
+              <a href="/inscription" data-track="cta-inscription-sticky" className="inline-flex flex-1 items-center justify-center rounded-xl bg-[var(--color-fc-deep)] px-4 py-3 text-sm font-bold text-white">Candidater</a>
+              <a href="https://wa.me/22943327832?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20les%20formations%20FuturCraft" target="_blank" rel="noopener noreferrer" data-track="cta-whatsapp-sticky" className="inline-flex items-center justify-center rounded-xl border border-[var(--color-fc-cyan)] px-4 py-3 text-sm font-bold text-[var(--color-fc-deep)]">WhatsApp</a>
+            </div>
+          </div>
         </ToastProvider>
         <Script
           id="sw-register"
@@ -167,3 +172,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   );
 }
+

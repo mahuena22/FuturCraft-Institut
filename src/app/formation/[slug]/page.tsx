@@ -128,28 +128,32 @@ export default async function FormationDetailPage(props: {
     const tools = JSON.parse(formation.tools || '[]') as string[];
     const jobs = JSON.parse(formation.jobs || '[]') as string[];
 
-    // FAQ tailored for each formation
     const faqs = [
-        {
-            q: 'Quels sont les prérequis pour intégrer cette formation ?',
-            a: `Le niveau recommandé est ${formation.level}. La motivation, la rigueur et la régularité dans la pratique sont les critères d'admission les plus déterminants.`,
-        },
-        {
-            q: "Comment s'organisent les paiements des frais de formation ?",
-            a: `Les frais s'élèvent à ${formation.price.toLocaleString('fr-FR')} FCFA. Vous pouvez payer en plusieurs mensualités (jusqu'à ${formation.installmentsCount} fois) par MTN MoMo, Moov Money, carte bancaire ou directement à la caisse de nos campus.`,
-        },
-        {
-            q: 'Obtient-on une attestation ou certification reconnue ?',
-            a: "Oui, à l'issue de la formation et après validation de la soutenance du projet devant jury professionnel, vous recevez le Certificat Professionnel de Compétences FuturCraft avec vérification numérique par QR Code.",
-        },
-        {
-            q: 'Les cours ont-ils lieu en présentiel ou en ligne ?',
-            a: `Cette formation est dispensée en mode ${formation.mode} sur nos campus de ${formation.campus}. Les ateliers pratiques se font en laboratoire équipé.`,
-        },
+        { q: 'Quels sont les prérequis pour intégrer cette formation ?', a: `Le niveau recommandé est ${formation.level}. La motivation, la rigueur et la régularité dans la pratique sont les critères d'admission les plus déterminants.` },
+        { q: "Comment s'organisent les paiements des frais de formation ?", a: `Les frais s'élèvent à ${formation.price.toLocaleString('fr-FR')} FCFA. Vous pouvez payer en plusieurs mensualités (jusqu'à ${formation.installmentsCount} fois) par MTN MoMo, Moov Money, carte bancaire ou directement à la caisse.` },
+        { q: 'Obtient-on une attestation ou certification reconnue ?', a: "Oui, à l'issue de la formation et après validation de la soutenance du projet devant jury professionnel, vous recevez le Certificat Professionnel de Compétences FuturCraft avec vérification numérique par QR Code." },
+        { q: 'Les cours ont-ils lieu en présentiel ou en ligne ?', a: `Cette formation est dispensée en mode ${formation.mode} sur nos campus de ${formation.campus}. Les ateliers pratiques se font en laboratoire équipé.` },
     ];
+    const courseJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: formation.title,
+        description: formation.shortDescription || formation.title,
+        provider: { '@type': 'EducationalOrganization', name: 'FuturCraft Institut', url: 'https://futurcraft.bj' },
+        offers: { '@type': 'Offer', price: formation.price, priceCurrency: 'XOF', availability: 'https://schema.org/InStock' },
+        timeRequired: formation.duration,
+        educationalLevel: formation.level,
+        url: `https://futurcraft.bj/formation/${slug}`,
+    };
+    const faqJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    };
 
     return (
         <div className="bg-[var(--color-fc-bg)] min-h-screen">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([courseJsonLd, faqJsonLd]) }} />
             {/* HERO */}
             <section className="relative isolate overflow-hidden bg-[var(--color-fc-deep)] text-white">
                 <div className="absolute inset-0">
