@@ -43,10 +43,10 @@ export default async function ViePage() {
             tag: 'Maintenance IT',
         },
         {
-            title: 'Initiation aux Réseaux informatiques',
-            desc: 'Dans un cadre pratique, les étudiants découvrent les bases des réseaux, de la connectivité et des bonnes pratiques pour maintenir une infrastructure fiable.',
+            title: 'Initiation à la Cybersécurité',
+            desc: 'Dans un cadre pratique, les étudiants découvrent les bases de la protection des systèmes, des réseaux et des bonnes pratiques de sécurité numérique.',
             image: '/images/campus/cybersecurite/02.jpg',
-            tag: 'Réseau informatique',
+            tag: 'Cybersécurité',
         },
     ];
 
@@ -58,7 +58,7 @@ export default async function ViePage() {
         { src: '/images/campus/dev/07.jpg', alt: 'Étudiants en développement travaillant sur ordinateur', label: 'Développement' },
         { src: '/images/campus/audiovisuel/04.jpg', alt: 'Exercice pratique en audiovisuel', label: 'Audiovisuel' },
         { src: '/images/campus/maintenance/05.jpg', alt: 'Étudiants en maintenance informatique', label: 'Maintenance' },
-        { src: '/images/campus/cybersecurite/05.jpg', alt: 'Apprenants en atelier réseau informatique', label: 'Réseau informatique' },
+        { src: '/images/campus/cybersecurite/05.jpg', alt: 'Apprenants en atelier cybersécurité', label: 'Cybersécurité' },
     ];
 
     return (
