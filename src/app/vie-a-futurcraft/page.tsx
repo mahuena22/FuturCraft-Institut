@@ -43,7 +43,7 @@ export default async function ViePage() {
             tag: 'Maintenance IT',
         },
         {
-            title: 'Initiation à la Cybersécurité',
+            title: 'Cybersécurité',
             desc: 'Dans un cadre pratique, les étudiants découvrent les bases de la protection des systèmes, des réseaux et des bonnes pratiques de sécurité numérique.',
             image: '/images/campus/cybersecurite/02.jpg',
             tag: 'Cybersécurité',
