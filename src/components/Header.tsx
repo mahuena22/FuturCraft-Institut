@@ -24,6 +24,7 @@ import {
   Wind,
   Pen,
   Phone,
+  HelpCircle,
 } from "lucide-react";
 
 const formations = [
@@ -65,6 +66,7 @@ export function Header() {
     { label: "Projets", href: "/projets-etudiants", icon: Layers },
     { label: "Entreprises", href: "/entreprises", icon: Briefcase },
     { label: "L'Institut", href: "/institut", icon: Building2 },
+    { label: "FAQ", href: "/faq", icon: HelpCircle },
     { label: "Contact", href: "/contact", icon: Phone },
   ];
 

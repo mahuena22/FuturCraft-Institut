@@ -4,6 +4,7 @@ import {
     getProjects,
 } from '@/lib/data-service';
 import { getCampusImagesForSlug } from '@/lib/campus-images';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -157,6 +158,9 @@ const courseJsonLd = {
     return (
         <div className="bg-[var(--color-fc-bg)] min-h-screen">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([courseJsonLd, faqJsonLd]) }} />
+            <div className="mx-auto max-w-[84rem] px-4 pt-6 sm:px-6 lg:px-10">
+                <Breadcrumbs items={[{ label: "Formations", href: "/formations" }, { label: formation.title }]} />
+            </div>
             {/* HERO */}
             <section className="relative isolate overflow-hidden bg-[var(--color-fc-deep)] text-white">
                 <div className="absolute inset-0">

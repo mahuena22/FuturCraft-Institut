@@ -25,14 +25,34 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const { showToast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    showToast({
-      type: "success",
-      title: "Message envoyé !",
-      message: `Merci ${form.name}, notre équipe a bien reçu votre demande et vous contactera très prochainement.`,
-    });
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur lors de l'envoi");
+      setSubmitted(true);
+      showToast({
+        type: "success",
+        title: "Message envoyé !",
+        message: `Merci ${form.name}, notre équipe a bien reçu votre demande et vous contactera très prochainement.`,
+      });
+    } catch (err: any) {
+      showToast({
+        type: "error",
+        title: "Échec de l'envoi",
+        message: err?.message || "Une erreur est survenue. Réessayez ou contactez-nous par WhatsApp.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -55,6 +75,9 @@ export default function ContactPage() {
                   <div>
                     <p className="font-semibold text-[var(--color-fc-black)]">Campus FuturCraft</p>
                     <p className="mt-1 leading-7 text-[var(--color-fc-gray-mid)]">Godomey, Supermarché O Bénin, avant pk14, Abomey-Calavi</p>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Godomey+Supermarche+O+Benin+pk14+Abomey-Calavi" target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-[var(--color-fc-primary)] hover:underline">
+                      <MapPin className="h-3.5 w-3.5" /> Ouvrir dans Google Maps
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -139,8 +162,8 @@ export default function ContactPage() {
                   <span className="mb-2 block text-sm font-semibold text-[var(--color-fc-black)]">Message *</span>
                   <textarea rows={5} required placeholder="Explique ton projet ou ta question..." value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-fc-primary)]" />
                 </label>
-                <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)] sm:w-auto">
-                  <Send className="h-4 w-4" /> Envoyer le message
+                <button type="submit" disabled={submitting} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-fc-deep)] px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-fc-primary)] disabled:opacity-60 sm:w-auto">
+                  {submitting ? "Envoi en cours..." : (<><Send className="h-4 w-4" /> Envoyer le message</>)}
                 </button>
               </form>
             )}

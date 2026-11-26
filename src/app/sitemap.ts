@@ -14,6 +14,10 @@ const staticRoutes = [
   "/vie-a-futurcraft",
   "/entreprises",
   "/contact",
+  "/faq",
+  "/mentions-legales",
+  "/politique-confidentialite",
+  "/conditions-inscription",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

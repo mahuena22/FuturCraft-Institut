@@ -33,6 +33,10 @@ export default async function ArticleDetailPage(props: {
   if (!article) notFound();
 
   const paragraphs = article.content.split("\n\n").filter(Boolean);
+  const allArticles = await getBlogArticles();
+  const related = allArticles
+    .filter((a) => a.slug !== article.slug && a.category === article.category)
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[var(--color-fc-bg)]">
@@ -82,10 +86,57 @@ export default async function ArticleDetailPage(props: {
         </div>
 
         {/* Share */}
-        <div className="flex items-center gap-3 border-t border-[var(--color-fc-gray-light)] pt-6">
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-fc-gray-light)] pt-6">
           <Share2 className="h-4 w-4 text-[var(--color-fc-gray-mid)]" />
-          <span className="text-sm text-[var(--color-fc-gray-mid)]">Partager cet article</span>
+          <span className="text-sm text-[var(--color-fc-gray-mid)]">Partager :</span>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(article.title + " " + (typeof window !== "undefined" ? window.location.href : ""))}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-fc-gray-light)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]"
+          >
+            WhatsApp
+          </a>
+          <a
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-fc-gray-light)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]"
+          >
+            LinkedIn
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof navigator !== "undefined" && navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-fc-gray-light)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-fc-black)] transition-colors hover:border-[var(--color-fc-primary)]/30 hover:text-[var(--color-fc-primary)]"
+          >
+            Copier le lien
+          </button>
         </div>
+
+        {/* Related articles */}
+        {related.length > 0 && (
+          <div className="border-t border-[var(--color-fc-gray-light)] pt-8">
+            <h3 className="font-display text-lg font-extrabold text-[var(--color-fc-black)]">Articles liés</h3>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {related.map((a) => (
+                <Link
+                  key={a.id}
+                  href={`/actualites/${a.slug}`}
+                  className="group rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-[var(--color-fc-primary)]/30 hover:shadow-md"
+                >
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-fc-primary)]">{a.category}</p>
+                  <p className="mt-2 text-sm font-semibold text-[var(--color-fc-black)] group-hover:text-[var(--color-fc-primary)] line-clamp-2">{a.title}</p>
+                  <p className="mt-1 text-xs text-[var(--color-fc-gray-mid)]">{a.readTime}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="rounded-[1.75rem] bg-[var(--color-fc-deep)] p-8 text-center text-white sm:p-10">
           <h3 className="font-display text-2xl font-extrabold tracking-tight">Envie de te former avec nous ?</h3>

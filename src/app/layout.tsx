@@ -68,7 +68,7 @@ export const metadata: Metadata = {
         description: "Centre de formation aux métiers du numérique au Bénin.",
         address: { "@type": "PostalAddress", streetAddress: "Supermarché O Bénin, avant pk14", addressLocality: "Godomey", addressRegion: "Cotonou", addressCountry: "BJ" },
         telephone: "+229 43 32 78 32",
-        email: "contact@futurcraftinstitut.com",
+        email: "futurcraftinstitut@gmail.com",
         sameAs: ["https://facebook.com/futurcraftinstitut","https://instagram.com/futurcraft_institut","https://linkedin.com/company/futurcraft-institut","https://tiktok.com/@futurcraft_institut"],
       },
       {

@@ -15,6 +15,7 @@ import {
 import { getFormations } from '@/lib/data-service';
 import { FAQAccordion } from '@/components/FAQAccordion';
 import { PageIntro } from '@/components/PageIntro';
+import { PaymentSimulator } from '@/components/PaymentSimulator';
 
 export const revalidate = 3600;
 export const metadata = {
@@ -220,6 +221,12 @@ export default async function AdmissionsPage() {
                             <Link href="/inscription" className="font-bold text-[var(--color-fc-primary)] hover:underline">Démarrer ma candidature →</Link>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section className="page-container py-12 sm:py-16">
+                <div className="mx-auto max-w-3xl">
+                    <PaymentSimulator formations={formations.map((f: any) => ({ id: f.id, title: f.title, price: f.price, registrationFee: f.registrationFee, installmentsCount: f.installmentsCount }))} />
                 </div>
             </section>
 

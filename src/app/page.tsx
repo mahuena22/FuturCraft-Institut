@@ -25,6 +25,7 @@ import { getFormations, getOpenPromotionsByFormation } from "@/lib/data-service"
 import { Reveal } from "@/components/Reveal";
 import { StatCounter } from "@/components/StatCounter";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { OrientationQuiz } from "@/components/OrientationQuiz";
 import { SectionHeading } from "@/components/SectionHeading";
 import { formatTrainingPrice } from "@/lib/format-training-price";
 
@@ -235,6 +236,13 @@ export default async function HomePage() {
                             </span>
                         </Link>
                     ))}
+                </div>
+            </section>
+
+            {/* â”â‚¬â”â‚¬ ORIENTATION QUIZ â”â‚¬â”â‚¬ */}
+            <section className="mx-auto max-w-[84rem] px-4 py-12 sm:px-6 lg:px-10">
+                <div className="mx-auto max-w-3xl">
+                    <OrientationQuiz />
                 </div>
             </section>
 

@@ -52,9 +52,9 @@ export function Footer() {
                 <Phone className="h-4 w-4 shrink-0 text-[var(--color-fc-cyan)]" />
                 +229 43 32 78 32
               </a>
-              <a href="mailto:contact@futurcraftinstitut.com" className="flex items-center gap-3 transition-colors hover:text-white">
+              <a href="mailto:futurcraftinstitut@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
                 <Mail className="h-4 w-4 shrink-0 text-[var(--color-fc-cyan)]" />
-                contact@futurcraftinstitut.com
+                futurcraftinstitut@gmail.com
               </a>
             </div>
             <div className="flex items-center gap-2 pt-1">
@@ -110,9 +110,12 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-white/40 sm:flex-row">
           <p>© {new Date().getFullYear()} FuturCraft Institut. Tous droits réservés.</p>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link href="/mentions-legales" className="transition-colors hover:text-white/70">Mentions légales</Link>
+            <Link href="/politique-confidentialite" className="transition-colors hover:text-white/70">Confidentialité</Link>
+            <Link href="/conditions-inscription" className="transition-colors hover:text-white/70">Conditions</Link>
             <Link href="/recu" className="transition-colors hover:text-white/70">Vérifier un reçu</Link>
-            <Link href="/admin" className="transition-colors hover:text-white/70">Admin</Link>
+            <Link href="/admin" className="text-[var(--color-fc-cyan)] font-semibold hover:text-[var(--color-fc-primary)]">Admin</Link>
           </div>
         </div>
       </div>
