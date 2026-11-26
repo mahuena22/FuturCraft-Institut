@@ -3,6 +3,7 @@ import {
     getPromotions,
     getProjects,
 } from '@/lib/data-service';
+import { getCampusImagesForSlug } from '@/lib/campus-images';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -134,7 +135,9 @@ export default async function FormationDetailPage(props: {
         { q: 'Obtient-on une attestation ou certification reconnue ?', a: "Oui, à l'issue de la formation et après validation de la soutenance du projet devant jury professionnel, vous recevez le Certificat Professionnel de Compétences FuturCraft avec vérification numérique par QR Code." },
         { q: 'Les cours ont-ils lieu en présentiel ou en ligne ?', a: `Cette formation est dispensée en mode ${formation.mode} sur nos campus de ${formation.campus}. Les ateliers pratiques se font en laboratoire équipé.` },
     ];
-    const courseJsonLd = {
+    
+    const campusSpotlight = getCampusImagesForSlug(formation.slug);
+const courseJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Course',
         name: formation.title,
@@ -315,6 +318,25 @@ export default async function FormationDetailPage(props: {
                                 </div>
                             </div>
                         </section>
+
+                        {campusSpotlight && (
+                            <section className="space-y-6">
+                                <div>
+                                    <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">En immersion</p>
+                                    <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-[var(--color-fc-black)] sm:text-3xl">{campusSpotlight.label} à FuturCraft</h2>
+                                    <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-fc-gray-mid)]">Des images réelles de nos ateliers pour vous projeter dans l&apos;apprentissage pratique et l&apos;ambiance du campus.</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                                    {campusSpotlight.images.map((img, idx) => (
+                                        <figure key={idx} className="group overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white">
+                                            <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-fc-gray-light)]/30">
+                                                <Image src={img.src} alt={img.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                                            </div>
+                                        </figure>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
                         <section className="space-y-5">
                             <p className="inline-flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">
