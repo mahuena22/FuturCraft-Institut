@@ -24,7 +24,7 @@ export const campusImagesBySlug: Record<string, { label: string; images: CampusI
     images: [
       { src: "/images/campus/maintenance/01.jpg", alt: "Étudiants en maintenance informatique pendant un atelier matériel" },
       { src: "/images/campus/maintenance/03.jpg", alt: "Diagnostic et maintenance d'équipements informatiques" },
-      { src: "/images/campus/cybersecurite/02.jpg", alt: "Atelier pratique réseau et cybersécurité" },
+      { src: "/images/campus/cybersecurite/02.jpg", alt: "Atelier pratique réseau informatique" },
       { src: "/images/campus/maintenance/05.jpg", alt: "Apprenants en maintenance informatique et réseau" },
     ],
   },
