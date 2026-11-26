@@ -8,7 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toast";
 import { Analytics } from "@/lib/analytics";
-import { WhatsAppFloatButton } from "@/components/WhatsAppButton";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -143,11 +143,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Header />
           <main id="contenu" className="flex-1 pb-20 sm:pb-0">{children}</main>
           <Footer />
-          <WhatsAppFloatButton
-            phoneNumber="22943327832"
-            defaultMessage="Bonjour, je souhaite des informations sur les formations FuturCraft"
-            showAfterScroll={200}
-          />
+
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-fc-gray-light)] bg-white/95 p-3 backdrop-blur sm:hidden">
             <div className="mx-auto flex max-w-[84rem] gap-2">
               <a href="/inscription" data-track="cta-inscription-sticky" className="inline-flex flex-1 items-center justify-center rounded-xl bg-[var(--color-fc-deep)] px-4 py-3 text-sm font-bold text-white">Candidater</a>
