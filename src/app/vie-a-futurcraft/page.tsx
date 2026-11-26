@@ -26,28 +26,39 @@ export default async function ViePage() {
     const lifeMoments = [
         {
             title: 'Ateliers Code & Développement',
-            desc: 'Des sessions nocturnes de coding collaboratif pour débugger en équipe dans une ambiance festive et stimulante.',
-            image: '/images/CodingNight.jpg',
-            tag: 'Coding Night',
+            desc: 'Des sessions pratiques de programmation où les étudiants conçoivent, testent et améliorent des projets réels en équipe, dans une ambiance collaborative.',
+            image: '/images/campus/dev/01.jpg',
+            tag: 'Développement Web',
         },
         {
-            title: 'Sortie sur Ouidah',
-            desc: "Pratique en plein air à Ouidah : les étudiants en Audiovisuel de FuturCraft Institut ont mis leurs compétences en pratique en capturant des plans cinématiques au cœur de la richesse culturelle de la ville. Une immersion sur le terrain pour travailler cadrage, lumière et mouvements de caméra, tout en racontant une histoire à travers l'image.",
-            image: '/images/sortieSurOuidah.jpg',
-            tag: 'Pratique Terrain',
+            title: 'Production Audiovisuelle sur le terrain',
+            desc: 'Les étudiants en audiovisuel apprennent le cadrage, la lumière et la prise de vue à travers des exercices pratiques et des sorties de terrain.',
+            image: '/images/campus/audiovisuel/02.jpg',
+            tag: 'Audiovisuel',
         },
         {
-            title: 'Du campus au terrain : place au professionnalisme !',
-            desc: 'En immersion professionnelle. Les étudiants de FuturCraft Institut ont effectué une sortie professionnelle, vêtus de leur tenue professionnelle, pour découvrir les réalités du terrain et mettre en pratique les attitudes et compétences acquises en formation.',
-            image: '/images/photoProfessionnelle.jpg',
-            tag: 'Immersion professionnelle',
+            title: 'Atelier Maintenance Informatique',
+            desc: 'Diagnostic, montage, entretien et dépannage : les étudiants mettent la main sur le matériel pour acquérir des réflexes professionnels.',
+            image: '/images/campus/maintenance/03.jpg',
+            tag: 'Maintenance IT',
         },
         {
-            title: 'Atelier en Maintenance Informatique',
-            desc: "Pratique en maintenance informatique : les étudiants de FuturCraft Institut passent à l'action pour découvrir les techniques de diagnostic et d'entretien des équipements informatiques. Une immersion pratique pour développer leur autonomie et apprendre à résoudre concrètement les problèmes techniques.",
-            image: '/images/maintenanceInformatique2.jpg',
-            tag: 'Maintenance Informatique',
+            title: 'Initiation à la Cybersécurité',
+            desc: 'Dans un cadre pratique, les étudiants découvrent les bases de la protection des systèmes, des réseaux et des bonnes pratiques de sécurité numérique.',
+            image: '/images/campus/cybersecurite/02.jpg',
+            tag: 'Cybersécurité',
         },
+    ];
+
+    const campusGallery = [
+        { src: '/images/campus/dev/04.jpg', alt: 'Étudiants en développement web en séance pratique', label: 'Développement' },
+        { src: '/images/campus/audiovisuel/01.jpg', alt: 'Étudiants en audiovisuel pendant un exercice de prise de vue', label: 'Audiovisuel' },
+        { src: '/images/campus/maintenance/01.jpg', alt: 'Atelier pratique de maintenance informatique', label: 'Maintenance' },
+        { src: '/images/campus/cybersecurite/01.jpg', alt: 'Session pratique en cybersécurité', label: 'Cybersécurité' },
+        { src: '/images/campus/dev/07.jpg', alt: 'Étudiants en développement travaillant sur ordinateur', label: 'Développement' },
+        { src: '/images/campus/audiovisuel/04.jpg', alt: 'Exercice pratique en audiovisuel', label: 'Audiovisuel' },
+        { src: '/images/campus/maintenance/05.jpg', alt: 'Étudiants en maintenance informatique', label: 'Maintenance' },
+        { src: '/images/campus/cybersecurite/05.jpg', alt: 'Apprenants en atelier cybersécurité', label: 'Cybersécurité' },
     ];
 
     return (
@@ -164,6 +175,32 @@ export default async function ViePage() {
                                     </p>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="space-y-6 pt-6 border-t border-[var(--color-fc-gray-light)]">
+                    <div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fc-primary)] bg-[var(--color-fc-primary)]/10 px-2.5 py-1 rounded">
+                            Campus en images
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-fc-black)] mt-1">
+                            Nos étudiants en action
+                        </h2>
+                        <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-fc-gray-mid)]">
+                            Des moments réels capturés pendant les ateliers pratiques, les séances techniques et les projets de terrain.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                        {campusGallery.map((img, i) => (
+                            <figure key={i} className="group overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white">
+                                <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-fc-gray-light)]/40">
+                                    <Image src={img.src} alt={img.alt} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    <div className="absolute inset-x-0 bottom-0 bg-[#06122f]/65 px-3 py-2">
+                                        <figcaption className="text-[11px] font-bold text-white">{img.label}</figcaption>
+                                    </div>
+                                </div>
+                            </figure>
                         ))}
                     </div>
                 </section>

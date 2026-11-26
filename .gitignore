@@ -1,9 +1,13 @@
+﻿# .gitignore
 node_modules
 .next
-.refact
 dist
 build
-*.tsbuildinfo
+coverage
+*.log
 .env.local
 .env.production
 public/uploads
+.vercel
+.env*.local
+*.tsbuildinfo
