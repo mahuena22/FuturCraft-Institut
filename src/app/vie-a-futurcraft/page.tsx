@@ -95,7 +95,7 @@ export default async function ViePage() {
                                         alt={ev.title}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 33vw"
-                                        className="object-cover"
+                                        className="object-cover object-top"
                                     />
                                     <div className="absolute top-3 left-3">
                                         <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[var(--color-fc-deep)] text-white">
@@ -158,7 +158,7 @@ export default async function ViePage() {
                                         alt={m.title}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 50vw"
-                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute top-3 left-3">
                                         <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-white/95 text-[var(--color-fc-black)] backdrop-blur-xs shadow-xs">
@@ -195,7 +195,7 @@ export default async function ViePage() {
                         {campusGallery.map((img, i) => (
                             <figure key={i} className="group overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white">
                                 <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-fc-gray-light)]/40">
-                                    <Image src={img.src} alt={img.alt} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    <Image src={img.src} alt={img.alt} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover object-top transition-transform duration-500 group-hover:scale-105" />
                                     <div className="absolute inset-x-0 bottom-0 bg-[#06122f]/65 px-3 py-2">
                                         <figcaption className="text-[11px] font-bold text-white">{img.label}</figcaption>
                                     </div>

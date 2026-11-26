@@ -330,7 +330,7 @@ const courseJsonLd = {
                                     {campusSpotlight.images.map((img, idx) => (
                                         <figure key={idx} className="group overflow-hidden rounded-2xl border border-[var(--color-fc-gray-light)] bg-white">
                                             <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-fc-gray-light)]/30">
-                                                <Image src={img.src} alt={img.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                <Image src={img.src} alt={img.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover object-top transition-transform duration-500 group-hover:scale-105" />
                                             </div>
                                         </figure>
                                     ))}
