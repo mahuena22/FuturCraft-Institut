@@ -227,8 +227,8 @@ export default async function HomePage() {
                             <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-[var(--color-fc-deep)] px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100 group-focus-visible:-translate-y-1 group-focus-visible:opacity-100">
                                 {label}
                             </span>
-                            <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-fc-gray-light)] bg-white text-[var(--color-fc-primary)] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[var(--color-fc-primary)]/30 group-hover:bg-[var(--color-fc-primary)] group-hover:text-white group-hover:shadow-[0_16px_30px_-12px_rgba(18,81,149,0.45)] group-focus-visible:-translate-y-1 group-focus-visible:border-[var(--color-fc-primary)]/30 group-focus-visible:bg-[var(--color-fc-primary)] group-focus-visible:text-white sm:h-16 sm:w-16">
-                                <Icon className="h-6 w-6" />
+                            <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-fc-gray-light)] bg-white p-3 text-[var(--color-fc-primary)] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[var(--color-fc-primary)]/30 group-hover:bg-[var(--color-fc-primary)] group-hover:text-white group-hover:shadow-[0_16px_30px_-12px_rgba(18,81,149,0.45)] group-focus-visible:-translate-y-1 group-focus-visible:border-[var(--color-fc-primary)]/30 group-focus-visible:bg-[var(--color-fc-primary)] group-hover:text-white sm:h-16 sm:w-16 sm:p-3.5">
+                                <Icon className="h-full w-full" />
                             </span>
                             <span className="mt-2 text-[11px] font-semibold text-[var(--color-fc-gray-mid)] transition-colors group-hover:text-[var(--color-fc-primary)] group-focus-visible:text-[var(--color-fc-primary)]">
                                 {short}
