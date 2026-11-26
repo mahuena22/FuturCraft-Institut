@@ -6,7 +6,6 @@ import {
     ArrowRight,
     ShieldCheck,
     Smartphone,
-    Sparkles,
     Clock,
     MapPin,
     Star,

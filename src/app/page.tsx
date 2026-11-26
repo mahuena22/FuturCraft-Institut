@@ -3,7 +3,9 @@ import Link from "next/link";
 import {
     ArrowRight,
     ArrowUpRight,
+    Award,
     BookOpen,
+    Bot,
     Briefcase,
     Camera,
     Code2,
@@ -14,7 +16,6 @@ import {
     Palette,
     Pen,
     Quote,
-    Sparkles,
     Target,
     TrendingUp,
     Users,
@@ -121,7 +122,7 @@ export default async function HomePage() {
         { label: "Marketing Digital", short: "Marketing", href: "/formation/marketing-digital", icon: TrendingUp },
         { label: "Graphisme & Sérigraphie", short: "Graphisme", href: "/formation/graphisme-et-serigraphie", icon: Pen },
         { label: "Audiovisuel & Montage", short: "Audiovisuel", href: "/formation/photographie-cadrage-et-montage-video", icon: Camera },
-        { label: "Outils d'IA", short: "Outils IA", href: "/formation/maitrise-outils-intelligence-artificielle", icon: Sparkles },
+        { label: "Outils d'IA", short: "Outils IA", href: "/formation/maitrise-outils-intelligence-artificielle", icon: Bot },
         { label: "Maintenance & Réseau", short: "Réseau", href: "/formation/maintenance-informatique-et-reseau", icon: Wrench },
         { label: "Copywriting", short: "Copy", href: "/formation/copywriting", icon: Pen },
         { label: "E-commerce", short: "E-com", href: "/formation/e-commerce", icon: Briefcase },
@@ -365,7 +366,7 @@ export default async function HomePage() {
                             {[
                                 { icon: Target, title: "Projets concrets", text: "Tu travailles sur des cas réels, pas seulement des exercices théoriques." },
                                 { icon: Users, title: "Mentors accessibles", text: "Des formateurs qui suivent ta progression et te challengent." },
-                                { icon: Sparkles, title: "Portfolio & confiance", text: "Tu sors avec des réalisations à montrer et des réflexes professionnels." },
+                                { icon: Award, title: "Portfolio & confiance", text: "Tu sors avec des réalisations à montrer et des réflexes professionnels." },
                             ].map((item, index) => {
                                 const Icon = item.icon;
                                 return (

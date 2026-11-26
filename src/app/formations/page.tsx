@@ -5,13 +5,13 @@ import {
   GraduationCap,
   Phone,
   ArrowRight,
-  Sparkles,
   BookOpen,
   Clock,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Compass } from "lucide-react";
 import { PageIntro } from "@/components/PageIntro";
 
 export const dynamic = "force-dynamic";
@@ -64,7 +64,7 @@ export default async function FormationsPage() {
           <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
             <div className="max-w-xl">
               <p className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-cyan)]">
-                <Sparkles className="h-3.5 w-3.5" /> Orientation personnalisée
+                <Compass className="h-3.5 w-3.5" /> Orientation personnalisée
               </p>
               <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
                 Besoin d&apos;aide pour choisir ?

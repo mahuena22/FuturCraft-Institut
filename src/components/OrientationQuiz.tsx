@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Compass } from "lucide-react";
 
 const questions = [
   {
@@ -58,7 +58,7 @@ export function OrientationQuiz() {
     <div className="rounded-[1.75rem] border border-[var(--color-fc-gray-light)] bg-white p-7 sm:p-8">
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--color-fc-primary)]/[0.08] text-[var(--color-fc-primary)]">
-          <Sparkles className="h-5 w-5" />
+          <Compass className="h-5 w-5" />
         </div>
         <div>
           <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[var(--color-fc-primary)]">Orientation</p>
