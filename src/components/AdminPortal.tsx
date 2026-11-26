@@ -237,8 +237,8 @@ export function AdminPortal({
   const [showManualPaymentModal, setShowManualPaymentModal] = useState(false);
   const [manualPayStudentId, setManualPayStudentId] = useState<number>(students[0]?.id || 1);
   const [manualPayAmount, setManualPayAmount] = useState<number>(50000);
-  const [manualPayMethod, setManualPayMethod] = useState<string>("Caisse / EspÃ¨ces");
-  const [manualPayNotes, setManualPayNotes] = useState<string>("RÃ¨glement physique Ã  la caisse du campus de Cotonou");
+  const [manualPayMethod, setManualPayMethod] = useState<string>("Caisse / Espèces");
+  const [manualPayNotes, setManualPayNotes] = useState<string>("Règlement physique à la caisse du campus de Cotonou");
   const [isRecordingPayment, setIsRecordingPayment] = useState(false);
 
   // Manual student creation modal
@@ -251,7 +251,7 @@ export function AdminPortal({
     city: "Cotonou",
     formationId: formationsList[0]?.id || 1,
     studyLevel: "BAC",
-    previousDiploma: "BaccalaurÃ©at",
+    previousDiploma: "Baccalauréat",
   });
   const [isCreatingStudent, setIsCreatingStudent] = useState(false);
 
@@ -391,7 +391,7 @@ export function AdminPortal({
   // Handle payment request: confirm / reject
   const [processingRequestId, setProcessingRequestId] = useState<number | null>(null);
   const handlePaymentRequestAction = async (id: number, action: "confirmer" | "rejeter") => {
-    if (!window.confirm(action === "confirmer" ? "Confirmer ce paiement et gÃ©nÃ©rer le reÃ§u officiel ?" : "Rejeter cette demande de paiement ?")) return;
+    if (!window.confirm(action === "confirmer" ? "Confirmer ce paiement et générer le reçu officiel ?" : "Rejeter cette demande de paiement ?")) return;
     setProcessingRequestId(id);
     try {
       const res = await fetch(`/api/payment-requests/${id}`, {
@@ -406,7 +406,7 @@ export function AdminPortal({
       await reloadData();
     } catch (e) {
       console.error(e);
-      window.alert("Erreur rÃ©seau lors du traitement");
+      window.alert("Erreur réseau lors du traitement");
     } finally {
       setProcessingRequestId(null);
     }
@@ -450,12 +450,12 @@ export function AdminPortal({
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Erreur mise Ã  jour");
+      if (!res.ok) throw new Error(data.error || "Erreur mise à jour");
       setFormations((prev) =>
         prev.map((f) => (f.slug === editingFormation.slug ? { ...f, ...data.formation } : f))
       );
       setEditingFormation(null);
-      alert("Formation mise Ã  jour avec succÃ¨s !");
+      alert("Formation mise à jour avec succès !");
     } catch (err: any) {
       alert(err.message || "Erreur");
     } finally {
@@ -485,7 +485,7 @@ export function AdminPortal({
             excerpt: "",
             content: "",
             coverImage: "",
-            author: "Ã‰quipe PÃ©dagogique FuturCraft",
+            author: "Équipe Pédagogique FuturCraft",
             readTime: "5 min de lecture",
             category: "",
             publishedAt: new Date().toISOString().slice(0, 10),
@@ -527,7 +527,7 @@ export function AdminPortal({
         setArticles((prev) => [data.article, ...prev]);
       }
       setArticleModalOpen(false);
-      alert(editingArticle ? "Article mis Ã  jour !" : "Article crÃ©Ã© !");
+      alert(editingArticle ? "Article mis à jour !" : "Article créé !");
     } catch (err: any) {
       alert(err.message || "Erreur");
     }
@@ -535,12 +535,12 @@ export function AdminPortal({
 
   // Delete article
   const handleDeleteArticle = async (article: ArticleItem) => {
-    if (!window.confirm(`Supprimer l'article Â« ${article.title} Â» ?`)) return;
+    if (!window.confirm(`Supprimer l'article « ${article.title} » ?`)) return;
     try {
       const res = await fetch(`/api/articles/${article.slug}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Erreur suppression");
       setArticles((prev) => prev.filter((a) => a.slug !== article.slug));
-      alert("Article supprimÃ©.");
+      alert("Article supprimé.");
     } catch (err: any) {
       alert(err.message || "Erreur");
     }
@@ -556,7 +556,7 @@ export function AdminPortal({
         body: JSON.stringify(projectForm),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Erreur lors de lâ€™enregistrement du projet");
+      if (!res.ok) throw new Error(data.error || "Erreur lors de l’enregistrement du projet");
       setProjects((current) => [data.project, ...current]);
       setProjectModalOpen(false);
       setProjectForm({
@@ -569,16 +569,16 @@ export function AdminPortal({
         projectUrl: "",
         githubUrl: "",
       });
-      alert("Projet ajoutÃ©. Il est visible sur le site car lâ€™Ã©tudiant est validÃ©.");
+      alert("Projet ajouté. Il est visible sur le site car l’étudiant est validé.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Erreur lors de lâ€™enregistrement");
+      alert(error instanceof Error ? error.message : "Erreur lors de l’enregistrement");
     } finally {
       setIsSavingProject(false);
     }
   };
 
   const handleDeleteProject = async (project: StudentProjectItem) => {
-    if (!window.confirm(`Supprimer le projet Â« ${project.title} Â» ?`)) return;
+    if (!window.confirm(`Supprimer le projet « ${project.title} » ?`)) return;
     try {
       const res = await fetch(`/api/admin/projects/${project.id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
@@ -597,7 +597,7 @@ export function AdminPortal({
     try {
       const recordedByStaff =
         currentRole === "financier"
-          ? "Sarah Menou (CaissiÃ¨re Centrale)"
+          ? "Sarah Menou (Caissière Centrale)"
           : currentRole === "agent"
           ? "Marcelle Agossou (Agent Administratif)"
           : "Gauthier I. ORE (Super Admin)";
@@ -617,7 +617,7 @@ export function AdminPortal({
       if (!res.ok) throw new Error("Erreur enregistrement paiement");
       await reloadData();
       setShowManualPaymentModal(false);
-      alert("Paiement enregistrÃ© et reÃ§u gÃ©nÃ©rÃ© avec succÃ¨s !");
+      alert("Paiement enregistré et reçu généré avec succès !");
     } catch (err: any) {
       alert(err.message || "Erreur");
     } finally {
@@ -641,10 +641,10 @@ export function AdminPortal({
         body: JSON.stringify(newStudentForm),
       });
 
-      if (!res.ok) throw new Error("Erreur crÃ©ation Ã©tudiant");
+      if (!res.ok) throw new Error("Erreur création étudiant");
       await reloadData();
       setShowNewStudentModal(false);
-      alert("Nouvel Ã©tudiant crÃ©Ã© et matricule gÃ©nÃ©rÃ© avec succÃ¨s !");
+      alert("Nouvel étudiant créé et matricule généré avec succès !");
     } catch (err: any) {
       alert(err.message || "Erreur");
     } finally {
@@ -708,14 +708,14 @@ export function AdminPortal({
                 </span>
               </h1>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Supervision des inscriptions, encaissements, cursus et dÃ©livrance des reÃ§us
+                Supervision des inscriptions, encaissements, cursus et délivrance des reçus
               </p>
             </div>
           </div>
 
           {/* Role selector dropdown */}
           <div className="flex items-center gap-2 bg-white/10 p-1.5 rounded-xl border border-white/15 text-xs">
-            <span className="text-[var(--color-fc-gray-mid)] font-semibold px-2">RÃ´le actif :</span>
+            <span className="text-[var(--color-fc-gray-mid)] font-semibold px-2">Rôle actif :</span>
             <button
               onClick={() => setCurrentRole("super_admin")}
               className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
@@ -750,11 +750,11 @@ export function AdminPortal({
 
           <button
             onClick={handleLogout}
-            title="Se dÃ©connecter"
+            title="Se déconnecter"
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 hover:text-white hover:bg-red-600/20 border border-white/15 hover:border-red-500/40 transition-all"
           >
             <LogOut className="w-4 h-4" />
-            DÃ©connexion
+            Déconnexion
           </button>
         </div>
 
@@ -798,7 +798,7 @@ export function AdminPortal({
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Gestion des Ã‰tudiants ({students.length})</span>
+            <span>Gestion des Étudiants ({students.length})</span>
           </button>
 
           <button
@@ -834,7 +834,7 @@ export function AdminPortal({
             }`}
           >
             <FileText className="w-4 h-4" />
-            <span>Blog &amp; ActualitÃ©s ({articles.length})</span>
+            <span>Blog &amp; Actualités ({articles.length})</span>
           </button>
 
           <button
@@ -846,7 +846,7 @@ export function AdminPortal({
             }`}
           >
             <FolderGit2 className="w-4 h-4" />
-            <span>Projets Ã©tudiants ({projects.length})</span>
+            <span>Projets étudiants ({projects.length})</span>
           </button>
 
           <button
@@ -870,7 +870,7 @@ export function AdminPortal({
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Gestion des RÃ´les & Permissions</span>
+            <span>Gestion des Rôles & Permissions</span>
           </button>
 
           <button
@@ -908,19 +908,19 @@ export function AdminPortal({
 
               <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
                 <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
-                  Total Ã‰tudiants
+                  Total Étudiants
                 </span>
                 <div className="text-3xl font-black text-[var(--color-fc-black)]">{stats.totalStudents}</div>
                 <div className="flex items-center gap-2 text-xs pt-1">
                   <span className="text-emerald-600 font-bold">{stats.activeStudents} actifs</span>
-                  <span className="text-white/60">â€¢</span>
-                  <span className="text-[var(--color-fc-primary)] font-semibold">{stats.newInscriptions} prÃ©inscrits</span>
+                  <span className="text-white/60">•</span>
+                  <span className="text-[var(--color-fc-primary)] font-semibold">{stats.newInscriptions} préinscrits</span>
                 </div>
               </div>
 
               <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
                 <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
-                  Montant EncaissÃ© (FCFA)
+                  Montant Encaissé (FCFA)
                 </span>
                 <div className="text-3xl font-black text-emerald-600">
                   {stats.totalCollectedAmount.toLocaleString("fr-FR")}
@@ -932,13 +932,13 @@ export function AdminPortal({
 
               <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-1">
                 <span className="text-xs font-bold text-[var(--color-fc-gray-mid)] uppercase tracking-wider block">
-                  Reste Ã  Percevoir
+                  Reste à Percevoir
                 </span>
                 <div className="text-3xl font-black text-rose-600">
                   {stats.totalRemainingAmount.toLocaleString("fr-FR")}
                 </div>
                 <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
-                  Sur <strong>{stats.totalExpectedAmount.toLocaleString("fr-FR")} FCFA</strong> prÃ©vus
+                  Sur <strong>{stats.totalExpectedAmount.toLocaleString("fr-FR")} FCFA</strong> prévus
                 </span>
               </div>
 
@@ -948,7 +948,7 @@ export function AdminPortal({
                 </span>
                 <div className="text-3xl font-black text-[var(--color-fc-primary)]">{stats.formationsCount}</div>
                 <span className="text-xs text-[var(--color-fc-gray-mid)] block pt-1">
-                  Tous campus (Godomey, SupermarchÃ© O BÃ©nin Avant pk14)
+                  Tous campus (Godomey, Supermarché O Bénin Avant pk14)
                 </span>
               </div>
             </div>
@@ -958,7 +958,7 @@ export function AdminPortal({
               {/* Recent Payments Table */}
               <div className="lg:col-span-8 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Derniers Encaissements EnregistrÃ©s</h3>
+                  <h3 className="text-base font-bold text-[var(--color-fc-black)]">Derniers Encaissements Enregistrés</h3>
                   <button
                     onClick={() => setActiveTab("paiements")}
                     className="text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
@@ -971,9 +971,9 @@ export function AdminPortal({
                   <table className="w-full text-left text-xs">
                     <thead className="border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] text-[11px] font-bold">
                       <tr>
-                        <th className="py-2">ReÃ§u NÂ°</th>
-                        <th className="py-2">Ã‰tudiant</th>
-                        <th className="py-2">FiliÃ¨re</th>
+                        <th className="py-2">Reçu N°</th>
+                        <th className="py-2">Étudiant</th>
+                        <th className="py-2">Filière</th>
                         <th className="py-2">Montant</th>
                         <th className="py-2">Mode</th>
                         <th className="py-2">Date</th>
@@ -1007,7 +1007,7 @@ export function AdminPortal({
 
               {/* Action shortcuts */}
               <div className="lg:col-span-4 bg-white rounded-2xl border border-[var(--color-fc-gray-light)] p-6  space-y-4">
-                <h3 className="text-base font-bold text-[var(--color-fc-black)]">OpÃ©rations Rapides</h3>
+                <h3 className="text-base font-bold text-[var(--color-fc-black)]">Opérations Rapides</h3>
                 <div className="space-y-2.5">
                   <button
                     onClick={() => setShowManualPaymentModal(true)}
@@ -1026,7 +1026,7 @@ export function AdminPortal({
                   >
                     <span className="flex items-center gap-2">
                       <Users className="w-4 h-4 text-[var(--color-fc-primary)]" />
-                      Inscrire un Ã©tudiant au guichet
+                      Inscrire un étudiant au guichet
                     </span>
                     <Plus className="w-4 h-4" />
                   </button>
@@ -1037,7 +1037,7 @@ export function AdminPortal({
                   >
                     <span className="flex items-center gap-2">
                       <QrCode className="w-4 h-4 text-[var(--color-fc-gray-mid)]" />
-                      VÃ©rifier l&apos;authenticitÃ© d&apos;un reÃ§u
+                      Vérifier l&apos;authenticité d&apos;un reçu
                     </span>
                     <ArrowUpRight className="w-4 h-4 text-[var(--color-fc-gray-mid)]" />
                   </Link>
@@ -1052,9 +1052,9 @@ export function AdminPortal({
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Validation des Comptes Ã‰tudiants</h2>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Validation des Comptes Étudiants</h2>
                 <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                  Chaque nouvel Ã©tudiant doit Ãªtre validÃ© avant de pouvoir se connecter et apparaÃ®tre sur la page Entreprises.
+                  Chaque nouvel étudiant doit être validé avant de pouvoir se connecter et apparaître sur la page Entreprises.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -1080,7 +1080,7 @@ export function AdminPortal({
                     <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="py-3 px-4">Matricule</th>
-                        <th className="py-3 px-4">Ã‰tudiant</th>
+                        <th className="py-3 px-4">Étudiant</th>
                         <th className="py-3 px-4">Contact</th>
                         <th className="py-3 px-4">Formation</th>
                         <th className="py-3 px-4">Date d&apos;inscription</th>
@@ -1099,9 +1099,9 @@ export function AdminPortal({
                             <div>{a.phone}</div>
                             <div className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.email}</div>
                           </td>
-                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "â€”"}</td>
+                          <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "—"}</td>
                           <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] text-[10px]">
-                            {a.createdAt ? new Date(a.createdAt).toLocaleDateString("fr-FR") : "â€”"}
+                            {a.createdAt ? new Date(a.createdAt).toLocaleDateString("fr-FR") : "—"}
                           </td>
                           <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                             <button
@@ -1130,12 +1130,12 @@ export function AdminPortal({
               <div className="px-5 py-3 border-b border-[var(--color-fc-gray-light)] flex items-center justify-between">
                 <span className="text-sm font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Dossiers traitÃ©s rÃ©cemment
+                  Dossiers traités récemment
                 </span>
               </div>
               {admissions.filter((a) => a.status !== "preinscrit").length === 0 ? (
                 <div className="p-8 text-center text-sm text-[var(--color-fc-gray-mid)]">
-                  Aucun dossier traitÃ© pour le moment.
+                  Aucun dossier traité pour le moment.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -1143,7 +1143,7 @@ export function AdminPortal({
                     <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="py-3 px-4">Matricule</th>
-                        <th className="py-3 px-4">Ã‰tudiant</th>
+                        <th className="py-3 px-4">Étudiant</th>
                         <th className="py-3 px-4">Formation</th>
                         <th className="py-3 px-4">Statut</th>
                         <th className="py-3 px-4">Note</th>
@@ -1160,7 +1160,7 @@ export function AdminPortal({
                               <strong className="text-[var(--color-fc-black)] block">{a.firstName} {a.lastName}</strong>
                               <span className="text-[10px] text-[var(--color-fc-gray-mid)]">{a.email}</span>
                             </td>
-                            <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "â€”"}</td>
+                            <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">{a.formationTitle || "—"}</td>
                             <td className="py-3 px-4">
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -1171,15 +1171,15 @@ export function AdminPortal({
                                     : "bg-[var(--color-fc-bg)] text-[var(--color-fc-gray-mid)]"
                                 }`}
                               >
-                                {a.status === "inscrit" && "ValidÃ© (inscrit)"}
+                                {a.status === "inscrit" && "Validé (inscrit)"}
                                 {a.status === "actif" && "Actif"}
-                                {a.status === "termine" && "Formation terminÃ©e"}
-                                {a.status === "rejete" && "RejetÃ©"}
+                                {a.status === "termine" && "Formation terminée"}
+                                {a.status === "rejete" && "Rejeté"}
                                 {!["inscrit", "actif", "termine", "rejete"].includes(a.status) && a.status}
                               </span>
                             </td>
                             <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] italic max-w-[220px]">
-                              {a.validationNote || "â€”"}
+                              {a.validationNote || "—"}
                             </td>
                           </tr>
                         ))}
@@ -1191,15 +1191,15 @@ export function AdminPortal({
           </div>
         )}
 
-        {/* 26 & 30. TAB GESTION DES Ã‰TUDIANTS */}
+        {/* 26 & 30. TAB GESTION DES ÉTUDIANTS */}
         {activeTab === "etudiants" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* Header + Add Student button */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">RÃ©pertoire des Candidats &amp; Ã‰tudiants</h2>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Répertoire des Candidats &amp; Étudiants</h2>
                 <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                  Recherchez par nom, matricule, tÃ©lÃ©phone et gÃ©rez les statuts d&apos;admission.
+                  Recherchez par nom, matricule, téléphone et gérez les statuts d&apos;admission.
                 </p>
               </div>
 
@@ -1208,7 +1208,7 @@ export function AdminPortal({
                 className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]  flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
-                <span>Inscrire un nouvel Ã©tudiant</span>
+                <span>Inscrire un nouvel étudiant</span>
               </button>
             </div>
 
@@ -1218,7 +1218,7 @@ export function AdminPortal({
                 <Search className="w-4 h-4 text-[var(--color-fc-gray-mid)] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Rechercher par nom, matricule FC-..., email, tÃ©lÃ©phone..."
+                  placeholder="Rechercher par nom, matricule FC-..., email, téléphone..."
                   value={searchStudent}
                   onChange={(e) => setSearchStudent(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)]/50 text-xs"
@@ -1233,10 +1233,10 @@ export function AdminPortal({
                 >
                   <option value="all">Tous les statuts</option>
                   <option value="preinscrit">En attente de validation</option>
-                  <option value="rejete">RejetÃ©s</option>
-                  <option value="inscrit">Inscrits (validÃ©s)</option>
-                  <option value="actif">Ã‰tudiants actifs</option>
-                  <option value="termine">Formation terminÃ©e</option>
+                  <option value="rejete">Rejetés</option>
+                  <option value="inscrit">Inscrits (validés)</option>
+                  <option value="actif">Étudiants actifs</option>
+                  <option value="termine">Formation terminée</option>
                 </select>
               </div>
 
@@ -1263,10 +1263,10 @@ export function AdminPortal({
                   <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Matricule</th>
-                      <th className="py-3 px-4">Ã‰tudiant</th>
+                      <th className="py-3 px-4">Étudiant</th>
                       <th className="py-3 px-4">Contact</th>
                       <th className="py-3 px-4">Statut</th>
-                      <th className="py-3 px-4">PayÃ© / Total</th>
+                      <th className="py-3 px-4">Payé / Total</th>
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -1339,7 +1339,7 @@ export function AdminPortal({
               <div>
                 <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Registre Comptable &amp; Encaissements</h2>
                 <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                  Enregistrez les versements en espÃ¨ces Ã  la caisse ou validez les paiements Mobile Money.
+                  Enregistrez les versements en espèces à la caisse ou validez les paiements Mobile Money.
                 </p>
               </div>
 
@@ -1379,11 +1379,11 @@ export function AdminPortal({
                         <table className="w-full text-left text-xs">
                           <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                              <th className="py-3 px-4">RÃ©fÃ©rence</th>
-                              <th className="py-3 px-4">Ã‰tudiant</th>
+                              <th className="py-3 px-4">Référence</th>
+                              <th className="py-3 px-4">Étudiant</th>
                               <th className="py-3 px-4">Montant</th>
                               <th className="py-3 px-4">Moyen</th>
-                              <th className="py-3 px-4">NÂ° Mobile Money</th>
+                              <th className="py-3 px-4">N° Mobile Money</th>
                               <th className="py-3 px-4">Date</th>
                               <th className="py-3 px-4">Statut</th>
                               <th className="py-3 px-4 text-right">Action</th>
@@ -1413,11 +1413,11 @@ export function AdminPortal({
                                     </span>
                                   ) : r.status === "valide" ? (
                                     <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[11px]">
-                                      ValidÃ©
+                                      Validé
                                     </span>
                                   ) : (
                                     <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-[11px]">
-                                      RejetÃ©
+                                      Rejeté
                                     </span>
                                   )}
                                 </td>
@@ -1441,7 +1441,7 @@ export function AdminPortal({
                                       </button>
                                     </div>
                                   ) : (
-                                    <span className="text-[11px] text-[var(--color-fc-gray-mid)]">TraitÃ©</span>
+                                    <span className="text-[11px] text-[var(--color-fc-gray-mid)]">Traité</span>
                                   )}
                                 </td>
                               </tr>
@@ -1461,12 +1461,12 @@ export function AdminPortal({
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
-                      <th className="py-3 px-4">NÂ° ReÃ§u</th>
-                      <th className="py-3 px-4">Ã‰tudiant</th>
+                      <th className="py-3 px-4">N° Reçu</th>
+                      <th className="py-3 px-4">Étudiant</th>
                       <th className="py-3 px-4">Formation</th>
                       <th className="py-3 px-4">Montant</th>
                       <th className="py-3 px-4">Moyen de paiement</th>
-                      <th className="py-3 px-4">EnregistrÃ© par</th>
+                      <th className="py-3 px-4">Enregistré par</th>
                       <th className="py-3 px-4">Date</th>
                       <th className="py-3 px-4 text-right">Action</th>
                     </tr>
@@ -1498,7 +1498,7 @@ export function AdminPortal({
                             className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-fc-primary)] hover:underline"
                           >
                             <Printer className="w-3.5 h-3.5" />
-                            <span>Voir reÃ§u</span>
+                            <span>Voir reçu</span>
                           </Link>
                         </td>
                       </tr>
@@ -1553,7 +1553,7 @@ export function AdminPortal({
                   </div>
 
                   <h3 className="text-base font-bold text-[var(--color-fc-black)] leading-snug">{f.title}</h3>
-                  <div className="text-xs text-[var(--color-fc-gray-mid)]">â±ï¸ {f.duration} â€” {f.mode || "PrÃ©sentiel & Hybride"}</div>
+                  <div className="text-xs text-[var(--color-fc-gray-mid)]">â±ï¸ {f.duration} — {f.mode || "Présentiel & Hybride"}</div>
 
                   <div className="pt-2 border-t border-[var(--color-fc-gray-light)] flex items-center justify-between">
                     <div>
@@ -1587,14 +1587,14 @@ export function AdminPortal({
           </div>
         )}
 
-        {/* TAB BLOG & ACTUALITÃ‰S */}
+        {/* TAB BLOG & ACTUALITÉS */}
         {activeTab === "articles" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Blog &amp; ActualitÃ©s</h2>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Blog &amp; Actualités</h2>
                 <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                  RÃ©digez, modifiez ou supprimez les articles publiÃ©s sur la page ActualitÃ©s.
+                  Rédigez, modifiez ou supprimez les articles publiés sur la page Actualités.
                 </p>
               </div>
               <button
@@ -1612,10 +1612,10 @@ export function AdminPortal({
                   <thead className="bg-[var(--color-fc-bg)] border-b border-[var(--color-fc-gray-light)] text-[var(--color-fc-gray-mid)] font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="py-3 px-4">Titre</th>
-                      <th className="py-3 px-4">CatÃ©gorie</th>
+                      <th className="py-3 px-4">Catégorie</th>
                       <th className="py-3 px-4">Auteur</th>
                       <th className="py-3 px-4">Temps de lecture</th>
-                      <th className="py-3 px-4">PubliÃ© le</th>
+                      <th className="py-3 px-4">Publié le</th>
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -1623,7 +1623,7 @@ export function AdminPortal({
                     {articles.length === 0 && (
                       <tr>
                         <td colSpan={6} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
-                          Aucun article publiÃ© pour le moment.
+                          Aucun article publié pour le moment.
                         </td>
                       </tr>
                     )}
@@ -1677,14 +1677,14 @@ export function AdminPortal({
           </div>
         )}
 
-        {/* TAB PROJETS Ã‰TUDIANTS */}
+        {/* TAB PROJETS ÉTUDIANTS */}
         {activeTab === "projects" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Projets des Ã©tudiants validÃ©s</h2>
+                <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Projets des étudiants validés</h2>
                 <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                  Seuls les Ã©tudiants confirmÃ©s par lâ€™administration peuvent Ãªtre associÃ©s Ã  un projet publiÃ©.
+                  Seuls les étudiants confirmés par l’administration peuvent être associés à un projet publié.
                 </p>
               </div>
               <button
@@ -1706,7 +1706,7 @@ export function AdminPortal({
 
             {validatedStudents.length === 0 && (
               <p className="rounded-xl border border-[var(--color-fc-primary)]/20 bg-[var(--color-fc-surface)] p-4 text-xs text-[var(--color-fc-black)]">
-                Validez dâ€™abord un dossier Ã©tudiant pour pouvoir lui associer un projet.
+                Validez d’abord un dossier étudiant pour pouvoir lui associer un projet.
               </p>
             )}
 
@@ -1716,7 +1716,7 @@ export function AdminPortal({
                   <thead className="border-b border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] text-[11px] font-bold uppercase tracking-wider text-[var(--color-fc-gray-mid)]">
                     <tr>
                       <th className="px-4 py-3">Projet</th>
-                      <th className="px-4 py-3">Ã‰tudiant</th>
+                      <th className="px-4 py-3">Étudiant</th>
                       <th className="px-4 py-3">Formation</th>
                       <th className="px-4 py-3 text-right">Action</th>
                     </tr>
@@ -1725,7 +1725,7 @@ export function AdminPortal({
                     {projects.length === 0 && (
                       <tr>
                         <td colSpan={4} className="py-8 text-center text-[var(--color-fc-gray-mid)]">
-                          Aucun projet publiÃ© pour le moment.
+                          Aucun projet publié pour le moment.
                         </td>
                       </tr>
                     )}
@@ -1736,7 +1736,7 @@ export function AdminPortal({
                           <span className="block truncate text-[10px] text-[var(--color-fc-gray-mid)]">{project.tagline}</span>
                         </td>
                         <td className="px-4 py-3 text-[var(--color-fc-black)]">
-                          {project.studentName || "Ã‰tudiant supprimÃ©"}
+                          {project.studentName || "Étudiant supprimé"}
                           {project.studentNumber && (
                             <span className="mt-1 block font-mono text-[10px] text-[var(--color-fc-gray-mid)]">
                               {project.studentNumber}
@@ -1769,7 +1769,7 @@ export function AdminPortal({
             <div>
               <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Demandes de Partenariat Entreprises</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Propositions de partenariat reÃ§ues depuis l&apos;espace entreprises : stages, recrutement, coaching, certification.
+                Propositions de partenariat reçues depuis l&apos;espace entreprises : stages, recrutement, coaching, certification.
               </p>
             </div>
 
@@ -1798,7 +1798,7 @@ export function AdminPortal({
                       <tr key={p.id} className="hover:bg-[var(--color-fc-bg)]/70 transition-colors align-top">
                         <td className="py-3 px-4">
                           <strong className="text-[var(--color-fc-black)] block">{p.companyName}</strong>
-                          <span className="text-[10px] text-[var(--color-fc-gray-mid)]">NÂ° {p.id}</span>
+                          <span className="text-[10px] text-[var(--color-fc-gray-mid)]">N° {p.id}</span>
                         </td>
                         <td className="py-3 px-4 text-[var(--color-fc-gray-mid)]">
                           <div className="font-semibold text-[var(--color-fc-black)]">{p.contactName}</div>
@@ -1811,7 +1811,7 @@ export function AdminPortal({
                           </span>
                         </td>
                         <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] max-w-[260px]">
-                          {p.message || <span className="text-white/60">â€”</span>}
+                          {p.message || <span className="text-white/60">—</span>}
                         </td>
                         <td className="py-3 px-4 text-[var(--color-fc-gray-mid)] whitespace-nowrap">
                           {new Date(p.createdAt).toLocaleDateString("fr-FR", {
@@ -1833,8 +1833,8 @@ export function AdminPortal({
                             }`}
                           >
                             <option value="nouveau">Nouveau</option>
-                            <option value="contacte">ContactÃ©e</option>
-                            <option value="cloture">ClÃ´turÃ©e</option>
+                            <option value="contacte">Contactée</option>
+                            <option value="cloture">Clôturée</option>
                           </select>
                         </td>
                       </tr>
@@ -1846,13 +1846,13 @@ export function AdminPortal({
           </div>
         )}
 
-        {/* 28. TAB ROLES ET ACCÃˆS */}
+        {/* 28. TAB ROLES ET ACCÈS */}
         {activeTab === "roles" && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="bg-white p-6 rounded-2xl border border-[var(--color-fc-gray-light)]  space-y-4">
-              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Matrice des RÃ´les et Autorisations</h2>
+              <h2 className="text-xl font-bold text-[var(--color-fc-black)]">Matrice des Rôles et Autorisations</h2>
               <p className="text-xs text-[var(--color-fc-gray-mid)]">
-                Chaque profil administratif dispose de droits spÃ©cifiques pour garantir la sÃ©curitÃ© et la traÃ§abilitÃ© des opÃ©rations.
+                Chaque profil administratif dispose de droits spécifiques pour garantir la sécurité et la traçabilité des opérations.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
@@ -1863,14 +1863,14 @@ export function AdminPortal({
                     </span>
                     <div>
                       <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Super Administrateur</h4>
-                      <span className="text-[10px] font-semibold text-[var(--color-fc-primary)]">Direction GÃ©nÃ©rale</span>
+                      <span className="text-[10px] font-semibold text-[var(--color-fc-primary)]">Direction Générale</span>
                     </div>
                   </div>
                   <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
-                    <li>âœ“ AccÃ¨s total Ã  la plateforme</li>
-                    <li>âœ“ Gestion financiÃ¨re et audits</li>
-                    <li>âœ“ Modification des formations et tarifs</li>
-                    <li>âœ“ Gestion des accÃ¨s du personnel</li>
+                    <li>✓ Accès total à la plateforme</li>
+                    <li>✓ Gestion financière et audits</li>
+                    <li>✓ Modification des formations et tarifs</li>
+                    <li>✓ Gestion des accès du personnel</li>
                   </ul>
                 </div>
 
@@ -1881,13 +1881,13 @@ export function AdminPortal({
                     </span>
                     <div>
                       <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Caissier / Financier</h4>
-                      <span className="text-[10px] text-emerald-700 font-semibold">Service ComptabilitÃ©</span>
+                      <span className="text-[10px] text-emerald-700 font-semibold">Service Comptabilité</span>
                     </div>
                   </div>
                   <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
-                    <li>âœ“ Enregistrement des paiements physiques</li>
-                    <li>âœ“ GÃ©nÃ©ration immÃ©diate des reÃ§us certifiÃ©s</li>
-                    <li>âœ“ Suivi des retards d&apos;Ã©chÃ©ances</li>
+                    <li>✓ Enregistrement des paiements physiques</li>
+                    <li>✓ Génération immédiate des reçus certifiés</li>
+                    <li>✓ Suivi des retards d&apos;échéances</li>
                     <li>âœ— Modification des programmes de cours</li>
                   </ul>
                 </div>
@@ -1899,14 +1899,14 @@ export function AdminPortal({
                     </span>
                     <div>
                       <h4 className="font-bold text-[var(--color-fc-black)] text-sm">Agent Administratif</h4>
-                      <span className="text-[10px] text-blue-700 font-semibold">Service ScolaritÃ©</span>
+                      <span className="text-[10px] text-blue-700 font-semibold">Service Scolarité</span>
                     </div>
                   </div>
                   <ul className="space-y-1.5 text-xs text-[var(--color-fc-black)]">
-                    <li>âœ“ Enregistrement des candidats physiques</li>
-                    <li>âœ“ Ã‰dition des attestations de scolaritÃ©</li>
-                    <li>âœ“ Mise Ã  jour des coordonnÃ©es des Ã©tudiants</li>
-                    <li>âœ— Modification des Ã©critures comptables</li>
+                    <li>✓ Enregistrement des candidats physiques</li>
+                    <li>✓ Édition des attestations de scolarité</li>
+                    <li>✓ Mise à jour des coordonnées des étudiants</li>
+                    <li>âœ— Modification des écritures comptables</li>
                   </ul>
                 </div>
               </div>
@@ -1922,7 +1922,7 @@ export function AdminPortal({
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
-                <span>Encaisser un versement Ã©tudiant</span>
+                <span>Encaisser un versement étudiant</span>
               </h3>
               <button
                 onClick={() => setShowManualPaymentModal(false)}
@@ -1934,7 +1934,7 @@ export function AdminPortal({
 
             <form onSubmit={handleRecordPayment} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Ã‰tudiant concernÃ© *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Étudiant concerné *</label>
                 <select
                   value={manualPayStudentId}
                   onChange={(e) => setManualPayStudentId(Number(e.target.value))}
@@ -1942,14 +1942,14 @@ export function AdminPortal({
                 >
                   {students.map((st) => (
                     <option key={st.id} value={st.id}>
-                      {st.firstName} {st.lastName} ({st.studentNumber}) â€” Reste: {st.remainingAmount} FCFA
+                      {st.firstName} {st.lastName} ({st.studentNumber}) — Reste: {st.remainingAmount} FCFA
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Montant encaissÃ© (FCFA) *</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Montant encaissé (FCFA) *</label>
                 <input
                   type="number"
                   value={manualPayAmount}
@@ -1965,15 +1965,15 @@ export function AdminPortal({
                   onChange={(e) => setManualPayMethod(e.target.value)}
                   className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                 >
-                  <option value="Caisse / EspÃ¨ces">Caisse / EspÃ¨ces (Guichet)</option>
+                  <option value="Caisse / Espèces">Caisse / Espèces (Guichet)</option>
                   <option value="MTN Mobile Money">MTN Mobile Money (Direct marchand)</option>
                   <option value="Moov Money">Moov Money (Direct marchand)</option>
-                  <option value="Virement Bancaire">Virement Bancaire / DÃ©pÃ´t guichet</option>
+                  <option value="Virement Bancaire">Virement Bancaire / Dépôt guichet</option>
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Notes / RÃ©f reÃ§u physique</label>
+                <label className="block font-bold text-[var(--color-fc-black)] mb-1">Notes / Réf reçu physique</label>
                 <input
                   type="text"
                   value={manualPayNotes}
@@ -1988,7 +1988,7 @@ export function AdminPortal({
                   disabled={isRecordingPayment}
                   className="w-full py-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition-all disabled:opacity-50"
                 >
-                  {isRecordingPayment ? "Enregistrement..." : "Valider l'encaissement et gÃ©nÃ©rer le reÃ§u"}
+                  {isRecordingPayment ? "Enregistrement..." : "Valider l'encaissement et générer le reçu"}
                 </button>
               </div>
             </form>
@@ -1996,14 +1996,14 @@ export function AdminPortal({
         </div>
       )}
 
-      {/* MODAL: NOUVEL Ã‰TUDIANT MANUEL */}
+      {/* MODAL: NOUVEL ÉTUDIANT MANUEL */}
       {showNewStudentModal && (
         <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-lg w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                 <Users className="w-4 h-4 text-[var(--color-fc-primary)]" />
-                <span>Inscrire un Ã©tudiant au guichet physique</span>
+                <span>Inscrire un étudiant au guichet physique</span>
               </h3>
               <button
                 onClick={() => setShowNewStudentModal(false)}
@@ -2028,7 +2028,7 @@ export function AdminPortal({
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">PrÃ©nom *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Prénom *</label>
                   <input
                     type="text"
                     required
@@ -2043,7 +2043,7 @@ export function AdminPortal({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">TÃ©lÃ©phone *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Téléphone *</label>
                   <input
                     type="text"
                     required
@@ -2092,7 +2092,7 @@ export function AdminPortal({
                   disabled={isCreatingStudent}
                   className="w-full py-3 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] shadow-md transition-all disabled:opacity-50"
                 >
-                  {isCreatingStudent ? "CrÃ©ation en cours..." : "CrÃ©er le dossier et gÃ©nÃ©rer le matricule FC-2025-..."}
+                  {isCreatingStudent ? "Création en cours..." : "Créer le dossier et générer le matricule FC-2025-..."}
                 </button>
               </div>
             </form>
@@ -2100,7 +2100,7 @@ export function AdminPortal({
         </div>
       )}
 
-      {/* MODAL: CHANGER LE STATUT D'UN Ã‰TUDIANT */}
+      {/* MODAL: CHANGER LE STATUT D'UN ÉTUDIANT */}
       {selectedStudentForStatus && (
         <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-sm w-full p-6  space-y-4 animate-in zoom-in-95 duration-200">
@@ -2115,11 +2115,11 @@ export function AdminPortal({
                 onChange={(e) => setNewStatusValue(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white font-medium"
               >
-                <option value="preinscrit">PrÃ©inscrit (en attente de validation)</option>
-                <option value="rejete">RejetÃ©</option>
-                <option value="inscrit">Inscrit (validÃ©)</option>
-                <option value="actif">Ã‰tudiant actif</option>
-                <option value="termine">Formation terminÃ©e</option>
+                <option value="preinscrit">Préinscrit (en attente de validation)</option>
+                <option value="rejete">Rejeté</option>
+                <option value="inscrit">Inscrit (validé)</option>
+                <option value="actif">Étudiant actif</option>
+                <option value="termine">Formation terminée</option>
                 <option value="suspendu">Suspendu</option>
               </select>
             </div>
@@ -2129,7 +2129,7 @@ export function AdminPortal({
                 onClick={handleUpdateStatus}
                 className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)]"
               >
-                Mettre Ã  jour
+                Mettre à jour
               </button>
               <button
                 onClick={() => setSelectedStudentForStatus(null)}
@@ -2161,19 +2161,19 @@ export function AdminPortal({
             </h3>
             <p className="text-xs text-[var(--color-fc-gray-mid)] text-center leading-relaxed">
               {validationAction === "validate"
-                ? "Le compte sera activÃ©, une notification sera envoyÃ©e Ã  l'Ã©tudiant et son profil apparaÃ®tra sur la page Entreprises."
-                : "Le compte restera fermÃ© et l'Ã©tudiant sera notifiÃ© de la dÃ©cision."}
+                ? "Le compte sera activé, une notification sera envoyée à l'étudiant et son profil apparaîtra sur la page Entreprises."
+                : "Le compte restera fermé et l'étudiant sera notifié de la décision."}
             </p>
 
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-[var(--color-fc-gray-mid)]">
-                Note pour l&apos;Ã©tudiant {validationAction === "validate" ? "(optionnel)" : ""}
+                Note pour l&apos;étudiant {validationAction === "validate" ? "(optionnel)" : ""}
               </label>
               <textarea
                 value={validationNote}
                 onChange={(e) => setValidationNote(e.target.value)}
                 rows={3}
-                placeholder={validationAction === "reject" ? "PrÃ©cisez la raison du rejet (ex : dossier incomplet)..." : "Ajoutez un message de bienvenue..."}
+                placeholder={validationAction === "reject" ? "Précisez la raison du rejet (ex : dossier incomplet)..." : "Ajoutez un message de bienvenue..."}
                 className="w-full p-2.5 rounded-xl border border-[var(--color-fc-gray-light)] bg-white text-xs"
               />
             </div>
@@ -2206,7 +2206,7 @@ export function AdminPortal({
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-[var(--color-fc-black)] flex items-center gap-2">
                 <Layers className="w-4 h-4 text-[var(--color-fc-primary)]" />
-                <span>Modifier Â« {editingFormation.title} Â»</span>
+                <span>Modifier « {editingFormation.title} »</span>
               </h3>
               <button
                 onClick={() => setEditingFormation(null)}
@@ -2229,7 +2229,7 @@ export function AdminPortal({
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">DurÃ©e *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Durée *</label>
                   <input
                     type="text"
                     required
@@ -2270,7 +2270,7 @@ export function AdminPortal({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nb mensualitÃ©s</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Nb mensualités</label>
                   <input
                     type="number"
                     min={1}
@@ -2288,9 +2288,9 @@ export function AdminPortal({
                     onChange={(e) => setFormationForm((p) => ({ ...p, mode: e.target.value }))}
                     className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] bg-white"
                   >
-                    <option value="PrÃ©sentiel & Hybride">PrÃ©sentiel & Hybride</option>
+                    <option value="Présentiel & Hybride">Présentiel & Hybride</option>
                     <option value="En ligne">En ligne</option>
-                    <option value="PrÃ©sentiel">PrÃ©sentiel</option>
+                    <option value="Présentiel">Présentiel</option>
                   </select>
                 </div>
               </div>
@@ -2332,7 +2332,7 @@ export function AdminPortal({
                   disabled={isSavingFormation}
                   className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--color-fc-deep)] hover:bg-[var(--color-fc-primary)] disabled:opacity-50 transition-all"
                 >
-                  {isSavingFormation ? "Enregistrementâ€¦" : "Enregistrer les modifications"}
+                  {isSavingFormation ? "Enregistrement…" : "Enregistrer les modifications"}
                 </button>
                 <button
                   type="button"
@@ -2347,14 +2347,14 @@ export function AdminPortal({
         </div>
       )}
 
-      {/* MODAL: NOUVEAU PROJET Ã‰TUDIANT */}
+      {/* MODAL: NOUVEAU PROJET ÉTUDIANT */}
       {projectModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-fc-deep)]/60 p-4 backdrop-blur-xs">
           <div className="max-h-[90vh] w-full max-w-2xl space-y-5 overflow-y-auto rounded-3xl border border-[var(--color-fc-gray-light)] bg-white p-6  sm:p-8">
             <div className="flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-base font-bold text-[var(--color-fc-black)]">
                 <FolderGit2 className="h-4 w-4 text-[var(--color-fc-primary)]" />
-                Nouveau projet Ã©tudiant
+                Nouveau projet étudiant
               </h3>
               <button
                 type="button"
@@ -2368,7 +2368,7 @@ export function AdminPortal({
 
             <form onSubmit={handleSaveProject} className="space-y-3 text-xs">
               <label className="block font-bold text-[var(--color-fc-black)]">
-                Ã‰tudiant confirmÃ© *
+                Étudiant confirmé *
                 <select
                   required
                   value={projectForm.studentId}
@@ -2377,7 +2377,7 @@ export function AdminPortal({
                 >
                   {validatedStudents.map((student) => (
                     <option key={student.id} value={student.id}>
-                      {student.firstName} {student.lastName} â€” {student.studentNumber}
+                      {student.firstName} {student.lastName} — {student.studentNumber}
                     </option>
                   ))}
                 </select>
@@ -2394,7 +2394,7 @@ export function AdminPortal({
               </label>
 
               <label className="block font-bold text-[var(--color-fc-black)]">
-                RÃ©sumÃ© *
+                Résumé *
                 <input
                   required
                   value={projectForm.tagline}
@@ -2420,13 +2420,13 @@ export function AdminPortal({
                   required
                   value={projectForm.coverImage}
                   onChange={(e) => setProjectForm((current) => ({ ...current, coverImage: e.target.value }))}
-                  placeholder="https://â€¦ ou /images/â€¦"
+                  placeholder="https://… ou /images/…"
                   className="mt-1 w-full rounded-xl border border-[var(--color-fc-gray-light)] p-2 font-mono"
                 />
               </label>
 
               <label className="block font-bold text-[var(--color-fc-black)]">
-                Technologies (sÃ©parÃ©es par des virgules) *
+                Technologies (séparées par des virgules) *
                 <input
                   required
                   value={projectForm.technologies}
@@ -2463,7 +2463,7 @@ export function AdminPortal({
                   disabled={isSavingProject || validatedStudents.length === 0}
                   className="flex-1 rounded-xl bg-[var(--color-fc-deep)] py-2.5 text-xs font-bold text-white transition-all hover:bg-[var(--color-fc-primary)] disabled:opacity-50"
                 >
-                  {isSavingProject ? "Enregistrementâ€¦" : "Publier le projet"}
+                  {isSavingProject ? "Enregistrement…" : "Publier le projet"}
                 </button>
                 <button
                   type="button"
@@ -2478,7 +2478,7 @@ export function AdminPortal({
         </div>
       )}
 
-      {/* MODAL: CRÃ‰ER / MODIFIER UN ARTICLE */}
+      {/* MODAL: CRÉER / MODIFIER UN ARTICLE */}
       {articleModalOpen && (
         <div className="fixed inset-0 z-50 bg-[var(--color-fc-deep)]/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-[var(--color-fc-gray-light)] max-w-2xl w-full p-6 sm:p-8  space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
@@ -2511,18 +2511,18 @@ export function AdminPortal({
                   <label className="block font-bold text-[var(--color-fc-black)] mb-1">Slug (URL)</label>
                   <input
                     type="text"
-                    placeholder="auto-gÃ©nÃ©rÃ© depuis le titre si vide"
+                    placeholder="auto-généré depuis le titre si vide"
                     value={articleForm.slug}
                     onChange={(e) => setArticleForm((p) => ({ ...p, slug: e.target.value }))}
                     className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)] font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">CatÃ©gorie *</label>
+                  <label className="block font-bold text-[var(--color-fc-black)] mb-1">Catégorie *</label>
                   <input
                     type="text"
                     required
-                    placeholder="Ex : Ã‰vÃ©nements"
+                    placeholder="Ex : Événements"
                     value={articleForm.category}
                     onChange={(e) => setArticleForm((p) => ({ ...p, category: e.target.value }))}
                     className="w-full p-2 rounded-xl border border-[var(--color-fc-gray-light)]"

@@ -174,7 +174,7 @@ export async function createStudentWithPlan(data: {
       guardianName: data.guardianName || "",
       guardianPhone: data.guardianPhone || "",
       guardianRelation: data.guardianRelation || "",
-      residenceCountry: data.residenceCountry || "BÃ©nin",
+      residenceCountry: data.residenceCountry || "Bénin",
       status: "preinscrit",
       totalAmount: total,
       paidAmount: 0,
@@ -182,7 +182,7 @@ export async function createStudentWithPlan(data: {
     })
     .returning();
 
-  // Create default payment schedule: Frais de dossier + mensualitÃ©s (dossier ajoutÃ© au prix)
+  // Create default payment schedule: Frais de dossier + mensualités (dossier ajouté au prix)
   const regFee = formation.registrationFee || 0;
   const tuition = formation.price;
   const installmentsCount = formation.installmentsCount || 4;
@@ -194,7 +194,7 @@ export async function createStudentWithPlan(data: {
       studentId: newStudent.id,
       title: "Frais d'inscription & validation de dossier",
       amount: regFee,
-      dueDate: "Ã€ rÃ©gler sous 7 jours",
+      dueDate: "À régler sous 7 jours",
       status: "en_attente",
     });
   }
@@ -207,7 +207,7 @@ export async function createStudentWithPlan(data: {
       : installmentAmount;
     await db.insert(paymentSchedules).values({
       studentId: newStudent.id,
-      title: `MensualitÃ© ${i} â€” Formation ${formation.title.slice(0, 20)}...`,
+      title: `Mensualité ${i} — Formation ${formation.title.slice(0, 20)}...`,
       amount,
       dueDate: `Mois ${i} de formation`,
       status: "en_attente",
@@ -217,8 +217,8 @@ export async function createStudentWithPlan(data: {
   // Welcome notification
   await db.insert(notifications).values({
     studentId: newStudent.id,
-    title: "Inscription enregistrÃ©e ðŸŽ“",
-    message: `Votre prÃ©inscription sous le numÃ©ro ${studentNumber} a Ã©tÃ© enregistrÃ©e avec succÃ¨s. Votre dossier est en attente de validation par l'administration. Vous serez notifiÃ© dÃ¨s que votre compte sera activÃ©.`,
+    title: "Inscription enregistrée 🎓",
+    message: `Votre préinscription sous le numéro ${studentNumber} a été enregistrée avec succès. Votre dossier est en attente de validation par l'administration. Vous serez notifié dès que votre compte sera activé.`,
     type: "admission",
   });
 
@@ -228,8 +228,8 @@ export async function createStudentWithPlan(data: {
 export async function validateStudent(id: number, adminName?: string, note?: string) {
   await ensureDatabaseSeeded();
   const [student] = await db.select().from(students).where(eq(students.id, id));
-  if (!student) throw new Error("Ã‰tudiant introuvable");
-  if (student.status === "rejete") throw new Error("Cet Ã©tudiant a dÃ©jÃ  Ã©tÃ© rejetÃ©. Modifiez d'abord son statut.");
+  if (!student) throw new Error("Étudiant introuvable");
+  if (student.status === "rejete") throw new Error("Cet étudiant a déjà été rejeté. Modifiez d'abord son statut.");
 
   const [updated] = await db
     .update(students)
@@ -245,8 +245,8 @@ export async function validateStudent(id: number, adminName?: string, note?: str
 
   await db.insert(notifications).values({
     studentId: id,
-    title: "Compte activÃ© ðŸŽ‰",
-    message: `FÃ©licitations ${student.firstName} ! Votre dossier a Ã©tÃ© validÃ© par l'administration. Vous pouvez maintenant vous connecter Ã  votre espace Ã©tudiant et finaliser vos frais d'inscription.`,
+    title: "Compte activé 🎉",
+    message: `Félicitations ${student.firstName} ! Votre dossier a été validé par l'administration. Vous pouvez maintenant vous connecter à votre espace étudiant et finaliser vos frais d'inscription.`,
     type: "admission",
   });
 
@@ -267,7 +267,7 @@ export async function validateStudent(id: number, adminName?: string, note?: str
 export async function rejectStudent(id: number, adminName?: string, note?: string) {
   await ensureDatabaseSeeded();
   const [student] = await db.select().from(students).where(eq(students.id, id));
-  if (!student) throw new Error("Ã‰tudiant introuvable");
+  if (!student) throw new Error("Étudiant introuvable");
 
   const [updated] = await db
     .update(students)
@@ -285,8 +285,8 @@ export async function rejectStudent(id: number, adminName?: string, note?: strin
     studentId: id,
     title: "Dossier non retenu",
     message: note
-      ? `Bonjour ${student.firstName}, votre dossier n'a pas Ã©tÃ© validÃ©. Raison : ${note}.`
-      : `Bonjour ${student.firstName}, votre dossier n'a pas Ã©tÃ© validÃ© par l'administration. Veuillez nous contacter pour plus d'informations.`,
+      ? `Bonjour ${student.firstName}, votre dossier n'a pas été validé. Raison : ${note}.`
+      : `Bonjour ${student.firstName}, votre dossier n'a pas été validé par l'administration. Veuillez nous contacter pour plus d'informations.`,
     type: "admission",
   });
 
@@ -339,9 +339,9 @@ export async function getValidatedStudentTalents() {
     return {
       name: `${r.firstName} ${r.lastName}`,
       formation: r.formationTitle,
-      skills: tools.length ? tools : ["â€”"],
-      status: r.status === "actif" ? "Disponible immÃ©diatement" : "Recherche de stage",
-      campus: r.city || "Cotonou, BÃ©nin",
+      skills: tools.length ? tools : ["—"],
+      status: r.status === "actif" ? "Disponible immédiatement" : "Recherche de stage",
+      campus: r.city || "Cotonou, Bénin",
       matricule: r.studentNumber,
       photoUrl: r.avatarUrl || undefined,
       cvUrl: r.cvUrl || undefined,
@@ -356,16 +356,16 @@ export async function recordPayment(data: { studentId: number; scheduleId?: numb
   if (!Number.isInteger(data.amount) || data.amount <= 0) throw new Error("Montant invalide");
   return await db.transaction(async (tx) => {
     const [student] = await tx.select().from(students).where(eq(students.id, data.studentId)).for("update");
-    if (!student) throw new Error("Ã‰tudiant introuvable");
+    if (!student) throw new Error("Étudiant introuvable");
     let schedule: typeof paymentSchedules.$inferSelect | null = null;
     if (data.scheduleId) {
       const [s] = await tx.select().from(paymentSchedules).where(eq(paymentSchedules.id, data.scheduleId)).for("update");
-      if (!s || s.studentId !== student.id) throw new Error("Ã‰chÃ©ance introuvable pour cet Ã©tudiant");
-      if (s.status === "paye") throw new Error("Cette Ã©chÃ©ance est dÃ©jÃ  payÃ©e");
-      if (data.amount > s.amount) throw new Error("Le montant dÃ©passe l'Ã©chÃ©ance sÃ©lectionnÃ©e");
+      if (!s || s.studentId !== student.id) throw new Error("Échéance introuvable pour cet étudiant");
+      if (s.status === "paye") throw new Error("Cette échéance est déjà payée");
+      if (data.amount > s.amount) throw new Error("Le montant dépasse l'échéance sélectionnée");
       schedule = s;
     }
-    if (data.amount > student.remainingAmount) throw new Error("Le montant dÃ©passe le solde restant");
+    if (data.amount > student.remainingAmount) throw new Error("Le montant dépasse le solde restant");
     const [paymentInsert] = await tx.insert(payments).values({ receiptNumber: `TMP-REC-${randomBytes(8).toString("hex").toUpperCase()}`, studentId: student.id, scheduleId: schedule?.id || null, amount: data.amount, paymentMethod: data.paymentMethod, transactionRef: data.transactionRef || `TMP-TRX-${randomBytes(8).toString("hex").toUpperCase()}`, status: "valide", notes: data.notes || `Paiement pour ${student.firstName} ${student.lastName}`, recordedBy: data.recordedBy || "Portail en ligne (MTN/Moov)", paidAt: formatPaymentDate(new Date()) }).returning();
     const receiptNumber = nextReceiptRef(paymentInsert.id, "REC");
     const trxRef = data.transactionRef || nextReceiptRef(paymentInsert.id, "TRX");
@@ -377,7 +377,7 @@ export async function recordPayment(data: { studentId: number; scheduleId?: numb
     const newRemaining = Math.max(0, student.totalAmount - newPaid);
     const newStatus = student.status === "preinscrit" || student.status === "inscrit" ? "actif" : student.status;
     await tx.update(students).set({ paidAmount: newPaid, remainingAmount: newRemaining, status: newStatus }).where(eq(students.id, student.id));
-    await tx.insert(notifications).values({ studentId: student.id, title: "Nouveau reÃ§u de paiement gÃ©nÃ©rÃ©", message: `Votre versement de ${data.amount.toLocaleString("fr-FR")} FCFA a Ã©tÃ© validÃ©. ReÃ§u NÂ° ${receiptNumber} disponible.`, type: "payment" });
+    await tx.insert(notifications).values({ studentId: student.id, title: "Nouveau reçu de paiement généré", message: `Votre versement de ${data.amount.toLocaleString("fr-FR")} FCFA a été validé. Reçu N° ${receiptNumber} disponible.`, type: "payment" });
     return { payment: paymentRecord, receipt: receiptRecord };
   });
 }
@@ -500,7 +500,7 @@ export async function createStudentProject(data: {
     !student.validatedAt ||
     !["inscrit", "actif", "termine", "alumni"].includes(student.status)
   ) {
-    throw new Error("Seuls les Ã©tudiants validÃ©s peuvent avoir un projet publiÃ©");
+    throw new Error("Seuls les étudiants validés peuvent avoir un projet publié");
   }
 
   const [project] = await db
@@ -515,7 +515,7 @@ export async function createStudentProject(data: {
       formationTitle: student.formationTitle,
       technologies: JSON.stringify(data.technologies),
       teamMembers: JSON.stringify([
-        { name: `${student.firstName} ${student.lastName}`, role: "Ã‰tudiant" },
+        { name: `${student.firstName} ${student.lastName}`, role: "Étudiant" },
       ]),
       projectUrl: data.projectUrl || null,
       githubUrl: data.githubUrl || null,
@@ -627,7 +627,7 @@ export async function confirmPaymentRequest(id: number) {
   await ensureDatabaseSeeded();
   const [req] = await db.select().from(paymentRequests).where(eq(paymentRequests.id, id)).limit(1);
   if (!req) throw new Error("Demande de paiement introuvable");
-  if (req.status !== "en_attente") throw new Error("Cette demande a dÃ©jÃ  Ã©tÃ© traitÃ©e");
+  if (req.status !== "en_attente") throw new Error("Cette demande a déjà été traitée");
 
   await db.update(paymentRequests).set({ status: "valide" }).where(eq(paymentRequests.id, id));
 
@@ -636,7 +636,7 @@ export async function confirmPaymentRequest(id: number) {
     amount: req.amount,
     paymentMethod: req.method,
     recordedBy: `Admin (Paiement en ligne ${req.phone})`,
-    notes: `Paiement en ligne validÃ© â€” RÃ©f ${req.reference}`,
+    notes: `Paiement en ligne validé — Réf ${req.reference}`,
     transactionRef: req.reference,
   });
 
@@ -647,7 +647,7 @@ export async function rejectPaymentRequest(id: number) {
   await ensureDatabaseSeeded();
   const [req] = await db.select().from(paymentRequests).where(eq(paymentRequests.id, id)).limit(1);
   if (!req) throw new Error("Demande de paiement introuvable");
-  if (req.status !== "en_attente") throw new Error("Cette demande a dÃ©jÃ  Ã©tÃ© traitÃ©e");
+  if (req.status !== "en_attente") throw new Error("Cette demande a déjà été traitée");
 
   await db.update(paymentRequests).set({ status: "rejete" }).where(eq(paymentRequests.id, id));
   return { success: true };
@@ -708,7 +708,7 @@ export async function createBlogArticle(data: {
       excerpt: data.excerpt,
       content: data.content,
       coverImage: data.coverImage,
-      author: data.author || "Ã‰quipe PÃ©dagogique FuturCraft",
+      author: data.author || "Équipe Pédagogique FuturCraft",
       readTime: data.readTime || "5 min de lecture",
       category: data.category,
       publishedAt: data.publishedAt || new Date().toISOString(),

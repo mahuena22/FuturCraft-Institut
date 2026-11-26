@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import {
     ArrowRight,
@@ -113,15 +113,15 @@ export default async function HomePage() {
     const activeFormations = formations.filter((f) => f.isActive);
     const openPromos = await getOpenPromotionsByFormation();
     const domainIcons = [
-        { label: "Développement Web Fullstack", short: "Web", href: "/formation/developpement-web-fullstack", icon: Code2 },
+        { label: "DÃ©veloppement Web Fullstack", short: "Web", href: "/formation/developpement-web-fullstack", icon: Code2 },
         { label: "IA & Machine Learning", short: "IA", href: "/formation/developpement-intelligence-artificielle", icon: Cpu },
         { label: "Web Design UI/UX", short: "Design", href: "/formation/web-design-ui-ux", icon: Palette },
         { label: "Pilotage de Drone", short: "Drone", href: "/formation/pilotage-de-drone", icon: Wind },
         { label: "Marketing Digital", short: "Marketing", href: "/formation/marketing-digital", icon: TrendingUp },
-        { label: "Graphisme & Sérigraphie", short: "Graphisme", href: "/formation/graphisme-et-serigraphie", icon: Pen },
+        { label: "Graphisme & SÃ©rigraphie", short: "Graphisme", href: "/formation/graphisme-et-serigraphie", icon: Pen },
         { label: "Audiovisuel & Montage", short: "Audiovisuel", href: "/formation/photographie-cadrage-et-montage-video", icon: Camera },
         { label: "Outils d'IA", short: "Outils IA", href: "/formation/maitrise-outils-intelligence-artificielle", icon: Sparkles },
-        { label: "Maintenance & Réseau", short: "Réseau", href: "/formation/maintenance-informatique-et-reseau", icon: Wrench },
+        { label: "Maintenance & RÃ©seau", short: "RÃ©seau", href: "/formation/maintenance-informatique-et-reseau", icon: Wrench },
         { label: "Copywriting", short: "Copy", href: "/formation/copywriting", icon: Pen },
         { label: "E-commerce", short: "E-com", href: "/formation/e-commerce", icon: Briefcase },
         { label: "Webmaster", short: "CMS", href: "/formation/webmaster", icon: Layers },
@@ -129,7 +129,7 @@ export default async function HomePage() {
 
     return (
         <div className="overflow-hidden bg-[var(--color-fc-bg)]">
-            {/* â”€â”€ HERO â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ HERO Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="relative isolate overflow-hidden bg-[#06122f] text-white">
                 <Image
                     src="/images/hero-bg.jpg"
@@ -210,7 +210,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ DOMAINES â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ DOMAINES Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="mx-auto max-w-[84rem] px-4 pt-20 sm:px-6 lg:px-10">
                 <div className="text-center">
                     <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-[var(--color-fc-cyan)]">Domaines</p>
@@ -238,7 +238,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ PROOF BAR â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ PROOF BAR Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="relative z-10 mx-auto -mt-8 max-w-[84rem] px-4 sm:px-6 lg:px-10">
                 <div className="grid gap-px overflow-hidden rounded-3xl border border-[var(--color-fc-gray-light)] bg-[var(--color-fc-gray-light)] shadow-[0_20px_60px_-20px_rgba(7,22,61,0.15)] sm:grid-cols-2 lg:grid-cols-4">
                     {[
@@ -270,7 +270,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ FORMATIONS â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ FORMATIONS Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="mx-auto max-w-[84rem] px-4 py-24 sm:px-6 lg:px-10 lg:py-28">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                     <SectionHeading
@@ -343,7 +343,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ WHY / METHOD â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ WHY / METHOD Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="border-y border-[var(--color-fc-gray-light)] bg-white">
                 <div className="mx-auto grid max-w-[84rem] gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-10 lg:py-28 lg:gap-16">
                     <div>
@@ -415,7 +415,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ TESTIMONIALS â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ TESTIMONIALS Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="bg-[var(--color-fc-bg)] py-24 lg:py-28">
                 <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
                     <SectionHeading
@@ -449,7 +449,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ PRICING OVERVIEW â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ PRICING OVERVIEW Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="border-y border-[var(--color-fc-gray-light)] bg-white py-24 lg:py-28">
                 <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-10">
                     <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
@@ -471,7 +471,7 @@ export default async function HomePage() {
                                 </div>
                                 <div className="flex items-start gap-3 text-sm text-[var(--color-fc-gray-mid)]">
                                     <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-fc-cyan)]/15 text-[var(--color-fc-primary)]"><ArrowRight className="h-3 w-3" /></span>
-                                    Accompagnement jusqu&apos;Ã  la fin du parcours
+                                    Accompagnement jusqu&apos;à la fin du parcours
                                 </div>
                             </div>
                             <Link href="/admissions" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[var(--color-fc-primary)] hover:text-[var(--color-fc-deep)]">
@@ -506,7 +506,7 @@ export default async function HomePage() {
                                 {activeFormations.length > 8 && (
                                     <div className="border-t border-[var(--color-fc-gray-light)] bg-[var(--color-fc-bg)] px-5 py-4 sm:px-6">
                                         <Link href="/formations" className="text-sm font-bold text-[var(--color-fc-primary)] hover:underline">
-                                            Voir les {activeFormations.length} formations â†’
+                                            Voir les {activeFormations.length} formations Ã¢â€ â€™
                                         </Link>
                                     </div>
                                 )}
@@ -516,7 +516,7 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* â”€â”€ CTA â”€â”€ */}
+            {/* Ã¢â€â‚¬Ã¢â€â‚¬ CTA Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <section className="px-4 py-24 sm:px-6 lg:px-10 lg:py-28">
                 <div className="relative mx-auto max-w-[84rem] overflow-hidden rounded-[2.5rem] bg-[var(--color-fc-deep)] px-6 py-16 sm:px-12 lg:px-16 lg:py-20">
                     <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_auto]">
@@ -563,3 +563,4 @@ export default async function HomePage() {
         </div>
     );
 }
+

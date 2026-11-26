@@ -25,34 +25,34 @@ const sora = Sora({
 export const metadata: Metadata = {
   metadataBase: new URL("https://futurcraft.bj"),
   title: {
-    default: "FuturCraft Institut | Centre de formation aux mÃ©tiers du numÃ©rique au BÃ©nin",
+    default: "FuturCraft Institut | Centre de formation aux métiers du numérique au Bénin",
     template: "%s | FuturCraft Institut",
   },
   description:
-    "Construisez les compÃ©tences de demain : DÃ©veloppement Web Fullstack, Intelligence Artificielle, Web Design, Pilotage de Drone, Marketing Digital, SÃ©rigraphie et Audiovisuel Ã  Godomey, SupermarchÃ© O BÃ©nin Avant pk14.",
+    "Construisez les compétences de demain : Développement Web Fullstack, Intelligence Artificielle, Web Design, Pilotage de Drone, Marketing Digital, Sérigraphie et Audiovisuel à Godomey, Supermarché O Bénin Avant pk14.",
   keywords: [
     "FuturCraft Institut",
-    "Formation informatique BÃ©nin",
-    "DÃ©veloppement Web Cotonou",
-    "Intelligence Artificielle BÃ©nin",
-    "Pilotage Drone BÃ©nin",
+    "Formation informatique Bénin",
+    "Développement Web Cotonou",
+    "Intelligence Artificielle Bénin",
+    "Pilotage Drone Bénin",
     "UI/UX Design Cotonou",
-    "Ã‰cole du numÃ©rique Afrique",
+    "École du numérique Afrique",
   ],
   openGraph: {
     type: "website",
     locale: "fr_BJ",
     url: "https://futurcraft.bj",
     siteName: "FuturCraft Institut",
-    title: "FuturCraft Institut | Centre de formation aux mÃ©tiers du numÃ©rique au BÃ©nin",
+    title: "FuturCraft Institut | Centre de formation aux métiers du numérique au Bénin",
     description:
-      "DÃ©veloppement Web, Intelligence Artificielle, UI/UX Design, Drone, Marketing Digital & plus encore Ã  Godomey, SupermarchÃ© O BÃ©nin Avant pk14.",
+      "Développement Web, Intelligence Artificielle, UI/UX Design, Drone, Marketing Digital & plus encore à Godomey, Supermarché O Bénin Avant pk14.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FuturCraft Institut | Centre de formation aux mÃ©tiers du numÃ©rique au BÃ©nin",
+    title: "FuturCraft Institut | Centre de formation aux métiers du numérique au Bénin",
     description:
-      "Apprends. CrÃ©e. Innove. Transforme ton avenir â€” le campus numÃ©rique de rÃ©fÃ©rence au BÃ©nin.",
+      "Apprends. Crée. Innove. Transforme ton avenir — le campus numérique de référence au Bénin.",
   },
   applicationName: "FuturCraft Institut",
   category: "education",

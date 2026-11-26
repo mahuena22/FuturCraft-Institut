@@ -16,7 +16,7 @@ import { desc, eq } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Console d'Administration | FuturCraft Institut",
-  description: "Gestion des Ã©tudiants, encaissements, cursus, rÃ´les et statistiques administratives.",
+  description: "Gestion des étudiants, encaissements, cursus, rôles et statistiques administratives.",
 };
 
 export default async function AdminPage() {
